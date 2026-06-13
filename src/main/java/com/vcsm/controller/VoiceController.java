@@ -1,11 +1,14 @@
 package com.vcsm.controller;
 
+import com.vcsm.service.LanguageDetectionService;
+import com.vcsm.service.HindiCommandMapper;
 import com.vcsm.model.VoiceCommand;
 import com.vcsm.service.OmnidimService;
 import com.vcsm.service.SentimentAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +23,12 @@ public class VoiceController {
     @Autowired
     private SentimentAnalysisService sentimentService;
 
+    @Autowired
+    private LanguageDetectionService languageDetectionService;
+
+    @Autowired
+    private HindiCommandMapper hindiCommandMapper;
+
     @PostMapping("/command")
     public ResponseEntity<Map<String, Object>> command(@RequestBody Map<String, String> body) {
         String transcript = body.get("transcript");
@@ -28,10 +37,34 @@ public class VoiceController {
             return ResponseEntity.badRequest().body(Map.of("error", "Transcript required", "success", false));
         }
         
-        // Process voice command
-        Map<String, Object> response = omnidimService.processVoiceCommand(transcript);
+        // Detect language
+        String language = languageDetectionService.detectLanguage(transcript);
         
-        // Analyze sentiment (using dummy userId 1 for now, you can get from session)
+        Map<String, Object> response = new HashMap<>();
+        response.put("originalText", transcript);
+        response.put("detectedLanguage", language);
+        
+        // Process based on language
+        if (language.equals("hi")) {
+            // Hindi command
+            String action = hindiCommandMapper.mapCommand(transcript);
+            if (action != null) {
+                response.put("action", action);
+                response.put("response", hindiCommandMapper.getResponse(action, null));
+                response.put("success", true);
+            } else {
+                response.put("action", "unknown");
+                response.put("response", hindiCommandMapper.getDefaultResponse());
+                response.put("success", false);
+            }
+        } else {
+            // English command - use existing logic
+            Map<String, Object> englishResponse = omnidimService.processVoiceCommand(transcript);
+            response.putAll(englishResponse);
+            response.put("success", true);
+        }
+        
+        // Analyze sentiment (using dummy userId 1 for now)
         Long userId = 1L;
         sentimentService.analyzeAndProcess(userId, transcript);
         

@@ -21,6 +21,9 @@ public class User {
     
     private String password;
     
+    @Column(name = "preferred_language")
+private String preferredLanguage = "en";
+
     @Column(name = "is_voice_enrolled")
     private boolean isVoiceEnrolled = false;
     
@@ -66,4 +69,7 @@ public class User {
     
     public VoicePrint getVoicePrint() { return voicePrint; }
     public void setVoicePrint(VoicePrint voicePrint) { this.voicePrint = voicePrint; }
+
+    public String getPreferredLanguage() { return preferredLanguage; }
+public void setPreferredLanguage(String preferredLanguage) { this.preferredLanguage = preferredLanguage; }
 }
