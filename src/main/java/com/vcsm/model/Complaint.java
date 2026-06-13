@@ -33,8 +33,9 @@ public class Complaint {
 
     // Auth ownership: residents can only view/manage their own complaints
     private String residentUsername;
-
-
+    private String priority = "NORMAL";  // Add this line
+public String getPriority() { return priority; }
+public void setPriority(String priority) { this.priority = priority; }
     @Column(length = 500)
     private String resolutionNotes;
 
