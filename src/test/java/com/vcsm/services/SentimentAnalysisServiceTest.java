@@ -82,4 +82,17 @@ class SentimentAnalysisServiceTest {
         boolean shouldEscalate = sentimentClassifier.shouldEscalate("NEUTRAL");
         assertFalse(shouldEscalate);
     }
+
+    @Test
+    void testAnalyzeAndProcess_SavesSentiment() {
+        String text = "I am happy";
+        when(sentimentClassifier.analyze(text)).thenReturn(positiveResult);
+        when(sentimentRepository.save(any(SentimentAnalysis.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        SentimentAnalysis result = sentimentService.analyzeAndProcess(testUser.getId(), text);
+
+        assertNotNull(result);
+        assertEquals("POSITIVE", result.getSentiment());
+        verify(sentimentRepository, times(1)).save(any(SentimentAnalysis.class));
+    }
 }

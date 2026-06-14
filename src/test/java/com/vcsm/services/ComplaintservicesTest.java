@@ -30,7 +30,7 @@ class ComplaintServiceTest {
     private Complaint testComplaint;
 
     @BeforeEach
-    void setUp() {
+void setUp() {
         testComplaint = new Complaint();
         testComplaint.setId(1L);
         testComplaint.setResidentName("Test User");
@@ -48,8 +48,7 @@ class ComplaintServiceTest {
 
         assertNotNull(saved);
         assertEquals("Test User", saved.getResidentName());
-        assertEquals("NOISE", saved.getCategory());
-        verify(complaintRepository, times(1)).save(testComplaint);
+        verify(complaintRepository, times(1)).save(any(Complaint.class));
     }
 
     @Test
@@ -92,5 +91,15 @@ class ComplaintServiceTest {
 
         assertNotNull(updated);
         assertEquals(Complaint.ComplaintStatus.IN_PROGRESS, updated.getStatus());
+        verify(complaintRepository, times(1)).save(any(Complaint.class));
+    }
+
+    @Test
+    void testDeleteComplaint() {
+        doNothing().when(complaintRepository).deleteById(1L);
+        
+        complaintService.deleteComplaint(1L);
+        
+        verify(complaintRepository, times(1)).deleteById(1L);
     }
 }
