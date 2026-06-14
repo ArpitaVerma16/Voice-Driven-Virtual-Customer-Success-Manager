@@ -1,0 +1,53 @@
+/* Confirmation Modal Styles */
+.confirm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.confirm-modal {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.confirm-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.confirm-modal-body {
+    padding: 20px;
+    color: #4b5563;
+}
+
+.confirm-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
