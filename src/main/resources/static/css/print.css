@@ -1,0 +1,171 @@
+/* ========================================
+   Print-Friendly Styles
+   Hide navigation and buttons when printing
+   ======================================== */
+
+@media print {
+    
+    /* Hide everything that's not needed */
+    .navbar,
+    .navbar-toggler,
+    .voice-card,
+    .btn,
+    button,
+    .btn-purple,
+    .btn-outline-purple,
+    .card-footer,
+    .modal,
+    .modal-backdrop,
+    footer,
+    .back-to-top-btn,
+    .typing-indicator,
+    .toast-container,
+    .spinner-overlay,
+    .voice-input-group,
+    #micBtn,
+    .shortcuts-help-modal,
+    .confirm-modal-overlay {
+        display: none !important;
+    }
+    
+    /* Show complaint/event details */
+    .container,
+    .card,
+    .card-body,
+    .table,
+    .table-responsive,
+    .event-card,
+    .stat-card {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Remove shadows and borders */
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Table styles for print */
+    .table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+    
+    .table th,
+    .table td {
+        border: 1px solid #ddd !important;
+        padding: 8px !important;
+        text-align: left !important;
+    }
+    
+    .table th {
+        background-color: #f5f5f5 !important;
+        font-weight: bold !important;
+    }
+    
+    /* Status badges - keep colors */
+    .badge {
+        border: 1px solid #ddd !important;
+        padding: 4px 8px !important;
+        border-radius: 4px !important;
+    }
+    
+    .bg-danger {
+        background-color: #ffcccc !important;
+        color: #000 !important;
+    }
+    
+    .bg-success {
+        background-color: #ccffcc !important;
+        color: #000 !important;
+    }
+    
+    .bg-warning {
+        background-color: #ffffcc !important;
+        color: #000 !important;
+    }
+    
+    /* Stats cards for print */
+    .stat-card {
+        border: 1px solid #ddd !important;
+        margin: 5px !important;
+    }
+    
+    /* Event cards */
+    .event-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+    
+    /* Headers */
+    h1, h2, h3, h4, h5, h6 {
+        color: #000 !important;
+    }
+    
+    /* Links - show URLs */
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 10px;
+        color: #666;
+    }
+    
+    /* Don't show URLs for buttons or nav links */
+    .nav-link:after,
+    .btn:after {
+        content: "" !important;
+    }
+    
+    /* Ensure table headers repeat on multiple pages */
+    thead {
+        display: table-header-group;
+    }
+    
+    tfoot {
+        display: table-footer-group;
+    }
+    
+    /* Avoid page breaks inside elements */
+    tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    /* Page margins */
+    @page {
+        margin: 2cm;
+        size: A4;
+    }
+    
+    /* Body background */
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt !important;
+    }
+    
+    /* Complaint descriptions */
+    .complaint-description,
+    .event-description {
+        font-size: 10pt !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* Dates */
+    .text-muted {
+        color: #666 !important;
+    }
+    
+    /* Progress bar - hide but show text */
+    .progress {
+        border: 1px solid #ddd !important;
+        background: #f5f5f5 !important;
+    }
+    
+    .progress-bar {
+        background: #8b5cf6 !important;
+        color: white !important;
+        text-align: center !important;
+    }
+}
