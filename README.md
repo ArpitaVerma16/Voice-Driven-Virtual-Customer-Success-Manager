@@ -1,6 +1,14 @@
 # 🎙️ Voice-Driven Virtual Customer Success Manager (VCSM)
 
-A Spring Boot web application that serves as a **Voice-enabled Virtual Community Manager** for resident support and community engagement.
+## Project Overview 
+
+Voice-Driven Virtual Customer Success Manager (VCSM) is a Spring Boot web application that serves as a **Voice-enabled Virtual Community Manager** for resident support and community engagement.
+
+It enables users to:
+- File complaints and track status.
+- Interact using Voice Assistant.
+- View visuals of stats related to complaints and engagement.
+- View and register for events.
 
 ---
 
@@ -26,7 +34,19 @@ A Spring Boot web application that serves as a **Voice-enabled Virtual Community
 
 ---
 
-## ▶️ How to Run
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+User --> Frontend
+Frontend --> Controller
+Controller --> Service
+Service --> Repository
+Repository --> Database
+```
+
+
+## ▶️ Installation and Setup
 
 ### Prerequisites
 - Java 17+
@@ -66,7 +86,7 @@ omnidim.api.key=YOUR_ACTUAL_API_KEY
 
 ---
 
-## 📡 REST API Endpoints
+## 📡  API 
 
 ### Complaints
 | Method | Endpoint | Description |
@@ -113,14 +133,42 @@ src/main/java/com/vcsm/
 ```
 
 ---
+## 📸 Screenshots
 
-## 📝 Resume Description
+Screenshots will be added once a stable or deployed version of the application is available.
 
-```
-Voice-Driven Virtual Customer Success Manager | Spring Boot
-• Built RESTful APIs for complaint management (filing, tracking, status updates) using Spring Boot 3 + JPA
-• Integrated Omnidim.io Voice AI for natural language command processing and intent detection
-• Developed event recommendation engine with category-based filtering and capacity management
-• Created analytics dashboard with Chart.js showing complaint resolution rates and community engagement
-• Tech: Spring Boot, Spring Data JPA, H2/MySQL, Thymeleaf, REST APIs, Omnidim.io Voice AI
-```
+---
+
+## 🚀 Deployment
+- Live Demo: Not available currently
+The application is currently not deployed. It can be run locally using the setup instructions below.
+
+---
+
+## 🛠️ Troubleshooting
+
+- Ensure Java 17+ is installed
+- Run `mvn clean install` if build fails
+- H2 console: http://localhost:8080/h2-console
+
+---
+
+## 🤝 Contributing
+
+1. Fork repo
+2. Create branch
+3. Commit changes
+4. Push branch
+5. Open PR
+
+---
+
+## 🚀 Future Enhancements
+- Deploy application on cloud (Render/AWS/Railway)
+- Add user authentication
+- Add role-based access 
+- Improve mobile responsiveness of UI
+- Add real-time notifications for complaint updates
+- Enhance voice assistant accuracy and intent detection
+- Improve analytics dashboard with advanced charts and filters
+
