@@ -1,0 +1,235 @@
+/* ========================================
+   Hover Effects & Micro-animations
+   Voice-Driven Virtual Customer Success Manager
+   ======================================== */
+
+/* Card Lift Effect */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Button Scale Effect */
+.btn {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    transform: scale(1.02);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Button Ripple Effect */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn:active::after {
+    width: 200px;
+    height: 200px;
+}
+
+/* Link Underline Animation */
+.nav-link, a:not(.btn) {
+    position: relative;
+    text-decoration: none;
+}
+
+.nav-link::after, a:not(.btn)::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after, a:not(.btn):hover::after {
+    width: 100%;
+}
+
+/* Icon Rotate/Bounce Effect */
+.fa, .fas, .far {
+    transition: transform 0.3s ease;
+}
+
+.btn:hover .fa,
+.btn:hover .fas,
+.btn:hover .far,
+a:hover .fa,
+a:hover .fas,
+a:hover .far {
+    transform: rotate(5deg) scale(1.1);
+}
+
+/* Stat Card Icon Pulse */
+.stat-icon {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Event Card Hover */
+.event-card {
+    transition: all 0.3s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.event-card:hover .badge {
+    transform: scale(1.05);
+}
+
+/* Table Row Hover */
+.table tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(139, 92, 246, 0.05);
+    transform: scale(1.01);
+}
+
+/* Modal Fade Animation */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal.fade .modal-dialog {
+    transform: translateY(-50px);
+}
+
+/* Skeleton Loading Shimmer */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Voice Card Hover */
+.voice-card {
+    transition: all 0.3s ease;
+}
+
+.voice-card:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+/* Badge Hover */
+.badge {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Image/Icon Spin on Hover */
+.icon-spin:hover {
+    animation: spin 0.5s ease;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Slide In Animation for Cards */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: slideIn 0.4s ease-out;
+}
+
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.2s; }
+.card:nth-child(4) { animation-delay: 0.3s; }
+
+/* Progress Bar Animation */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+.progress-bar:hover {
+    filter: brightness(1.1);
+}
+
+/* Close Button Hover */
+.btn-close {
+    transition: transform 0.2s ease;
+}
+
+.btn-close:hover {
+    transform: rotate(90deg);
+}
+
+/* Responsive: Disable some animations on mobile for performance */
+@media (max-width: 768px) {
+    .card:hover {
+        transform: none;
+    }
+    
+    .event-card:hover {
+        transform: none;
+    }
+    
+    .table tbody tr:hover {
+        transform: none;
+    }
+}
