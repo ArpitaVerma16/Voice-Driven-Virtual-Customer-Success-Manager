@@ -1,15 +1,17 @@
 package com.vcsm.service;
 
 import com.vcsm.model.Complaint;
+import com.vcsm.model.User;
 import com.vcsm.repository.ComplaintRepository;
+import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.logging.Logger;
-
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.logging.Logger;
 
 @Service
 public class ComplaintService {
@@ -18,6 +20,15 @@ public class ComplaintService {
 
     @Autowired
     private ComplaintRepository complaintRepository;
+
+    @Autowired
+    private PriorityClassifierService priorityClassifierService;
+
+    @Autowired
+    private UserActivityService userActivityService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -30,15 +41,48 @@ public class ComplaintService {
         return auth != null ? auth.getName() : null;
     }
 
+    private User getCurrentUser() {
+        String username = currentUsername();
+        if (username == null) return null;
+        return userRepository.findByEmail(username).orElse(null);
+    }
+
     public Complaint fileComplaint(Complaint complaint) {
         String username = currentUsername();
         if (username == null) throw new RuntimeException("Unauthorized");
 
         // Force ownership to current user
         complaint.setResidentUsername(username);
+        
+        // Auto-assign priority based on description and category
+        String priority = priorityClassifierService.classifyPriority(
+            complaint.getDescription(), 
+            complaint.getCategory() != null ? complaint.getCategory().toString() : null
+        );
+        complaint.setPriority(priority);
+        complaint.setAutoAssigned(true);
+        complaint.setCreatedAt(LocalDateTime.now());
+        complaint.setStatus(Complaint.ComplaintStatus.OPEN);
 
-        log.info("Filing complaint for user: " + username);
-        return complaintRepository.save(complaint);
+        Complaint saved = complaintRepository.save(complaint);
+
+        log.info("📝 Filing complaint for user: " + username + " with priority: " + priority);
+        
+        // Log user activity
+        try {
+            User user = getCurrentUser();
+            if (user != null) {
+                String description = "Filed complaint: " + saved.getDescription();
+                if (description.length() > 100) {
+                    description = description.substring(0, 100) + "...";
+                }
+                userActivityService.logActivity(user, "COMPLAINT", description, saved.getId());
+            }
+        } catch (Exception e) {
+            log.warning("Failed to log user activity: " + e.getMessage());
+        }
+        
+        return saved;
     }
 
     public List<Complaint> getAllComplaints() {
@@ -62,33 +106,111 @@ public class ComplaintService {
             return complaintRepository.findByStatus(status);
         }
         String username = currentUsername();
-        // No repo method for status+resident; filter in memory safely for small datasets
         return getAllComplaints().stream().filter(c -> c.getStatus() == status).toList();
+    }
+
+    public List<Complaint> getComplaintsByPriority(String priority) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("Only admins can view complaints by priority");
+        }
+        return complaintRepository.findByPriority(priority);
     }
 
     public Complaint updateStatus(Long id, String status, String resolvedBy, String notes) {
         if (!isAdmin()) {
-            throw new org.springframework.security.access.AccessDeniedException("Only admins can update complaint status");
+            throw new AccessDeniedException("Only admins can update complaint status");
         }
 
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));
-        complaint.setStatus(Complaint.ComplaintStatus.valueOf(status.toUpperCase()));
+        
+        Complaint.ComplaintStatus oldStatus = complaint.getStatus();
+        Complaint.ComplaintStatus newStatus = Complaint.ComplaintStatus.valueOf(status.toUpperCase());
+        complaint.setStatus(newStatus);
+        
         if (resolvedBy != null && !resolvedBy.isBlank()) complaint.setResolvedBy(resolvedBy);
         if (notes != null && !notes.isBlank()) complaint.setResolutionNotes(notes);
-        return complaintRepository.save(complaint);
+        
+        Complaint updated = complaintRepository.save(complaint);
+        
+        // Log user activity
+        try {
+            User admin = userRepository.findByEmail(currentUsername()).orElse(null);
+            if (admin != null) {
+                userActivityService.logActivity(
+                    admin, 
+                    "COMPLAINT", 
+                    "Updated complaint #" + id + " status from " + oldStatus + " to " + newStatus, 
+                    id
+                );
+            }
+        } catch (Exception e) {
+            log.warning("Failed to log user activity: " + e.getMessage());
+        }
+        
+        return updated;
+    }
+
+    public Complaint updatePriority(Long id, String newPriority) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("Only admins can manually update complaint priority");
+        }
+        
+        log.info("🔄 Manually updating complaint {} priority to: {}", id, newPriority);
+        
+        Complaint complaint = complaintRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));
+        
+        String oldPriority = complaint.getPriority();
+        complaint.setPriority(newPriority);
+        complaint.setAutoAssigned(false);
+        
+        Complaint updated = complaintRepository.save(complaint);
+        
+        // Log user activity
+        try {
+            User admin = userRepository.findByEmail(currentUsername()).orElse(null);
+            if (admin != null) {
+                userActivityService.logActivity(
+                    admin, 
+                    "COMPLAINT", 
+                    "Updated complaint #" + id + " priority from " + oldPriority + " to " + newPriority, 
+                    id
+                );
+            }
+        } catch (Exception e) {
+            log.warning("Failed to log user activity: " + e.getMessage());
+        }
+        
+        return updated;
     }
 
     public void deleteComplaint(Long id) {
         if (!isAdmin()) {
-            throw new org.springframework.security.access.AccessDeniedException("Only admins can delete complaints");
+            throw new AccessDeniedException("Only admins can delete complaints");
         }
+        
+        // Log before deletion
+        try {
+            User admin = userRepository.findByEmail(currentUsername()).orElse(null);
+            if (admin != null) {
+                userActivityService.logActivity(
+                    admin, 
+                    "COMPLAINT", 
+                    "Deleted complaint #" + id, 
+                    id
+                );
+            }
+        } catch (Exception e) {
+            log.warning("Failed to log user activity: " + e.getMessage());
+        }
+        
         complaintRepository.deleteById(id);
     }
 
     public Map<String, Long> getComplaintStats() {
         if (!isAdmin()) {
-            throw new org.springframework.security.access.AccessDeniedException("Only admins can access analytics");
+            throw new AccessDeniedException("Only admins can access analytics");
         }
 
         Map<String, Long> stats = new LinkedHashMap<>();
@@ -102,7 +224,7 @@ public class ComplaintService {
 
     public Map<String, Long> getComplaintsByCategory() {
         if (!isAdmin()) {
-            throw new org.springframework.security.access.AccessDeniedException("Only admins can access analytics");
+            throw new AccessDeniedException("Only admins can access analytics");
         }
 
         Map<String, Long> map = new LinkedHashMap<>();
@@ -110,5 +232,18 @@ public class ComplaintService {
             map.put(row[0].toString(), (Long) row[1]);
         }
         return map;
+    }
+    
+    public Map<String, Long> getPriorityStats() {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("Only admins can access analytics");
+        }
+        
+        Map<String, Long> stats = new LinkedHashMap<>();
+        List<Object[]> results = complaintRepository.countByPriority();
+        for (Object[] result : results) {
+            stats.put((String) result[0], (Long) result[1]);
+        }
+        return stats;
     }
 }

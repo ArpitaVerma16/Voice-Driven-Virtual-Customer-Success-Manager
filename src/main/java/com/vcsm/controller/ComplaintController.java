@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,6 +86,31 @@ public class ComplaintController {
     public ResponseEntity<Map<String, Long>> statsByCategory() {
         return ResponseEntity.ok(complaintService.getComplaintsByCategory());
     }
+
+    // Get complaints by priority
+@GetMapping("/priority/{priority}")
+public ResponseEntity<List<Complaint>> getByPriority(@PathVariable String priority) {
+    return ResponseEntity.ok(complaintService.getComplaintsByPriority(priority.toUpperCase()));
+}
+
+// Update complaint priority manually
+@PutMapping("/{id}/priority")
+public ResponseEntity<Complaint> updatePriority(
+        @PathVariable Long id,
+        @RequestParam String priority) {
+    return ResponseEntity.ok(complaintService.updatePriority(id, priority.toUpperCase()));
+}
+
+// Get priority statistics
+@GetMapping("/stats/priority")
+public ResponseEntity<Map<String, Long>> getPriorityStats() {
+    List<Object[]> results = complaintRepository.countByPriority();
+    Map<String, Long> stats = new HashMap<>();
+    for (Object[] result : results) {
+        stats.put((String) result[0], (Long) result[1]);
+    }
+    return ResponseEntity.ok(stats);
+}
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex, HttpServletRequest request) {

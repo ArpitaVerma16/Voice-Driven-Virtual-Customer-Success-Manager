@@ -33,11 +33,16 @@ public class Complaint {
 
     // Auth ownership: residents can only view/manage their own complaints
     private String residentUsername;
-    private String priority = "NORMAL";  // Add this line
-public String getPriority() { return priority; }
-public void setPriority(String priority) { this.priority = priority; }
+
     @Column(length = 500)
     private String resolutionNotes;
+
+    // Priority Auto-Assign Fields
+    @Column(name = "priority")
+    private String priority = "MEDIUM";
+
+    @Column(name = "auto_assigned")
+    private boolean autoAssigned = true;
 
     @PrePersist
     protected void onCreate() {
@@ -64,7 +69,8 @@ public void setPriority(String priority) { this.priority = priority; }
     public String getResolvedBy() { return resolvedBy; }
     public String getResolutionNotes() { return resolutionNotes; }
     public String getResidentUsername() { return residentUsername; }
-
+    public String getPriority() { return priority; }
+    public boolean isAutoAssigned() { return autoAssigned; }
 
     // ---- Setters ----
     public void setId(Long id) { this.id = id; }
@@ -78,9 +84,19 @@ public void setPriority(String priority) { this.priority = priority; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public void setResolvedBy(String resolvedBy) { this.resolvedBy = resolvedBy; }
     public void setResidentUsername(String residentUsername) { this.residentUsername = residentUsername; }
-
     public void setResolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; }
+    public void setPriority(String priority) { this.priority = priority; }
+    public void setAutoAssigned(boolean autoAssigned) { this.autoAssigned = autoAssigned; }
 
-    public enum ComplaintStatus { OPEN, IN_PROGRESS, RESOLVED, CLOSED }
-    public enum ComplaintCategory { NOISE, MAINTENANCE, SECURITY, CLEANLINESS, PARKING, UTILITIES, OTHER }
+    // ---- Enums ----
+    public enum ComplaintStatus { 
+        OPEN, IN_PROGRESS, RESOLVED, CLOSED 
+    }
+    
+    public enum ComplaintCategory { 
+        NOISE, MAINTENANCE, SECURITY, CLEANLINESS, PARKING, UTILITIES, OTHER 
+    }
+    public enum PriorityLevel {
+    CRITICAL, HIGH, MEDIUM, LOW
+}
 }

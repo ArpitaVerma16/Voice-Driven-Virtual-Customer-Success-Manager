@@ -2,7 +2,9 @@ package com.vcsm.service;
 
 import com.vcsm.model.VoiceCommand;
 import com.vcsm.model.Complaint;
+import com.vcsm.model.User;
 import com.vcsm.repository.VoiceCommandRepository;
+import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,15 @@ public class OmnidimService {
     @Autowired
     private VoiceModelRegistryService voiceModelRegistryService;
 
+    @Autowired
+    private VoiceAnalyticsService voiceAnalyticsService;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public Map<String, Object> processVoiceCommand(String transcript) {
+        long startTime = System.currentTimeMillis();
+        
         log.info("Processing: " + transcript);
         String lower = transcript.toLowerCase();
         String intent = detectIntent(lower);
@@ -42,6 +52,8 @@ public class OmnidimService {
             default -> "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
         };
 
+        long responseTime = System.currentTimeMillis() - startTime;
+
         VoiceCommand cmd = new VoiceCommand();
         cmd.setTranscript(transcript);
         cmd.setIntent(intent);
@@ -49,11 +61,23 @@ public class OmnidimService {
         cmd.setProcessed(true);
         voiceCommandRepository.save(cmd);
 
+        // Log voice analytics
+        try {
+            User user = userRepository.findById(1L).orElse(null); // Get current user (update with actual auth)
+            if (user != null) {
+                boolean success = !intent.equals("UNKNOWN");
+                voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
+            }
+        } catch (Exception e) {
+            log.warning("Failed to log voice analytics: " + e.getMessage());
+        }
+
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("intent", intent);
         result.put("transcript", transcript);
         result.put("response", response);
         result.put("success", true);
+        result.put("responseTime", responseTime);
         voiceModelRegistryService.getActiveModel()
                 .ifPresent(model -> result.put("voiceModelKey", model.modelKey()));
         return result;

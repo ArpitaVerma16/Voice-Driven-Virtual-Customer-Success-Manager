@@ -16,6 +16,10 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 
     List<Complaint> findByResidentUsernameOrderByCreatedAtDesc(String residentUsername);
 
+    List<Complaint> findByPriority(String priority);
+
+    List<Complaint> findByPriorityOrderByCreatedAtAsc(String priority);
+
     Optional<Complaint> findByIdAndResidentUsername(Long id, String residentUsername);
 
 
@@ -30,4 +34,7 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 
     @Query("SELECT c FROM Complaint c ORDER BY c.createdAt DESC")
     List<Complaint> findAllOrderByCreatedAtDesc();
+
+    @Query("SELECT c.priority, COUNT(c) FROM Complaint c GROUP BY c.priority")
+    List<Object[]> countByPriority();
 }
