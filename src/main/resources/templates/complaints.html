@@ -119,7 +119,7 @@
         </div>
         <div class="col-6 col-md-3">
             <div class="card text-center border-secondary h-100 stat-card">
-                <div class-card-body py-2">
+                <div class="card-body py-2">
                     <div class="stat-icon bg-secondary-soft mb-1">
                         <i class="fas fa-chart-bar text-secondary"></i>
                     </div>
@@ -273,7 +273,7 @@
     </div>
 </div>
 
-<!-- File Complaint Modal - Responsive on mobile -->
+<!-- File Complaint Modal - Responsive on mobile with Sub-categories -->
 <div class="modal fade" id="fileComplaintModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -296,15 +296,21 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Category *</label>
-                    <select id="m_category" class="form-select">
+                    <select id="m_category" class="form-select" onchange="loadSubCategories(this.value)">
                         <option value="">Select Category</option>
-                        <option>NOISE</option>
-                        <option>MAINTENANCE</option>
-                        <option>SECURITY</option>
-                        <option>CLEANLINESS</option>
-                        <option>PARKING</option>
-                        <option>UTILITIES</option>
-                        <option>OTHER</option>
+                        <option value="NOISE">NOISE</option>
+                        <option value="MAINTENANCE">MAINTENANCE</option>
+                        <option value="SECURITY">SECURITY</option>
+                        <option value="CLEANLINESS">CLEANLINESS</option>
+                        <option value="PARKING">PARKING</option>
+                        <option value="UTILITIES">UTILITIES</option>
+                        <option value="OTHER">OTHER</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="subCategoryContainer" style="display:none;">
+                    <label class="form-label">Sub-category</label>
+                    <select id="m_subcategory" class="form-select">
+                        <option value="">Select Sub-category</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -359,6 +365,37 @@
             }
         }, 1000);
     });
+
+    // Load sub-categories based on parent category
+    function loadSubCategories(categoryName) {
+        const subContainer = document.getElementById('subCategoryContainer');
+        const subSelect = document.getElementById('m_subcategory');
+        
+        if (!categoryName) {
+            subContainer.style.display = 'none';
+            return;
+        }
+        
+        // Try to get sub-categories from API
+        fetch(`/api/categories/parents`)
+            .then(r => r.json())
+            .then(parents => {
+                const parent = parents.find(p => p.name === categoryName);
+                if (parent && parent.subCategories && parent.subCategories.length > 0) {
+                    subContainer.style.display = 'block';
+                    subSelect.innerHTML = '<option value="">Select Sub-category</option>';
+                    parent.subCategories.forEach(sub => {
+                        subSelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                    });
+                } else {
+                    subContainer.style.display = 'none';
+                }
+            })
+            .catch(err => {
+                console.error('Error loading sub-categories:', err);
+                subContainer.style.display = 'none';
+            });
+    }
 
     // Bulk Operations
     let selectedIds = [];
@@ -501,7 +538,7 @@
         window.location.href = '/api/export/complaints/pdf';
     }
 
-    // Submit complaint with toast
+    // Submit complaint with toast and sub-category support
     function submitComplaint() {
         const btn = event.target.closest('button');
         if (btn && btn.classList) {
@@ -511,6 +548,7 @@
         const name = document.getElementById('m_name').value;
         const apt = document.getElementById('m_apt').value;
         const category = document.getElementById('m_category').value;
+        const subCategory = document.getElementById('m_subcategory').value;
         const desc = document.getElementById('m_desc').value;
         
         if (!name || !category || !desc) {
@@ -523,16 +561,23 @@
             return;
         }
         
+        const complaintData = {
+            residentName: name,
+            apartmentNumber: apt,
+            category: category,
+            description: desc,
+            email: document.getElementById('m_email').value
+        };
+        
+        // Add sub-category if selected
+        if (subCategory) {
+            complaintData.categoryEntity = { id: parseInt(subCategory) };
+        }
+        
         fetch('/api/complaints', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                residentName: name,
-                apartmentNumber: apt,
-                category: category,
-                description: desc,
-                email: document.getElementById('m_email').value
-            })
+            body: JSON.stringify(complaintData)
         })
         .then(r => r.json())
         .then(data => {

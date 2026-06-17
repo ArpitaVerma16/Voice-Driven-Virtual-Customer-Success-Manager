@@ -25,6 +25,11 @@ public class Complaint {
     @Enumerated(EnumType.STRING)
     private ComplaintCategory category;
 
+    // Category Entity Reference (for sub-categories)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category categoryEntity;
+
     private String apartmentNumber;
     private String contactEmail;
     private LocalDateTime createdAt;
@@ -62,6 +67,7 @@ public class Complaint {
     public String getDescription() { return description; }
     public ComplaintStatus getStatus() { return status; }
     public ComplaintCategory getCategory() { return category; }
+    public Category getCategoryEntity() { return categoryEntity; }
     public String getApartmentNumber() { return apartmentNumber; }
     public String getContactEmail() { return contactEmail; }
     public LocalDateTime getCreatedAt() { return createdAt; }
@@ -78,6 +84,7 @@ public class Complaint {
     public void setDescription(String description) { this.description = description; }
     public void setStatus(ComplaintStatus status) { this.status = status; }
     public void setCategory(ComplaintCategory category) { this.category = category; }
+    public void setCategoryEntity(Category categoryEntity) { this.categoryEntity = categoryEntity; }
     public void setApartmentNumber(String apartmentNumber) { this.apartmentNumber = apartmentNumber; }
     public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -96,7 +103,8 @@ public class Complaint {
     public enum ComplaintCategory { 
         NOISE, MAINTENANCE, SECURITY, CLEANLINESS, PARKING, UTILITIES, OTHER 
     }
+    
     public enum PriorityLevel {
-    CRITICAL, HIGH, MEDIUM, LOW
-}
+        CRITICAL, HIGH, MEDIUM, LOW
+    }
 }
