@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Dashboard - VCSM</title>
+
     
     <!-- Favicon & Meta Tags -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
@@ -16,6 +17,8 @@
     <meta name="twitter:card" content="summary_large_image">
     
     <!-- CSS Dependencies -->
+
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
@@ -88,6 +91,15 @@
 
 
 
+
+    <link rel="stylesheet" href="/css/back-to-top.css">
+    <link rel="stylesheet" href="/css/hover-effects.css">
+    <link rel="stylesheet" href="/css/toast-notifications.css">
+    <link rel="stylesheet" href="/css/spinners.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/dark-mode-toggle.css">
+
 </head>
 <body>
 
@@ -96,15 +108,20 @@
     <div class="spinner"></div>
 </div>
 
+
 <!-- Back to Top Button (created by JS) -->
 
 <!-- Navbar with mobile toggler -->
+
+<!-- Navbar with Notification Bell -->
+
 <nav class="navbar navbar-expand-lg navbar-dark app-nav">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/">
             <i class="fas fa-robot me-2"></i>Virtual Customer Success Manager
         </a>
         
+
         <!-- Mobile Toggler Button -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -120,6 +137,37 @@
                 <a class="nav-link" href="/analytics"><i class="fas fa-chart-bar me-1"></i>Analytics</a>
                 <a class="nav-link" href="/voice-analytics">Voice Analytics</a>
             </div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <!-- Notification Bell -->
+            <div class="dropdown" style="position: relative;">
+                <button class="btn btn-link nav-link position-relative" onclick="toggleNotifications()" style="color: white; font-size: 20px;">
+                    <i class="fas fa-bell"></i>
+                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 10px;">
+                        0
+                    </span>
+                </button>
+                <div id="notificationDropdown" class="dropdown-menu dropdown-menu-end" style="display: none; width: 380px; max-height: 450px; overflow-y: auto; padding: 0;">
+                    <div class="dropdown-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                        <strong><i class="fas fa-bell me-2"></i>Notifications</strong>
+                        <button class="btn btn-sm btn-link text-purple" onclick="markAllRead()" style="text-decoration: none; font-size: 12px;">
+                            Mark all read
+                        </button>
+                    </div>
+                    <div id="notificationList" class="p-2">
+                        <div class="text-center text-muted py-3">Loading notifications...</div>
+                    </div>
+                    <div class="dropdown-footer text-center p-2 border-top">
+                        <small class="text-muted">Real-time updates</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dark Mode Toggle -->
+            <button class="btn btn-link nav-link" onclick="toggleDarkMode()" style="color: white; font-size: 20px;">
+                <i class="fas fa-moon" id="darkModeIcon"></i>
+            </button>
+
         </div>
     </div>
 </nav>
@@ -336,6 +384,7 @@
 <script src="/js/shortcuts.js"></script>
 <script src="/js/toast-notifications.js"></script>
 <script src="/js/spinners.js"></script>
+
 <script src="/js/typing-indicator.js"></script>
 <script src="/js/back-to-top.js"></script>
 <script src="/js/dark-mode.js"></script>
@@ -358,14 +407,184 @@
                 spinner.classList.remove('active');
             }
         }, 300);
+
+<script src="/js/back-to-top.js"></script>
+<script src="/js/dark-mode.js"></script>
+
+<script>
+    // WebSocket Connection for Notifications
+    let stompClient = null;
+
+    function connectWebSocket() {
+        if (typeof SockJS === 'undefined') {
+            console.warn('SockJS not loaded. Loading dynamically...');
+            loadSockJS();
+            return;
+        }
+        try {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                console.log('✅ Connected to WebSocket');
+                
+                // Subscribe to user-specific notifications
+                stompClient.subscribe('/user/queue/notifications', function(notification) {
+                    const data = JSON.parse(notification.body);
+                    showNotification(data);
+                    updateNotificationCount();
+                });
+                
+                // Subscribe to global notifications
+                stompClient.subscribe('/topic/global', function(notification) {
+                    const data = JSON.parse(notification.body);
+                    showNotification(data);
+                });
+            }, function(error) {
+                console.error('WebSocket connection failed:', error);
+            });
+        } catch (e) {
+            console.error('WebSocket error:', e);
+        }
+    }
+
+    function loadSockJS() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js';
+        script.onload = function() {
+            const stompScript = document.createElement('script');
+            stompScript.src = 'https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js';
+            stompScript.onload = function() { connectWebSocket(); };
+            document.head.appendChild(stompScript);
+        };
+        document.head.appendChild(script);
+    }
+
+    function showNotification(data) {
+        // Show toast
+        if (typeof toast !== 'undefined') {
+            const type = data.type ? data.type.toLowerCase() : 'info';
+            toast[type](data.message || 'New notification', data.title || 'Notification');
+        }
+        // Update badge
+        updateNotificationCount();
+    }
+
+    function updateNotificationCount() {
+        fetch('/api/notifications/count')
+            .then(r => r.json())
+            .then(data => {
+                const badge = document.getElementById('notificationBadge');
+                if (data.count > 0) {
+                    badge.style.display = 'inline';
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(err => console.error('Error fetching notification count:', err));
+    }
+
+    function toggleNotifications() {
+        const dropdown = document.getElementById('notificationDropdown');
+        if (dropdown.style.display === 'none') {
+            loadNotifications();
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    }
+
+    function loadNotifications() {
+        fetch('/api/notifications')
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('notificationList');
+                if (data.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-bell-slash fa-2x mb-2 d-block"></i>
+                            <span>No notifications</span>
+                        </div>
+                    `;
+                    return;
+                }
+                list.innerHTML = data.map(n => `
+                    <div class="dropdown-item notification-item ${n.read ? '' : 'unread'}" 
+                         style="padding: 10px 12px; border-bottom: 1px solid #f0f0f0; ${n.read ? 'opacity: 0.7;' : 'background: #f8f9fa;'}"
+                         onclick="markAsRead(${n.id})">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold ${n.read ? '' : 'text-purple'}">${n.title}</div>
+                                <div class="small text-muted">${n.message}</div>
+                            </div>
+                            <small class="text-muted ms-2" style="font-size: 10px; white-space: nowrap;">
+                                ${new Date(n.createdAt).toLocaleString()}
+                            </small>
+                        </div>
+                        ${!n.read ? '<span class="badge bg-purple" style="font-size: 8px;">NEW</span>' : ''}
+                    </div>
+                `).join('');
+            })
+            .catch(err => console.error('Error loading notifications:', err));
+    }
+
+    function markAsRead(id) {
+        fetch(`/api/notifications/${id}/read`, { method: 'PUT' })
+            .then(() => {
+                updateNotificationCount();
+                loadNotifications();
+            })
+            .catch(err => console.error('Error marking as read:', err));
+    }
+
+    function markAllRead() {
+        fetch('/api/notifications/read-all', { method: 'PUT' })
+            .then(() => {
+                updateNotificationCount();
+                loadNotifications();
+                if (typeof toast !== 'undefined') {
+                    toast.success('All notifications marked as read', 'Success');
+                }
+            })
+            .catch(err => console.error('Error marking all as read:', err));
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const bell = document.querySelector('.btn-link');
+        if (dropdown && dropdown.style.display === 'block') {
+            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide spinner
+        setTimeout(function() {
+            const spinner = document.getElementById('pageSpinner');
+            if (spinner) spinner.classList.remove('active');
+        }, 500);
+        
+        // Connect WebSocket
+        connectWebSocket();
+        
+        // Update notification count
+        updateNotificationCount();
+
         
         // Show welcome toast
         setTimeout(function() {
             if (typeof toast !== 'undefined') {
+
                 toast.info('Welcome to Voice-Driven Customer Success Manager!', '🎤 Welcome');
             }
         }, 1000);
     });
+
 
     // Override sendCommand to capture command ID
     function sendCommand() {
@@ -448,6 +667,36 @@
             }
         });
     }
+
+                toast.info('Welcome to VCSM Dashboard!', '🎤 Welcome');
+            }
+        }, 1000);
+    });
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+        const isDark = document.documentElement.classList.toggle('dark-mode');
+        const icon = document.getElementById('darkModeIcon');
+        if (isDark) {
+            icon.className = 'fas fa-sun';
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            icon.className = 'fas fa-moon';
+            localStorage.setItem('darkMode', 'false');
+        }
+    }
+
+    // Check saved dark mode preference
+    (function() {
+        const saved = localStorage.getItem('darkMode');
+        if (saved === 'true') {
+            document.documentElement.classList.add('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = 'fas fa-sun';
+        }
+    })();
+
+
 </script>
 </body>
 </html>

@@ -72,18 +72,16 @@ public class VoiceController {
         }
         
         // Analyze sentiment dynamically from authenticated user
-        Long userId = 1L;
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null) {
-                User user = userRepository.findByEmail(auth.getName()).orElse(null);
-                if (user != null) {
-                    userId = user.getId();
-                }
-            }
-        } catch (Exception e) {
-            // Fallback to default
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(401, "Unauthorized", "Authentication required"));
         }
+
+        User user = userRepository.findByEmail(auth.getName())
+            .orElseThrow(() -> new IllegalArgumentException("User not found: " + auth.getName()));
+
+        Long userId = user.getId();
         sentimentService.analyzeAndProcess(userId, transcript);
         
         return ResponseEntity.ok(response);

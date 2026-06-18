@@ -41,12 +41,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring("Bearer ".length());
+
+        if (token == null || token.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing authentication token");
+            return;
+        }
+
         if (!jwtService.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
             return;
         }
 
         String username = jwtService.extractUsername(token);
+        if (username == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token claims");
+            return;
+        }
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         // Roles from token (still map to authorities)

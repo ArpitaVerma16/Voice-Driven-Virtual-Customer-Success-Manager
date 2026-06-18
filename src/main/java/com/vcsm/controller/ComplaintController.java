@@ -145,8 +145,7 @@ public class ComplaintController {
 
     @Operation(summary = "Update complaint priority manually")
     @PutMapping("/{id}/priority")
-    public ResponseEntity<Complaint> updatePriority(
-            @PathVariable Long id,
+    public ResponseEntity<Complaint> updatePriority(  @PathVariable Long id,
             @RequestParam String priority) {
         return ResponseEntity.ok(
                 complaintService.updatePriority(id, priority.toUpperCase())

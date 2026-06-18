@@ -57,20 +57,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
             DataIntegrityViolationException ex, HttpServletRequest request) {
-        
-        String userMessage = "Database constraint violation. ";
-        if (ex.getMessage().contains("Duplicate entry")) {
+
+        String userMessage = "There was an issue saving your data. Please try again.";
+        if (ex.getMessage() != null && ex.getMessage().contains("Duplicate entry")) {
             userMessage = "This record already exists. Duplicate entries are not allowed.";
-        } else if (ex.getMessage().contains("cannot be null")) {
+        } else if (ex.getMessage() != null && ex.getMessage().contains("cannot be null")) {
             userMessage = "Required fields are missing. Please fill all required fields.";
-        } else {
-            userMessage = "There was an issue saving your data. Please try again.";
         }
-        
+
         ErrorResponse error = new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
             "Data Integrity Error",
-            ex.getMessage(),
+            "Database constraint violated",
             userMessage,
             request.getRequestURI()
         );
@@ -115,11 +113,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ErrorResponse> handleDatabaseError(
             DataAccessException ex, HttpServletRequest request) {
-        
+
         ErrorResponse error = new ErrorResponse(
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
             "Database Error",
-            ex.getMessage(),
+            "Database access failed",
             "We're experiencing technical difficulties with our database. Our team has been notified. Please try again later.",
             request.getRequestURI()
         );
