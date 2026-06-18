@@ -80,8 +80,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===== QUICK COMPLAINT (Dashboard) =====
+function getJwt() {
+    return localStorage.getItem('token');
+}
+
+function withAuthHeaders(headers = {}) {
+    const token = getJwt();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    return headers;
+}
+
 async function quickFileComplaint() {
     const name = document.getElementById('qName')?.value?.trim();
+
     const apt = document.getElementById('qApt')?.value?.trim();
     const category = document.getElementById('qCategory')?.value;
     const desc = document.getElementById('qDesc')?.value?.trim();
@@ -101,7 +112,7 @@ async function quickFileComplaint() {
     try {
         const res = await fetch('/api/complaints', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: withAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify(complaint)
         });
         if (res.ok) {
@@ -137,7 +148,7 @@ async function submitComplaint() {
     try {
         const res = await fetch('/api/complaints', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: withAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify(complaint)
         });
         if (res.ok) {
@@ -152,7 +163,7 @@ async function updateComplaintStatus(id) {
     const status = prompt('Enter new status (OPEN, IN_PROGRESS, RESOLVED, CLOSED):');
     if (!status) return;
     try {
-        await fetch(`/api/complaints/${id}/status?status=${status.toUpperCase()}`, { method: 'PUT' });
+        await fetch(`/api/complaints/${id}/status?status=${status.toUpperCase()}`, { method: 'PUT', headers: withAuthHeaders() });
         location.reload();
     } catch (err) {
         console.error('Error updating status:', err);
@@ -180,7 +191,7 @@ async function submitEvent() {
     try {
         const res = await fetch('/api/events', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: withAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify(event)
         });
         if (res.ok) location.reload();
@@ -191,7 +202,7 @@ async function submitEvent() {
 
 async function registerEvent(id) {
     try {
-        const res = await fetch(`/api/events/${id}/register`, { method: 'POST' });
+        const res = await fetch(`/api/events/${id}/register`, { method: 'POST', headers: withAuthHeaders() });
         if (res.ok) {
             alert('Successfully registered for the event!');
             location.reload();
