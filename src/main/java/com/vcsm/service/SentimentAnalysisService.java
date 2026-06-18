@@ -4,6 +4,8 @@ import com.vcsm.model.*;
 import com.vcsm.repository.*;
 import com.vcsm.utils.SentimentClassifier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +52,13 @@ public class SentimentAnalysisService {
             // Create HIGH priority complaint
             Complaint complaint = new Complaint();
             complaint.setUser(user);
+            if (user != null) {
+                complaint.setResidentName(user.getName());
+                complaint.setResidentUsername(user.getEmail());
+                complaint.setContactEmail(user.getEmail());
+            } else {
+                complaint.setResidentName("System Auto-Escalation");
+            }
             complaint.setDescription("[AUTO-ESCALATED] " + transcribedText);
             complaint.setCategory(Complaint.ComplaintCategory.OTHER);
             complaint.setStatus(Complaint.ComplaintStatus.OPEN);
@@ -92,9 +101,9 @@ public class SentimentAnalysisService {
     }
     
     public List<SentimentAnalysis> getRecentAnalyses(int limit) {
-        return sentimentRepository.findAll().stream()
-            .limit(limit)
-            .toList();
+        return sentimentRepository.findAll(
+            PageRequest.of(0, limit, Sort.by("createdAt").descending())
+        ).getContent();
     }
     
     public List<EscalatedCase> getPendingEscalations() {

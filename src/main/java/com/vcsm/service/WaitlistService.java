@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.Scheduled;
+
 @Service
 public class WaitlistService {
     
@@ -155,13 +157,16 @@ public class WaitlistService {
      * Clean expired waitlist entries (run by scheduler)
      */
     @Transactional
+    @Scheduled(cron = "0 0 * * * *")
     public void cleanExpiredWaitlist() {
         LocalDateTime now = LocalDateTime.now();
         List<EventWaitlist> expired = waitlistRepository.findByConfirmedFalseAndExpiresAtBefore(now);
         
         for (EventWaitlist entry : expired) {
+            Event event = entry.getEvent();
             waitlistRepository.delete(entry);
             System.out.println("🗑️ Removed expired waitlist entry: " + entry.getId());
+            processWaitlist(event);
         }
     }
 }

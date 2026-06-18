@@ -5,7 +5,7 @@ import com.vcsm.security.dto.AuthRequest;
 import com.vcsm.security.jwt.JwtService;
 import com.vcsm.security.model.AppUser;
 import com.vcsm.security.model.UserRole;
-import com.vcsm.security.repo.UserRepository;
+import com.vcsm.security.repo.AppUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,11 @@ import java.util.Set;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(AppUserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;

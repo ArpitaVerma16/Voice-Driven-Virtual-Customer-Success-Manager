@@ -1,11 +1,14 @@
 package com.vcsm.repository;
 
 import com.vcsm.model.Complaint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,8 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
     List<Complaint> findByResidentName(String residentName);
 
     List<Complaint> findByResidentUsernameOrderByCreatedAtDesc(String residentUsername);
+
+    Page<Complaint> findByResidentUsername(String residentUsername, Pageable pageable);
 
     List<Complaint> findByPriority(String priority);
 

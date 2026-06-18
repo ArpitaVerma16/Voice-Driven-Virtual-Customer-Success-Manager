@@ -21,6 +21,7 @@ public class ReminderScheduler {
     private EmailService emailService;
     
     @Autowired
+    @org.springframework.context.annotation.Lazy
     private EventRegistrationService eventRegistrationService;
     
     /**

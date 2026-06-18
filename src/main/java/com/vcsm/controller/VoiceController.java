@@ -5,8 +5,12 @@ import com.vcsm.service.HindiCommandMapper;
 import com.vcsm.model.VoiceCommand;
 import com.vcsm.service.OmnidimService;
 import com.vcsm.service.SentimentAnalysisService;
+import com.vcsm.model.User;
+import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +26,9 @@ public class VoiceController {
     
     @Autowired
     private SentimentAnalysisService sentimentService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private LanguageDetectionService languageDetectionService;
@@ -64,8 +71,19 @@ public class VoiceController {
             response.put("success", true);
         }
         
-        // Analyze sentiment (using dummy userId 1 for now)
+        // Analyze sentiment dynamically from authenticated user
         Long userId = 1L;
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                User user = userRepository.findByEmail(auth.getName()).orElse(null);
+                if (user != null) {
+                    userId = user.getId();
+                }
+            }
+        } catch (Exception e) {
+            // Fallback to default
+        }
         sentimentService.analyzeAndProcess(userId, transcript);
         
         return ResponseEntity.ok(response);

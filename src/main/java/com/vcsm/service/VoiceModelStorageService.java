@@ -1,6 +1,7 @@
 package com.vcsm.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Service
+@ConditionalOnProperty(name = "voice.model.s3.bucket")
 public class VoiceModelStorageService {
 
     private final S3Client s3Client;

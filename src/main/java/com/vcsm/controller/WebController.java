@@ -4,6 +4,7 @@ import com.vcsm.model.Complaint;
 import com.vcsm.service.ComplaintService;
 import com.vcsm.service.EventService;
 import com.vcsm.service.OmnidimService;
+import com.vcsm.service.InteractionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +29,9 @@ public class WebController {
 
     @Autowired
     private OmnidimService omnidimService;
+
+    @Autowired
+    private InteractionService interactionService;
 
     @GetMapping("/landing")
     public String landing() {
@@ -152,5 +156,26 @@ public String complaintsPage(
                         : 0);
 
         return "analytics";
+    }
+
+    @GetMapping("/interaction-history")
+    public String interactionHistory(Model model) {
+        try {
+            Map<String, Long> stats = interactionService.getInteractionStats();
+            if (stats == null) {
+                stats = new HashMap<>();
+                stats.put("total", 0L);
+                stats.put("completed", 0L);
+                stats.put("pending", 0L);
+                stats.put("inProgress", 0L);
+                stats.put("positive", 0L);
+                stats.put("neutral", 0L);
+                stats.put("negative", 0L);
+            }
+            model.addAttribute("interactionStats", stats);
+        } catch (Exception e) {
+            model.addAttribute("interactionStats", new HashMap<>());
+        }
+        return "interaction-history";
     }
 }

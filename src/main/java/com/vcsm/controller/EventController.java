@@ -1,10 +1,13 @@
 package com.vcsm.controller;
 
 import com.vcsm.model.Event;
+import com.vcsm.repository.UserRepository;
 import com.vcsm.service.EventService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -15,6 +18,9 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
@@ -58,10 +64,28 @@ public class EventController {
 
 
     @PostMapping("/{id}/register")
-    public ResponseEntity<?> register(@PathVariable Long id) {
+    public ResponseEntity<?> register(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long userId) {
+
+        Long resolvedUserId = userId;
+        if (resolvedUserId == null) {
+            resolvedUserId = 1L; // fallback
+            try {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null) {
+                    com.vcsm.model.User user = userRepository.findByEmail(auth.getName()).orElse(null);
+                    if (user != null) {
+                        resolvedUserId = user.getId();
+                    }
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+        }
 
         try {
-            return ResponseEntity.ok(eventService.registerForEvent(id));
+            return ResponseEntity.ok(eventService.registerForEvent(id, resolvedUserId));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

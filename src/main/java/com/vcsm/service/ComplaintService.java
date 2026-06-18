@@ -53,10 +53,8 @@ public class ComplaintService {
         String username = currentUsername();
         if (username == null) throw new RuntimeException("Unauthorized");
 
-        // Force ownership to current user
         complaint.setResidentUsername(username);
         
-        // Auto-assign priority based on description and category
         String priority = priorityClassifierService.classifyPriority(
             complaint.getDescription(), 
             complaint.getCategory() != null ? complaint.getCategory().toString() : null
@@ -70,7 +68,10 @@ public class ComplaintService {
 
         log.info("📝 Filing complaint for user: " + username + " with priority: " + priority);
         
+
+
         // Log user activity
+
         try {
             User user = getCurrentUser();
             if (user != null) {
@@ -95,7 +96,9 @@ public class ComplaintService {
         return complaintRepository.findByResidentUsernameOrderByCreatedAtDesc(username);
     }
 
+
     // Pagination method
+
     public Page<Complaint> getPaginatedComplaints(Pageable pageable) {
         if (isAdmin()) {
             return complaintRepository.findAll(pageable);
@@ -144,7 +147,10 @@ public class ComplaintService {
         
         Complaint updated = complaintRepository.save(complaint);
         
+
+
         // Log user activity
+
         try {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
             if (admin != null) {
@@ -167,7 +173,7 @@ public class ComplaintService {
             throw new AccessDeniedException("Only admins can manually update complaint priority");
         }
         
-        log.info("🔄 Manually updating complaint {} priority to: {}", id, newPriority);
+        log.info("🔄 Manually updating complaint " + id + " priority to: " + newPriority);
         
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));
@@ -178,7 +184,7 @@ public class ComplaintService {
         
         Complaint updated = complaintRepository.save(complaint);
         
-        // Log user activity
+
         try {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
             if (admin != null) {
@@ -201,7 +207,7 @@ public class ComplaintService {
             throw new AccessDeniedException("Only admins can delete complaints");
         }
         
-        // Log before deletion
+
         try {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
             if (admin != null) {

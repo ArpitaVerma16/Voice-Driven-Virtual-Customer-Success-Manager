@@ -15,6 +15,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
+import org.springframework.core.annotation.Order;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -28,8 +33,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/api/**", "/voice-model")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -39,6 +46,28 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/landing", "/login", "/signup", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/complaints/**", "/events/**", "/analytics/**", "/interaction-history/**", "/voice-analytics/**").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/landing")
+                        .permitAll()
+                );
 
         return http.build();
     }

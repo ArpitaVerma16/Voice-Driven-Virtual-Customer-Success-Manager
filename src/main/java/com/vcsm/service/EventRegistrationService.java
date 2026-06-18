@@ -2,7 +2,9 @@ package com.vcsm.service;
 
 import com.vcsm.model.Event;
 import com.vcsm.model.User;
+import com.vcsm.model.EventRegistration;
 import com.vcsm.repository.EventRepository;
+import com.vcsm.repository.EventRegistrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,9 @@ public class EventRegistrationService {
 
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private EventRegistrationRepository eventRegistrationRepository;
 
     @Autowired
     private ReminderScheduler reminderScheduler;
@@ -33,15 +38,14 @@ public class EventRegistrationService {
         }
 
         // Check if user already registered
-        if (event.getRegisteredUsers() != null && event.getRegisteredUsers().contains(user)) {
+        if (eventRegistrationRepository.existsByUserAndEvent(user, event)) {
             throw new RuntimeException("User already registered for this event");
         }
 
-        // Add user to event registrations
-        if (event.getRegisteredUsers() == null) {
-            event.setRegisteredUsers(new ArrayList<>());
-        }
-        event.getRegisteredUsers().add(user);
+        // Create and save event registration
+        EventRegistration registration = new EventRegistration(user, event);
+        eventRegistrationRepository.save(registration);
+
         event.setRegistrations(event.getRegistrations() + 1);
 
         Event updatedEvent = eventRepository.save(event);
@@ -60,8 +64,9 @@ public class EventRegistrationService {
             throw new RuntimeException("Event not found");
         }
 
-        if (event.getRegisteredUsers() != null && event.getRegisteredUsers().contains(user)) {
-            event.getRegisteredUsers().remove(user);
+        java.util.Optional<EventRegistration> registrationOpt = eventRegistrationRepository.findByUserAndEvent(user, event);
+        if (registrationOpt.isPresent()) {
+            eventRegistrationRepository.delete(registrationOpt.get());
             event.setRegistrations(event.getRegistrations() - 1);
             return eventRepository.save(event);
         }
@@ -73,21 +78,34 @@ public class EventRegistrationService {
      * Check if user is registered for event
      */
     public boolean isUserRegistered(Event event, User user) {
-        return event.getRegisteredUsers() != null && event.getRegisteredUsers().contains(user);
+        if (event == null || user == null) {
+            return false;
+        }
+        return eventRegistrationRepository.existsByUserAndEvent(user, event);
     }
 
     /**
      * Get all registrants for an event
      */
     public List<User> getEventRegistrants(Event event) {
-        return event.getRegisteredUsers() != null ? event.getRegisteredUsers() : new ArrayList<>();
+        if (event == null) {
+            return new ArrayList<>();
+        }
+        return eventRegistrationRepository.findByEvent(event).stream()
+                .map(EventRegistration::getUser)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     /**
      * Get all events a user is registered for
      */
     public List<Event> getUserEvents(User user) {
-        return eventRepository.findByRegisteredUsersContaining(user);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        return eventRegistrationRepository.findByUser(user).stream()
+                .map(EventRegistration::getEvent)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     /**

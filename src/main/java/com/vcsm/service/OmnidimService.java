@@ -7,6 +7,8 @@ import com.vcsm.repository.VoiceCommandRepository;
 import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,15 @@ public class OmnidimService {
 
         // Log voice analytics
         try {
-            User user = userRepository.findById(1L).orElse(null); // Get current user (update with actual auth)
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String email = auth != null ? auth.getName() : null;
+            User user = null;
+            if (email != null) {
+                user = userRepository.findByEmail(email).orElse(null);
+            }
+            if (user == null) {
+                user = userRepository.findById(1L).orElse(null); // Fallback to 1L
+            }
             if (user != null) {
                 boolean success = !intent.equals("UNKNOWN");
                 voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
@@ -101,8 +111,25 @@ public class OmnidimService {
         else if (t.contains("security")) cat = "security";
         else if (t.contains("parking")) cat = "parking";
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+        User user = null;
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+        if (user == null) {
+            user = userRepository.findById(1L).orElse(null); // Fallback to 1L
+        }
+
         Complaint complaint = new Complaint();
-        complaint.setResidentName("Voice Command");
+        if (user != null) {
+            complaint.setResidentName(user.getName());
+            complaint.setResidentUsername(user.getEmail());
+            complaint.setContactEmail(user.getEmail());
+            complaint.setUser(user);
+        } else {
+            complaint.setResidentName("Voice Command");
+        }
         complaint.setDescription(t);
         complaint.setCategory(Complaint.ComplaintCategory.valueOf(cat.toUpperCase()));
         complaintService.fileComplaint(complaint);

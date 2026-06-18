@@ -51,7 +51,7 @@ public class LanguageController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             // Add language field to User entity if not exists
-            // user.setPreferredLanguage(language);
+            user.setPreferredLanguage(language);
             userRepository.save(user);
             response.put("success", true);
             response.put("message", "Language preference set to " + language);

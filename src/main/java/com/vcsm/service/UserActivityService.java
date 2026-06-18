@@ -4,6 +4,8 @@ import com.vcsm.model.User;
 import com.vcsm.model.UserActivity;
 import com.vcsm.repository.UserActivityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +27,10 @@ public class UserActivityService {
     
     public List<UserActivity> getUserActivities(User user) {
         return userActivityRepository.findByUserOrderByCreatedAtDesc(user);
+    }
+    
+    public Page<UserActivity> getUserActivities(User user, Pageable pageable) {
+        return userActivityRepository.findByUser(user, pageable);
     }
     
     public List<UserActivity> getUserActivitiesByType(User user, String actionType) {
