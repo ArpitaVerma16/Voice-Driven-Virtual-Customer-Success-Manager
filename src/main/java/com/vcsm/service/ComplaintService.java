@@ -170,7 +170,7 @@ public class ComplaintService {
             throw new AccessDeniedException("Only admins can manually update complaint priority");
         }
         
-        log.info("🔄 Manually updating complaint {} priority to: {}", id, newPriority);
+        log.info("🔄 Manually updating complaint " + id + " priority to: " + newPriority);
         
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));

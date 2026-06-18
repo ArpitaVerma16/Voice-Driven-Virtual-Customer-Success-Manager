@@ -2,7 +2,7 @@ package com.vcsm.security.seed;
 
 import com.vcsm.security.model.AppUser;
 import com.vcsm.security.model.UserRole;
-import com.vcsm.security.repo.UserRepository;
+import com.vcsm.security.repo.AppUserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +13,7 @@ import java.util.Set;
 @Component
 public class DefaultAdminSeeder implements CommandLineRunner {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${security.admin.username:}")
@@ -22,7 +22,7 @@ public class DefaultAdminSeeder implements CommandLineRunner {
     @Value("${security.admin.password:}")
     private String adminPassword;
 
-    public DefaultAdminSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DefaultAdminSeeder(AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }

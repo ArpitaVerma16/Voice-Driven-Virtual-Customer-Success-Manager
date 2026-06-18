@@ -3,7 +3,7 @@ package com.vcsm.security.controller;
 import com.vcsm.security.dto.AuthRequest;
 import com.vcsm.security.dto.AuthResponse;
 import com.vcsm.security.model.AppUser;
-import com.vcsm.security.repo.UserRepository;
+import com.vcsm.security.repo.AppUserRepository;
 import com.vcsm.security.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,11 +18,11 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository userRepository;
     private final AuthService authService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserRepository userRepository, AuthService authService, PasswordEncoder passwordEncoder) {
+    public AuthController(AppUserRepository userRepository, AuthService authService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.authService = authService;
         this.passwordEncoder = passwordEncoder;
