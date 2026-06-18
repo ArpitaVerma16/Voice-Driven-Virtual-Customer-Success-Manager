@@ -19,8 +19,6 @@ public class User {
     @Column(nullable = false)
     private String name;
     
-    private String password;
-    
     @Column(name = "preferred_language")
     private String preferredLanguage = "en";
     
@@ -59,10 +57,9 @@ public class User {
     // Constructors
     public User() {}
     
-    public User(String email, String name, String password) {
+    public User(String email, String name) {
         this.email = email;
         this.name = name;
-        this.password = password;
         this.createdAt = LocalDateTime.now();
         this.emailNotifications = true;
         this.smsNotifications = false;
@@ -72,7 +69,6 @@ public class User {
     public Long getId() { return id; }
     public String getEmail() { return email; }
     public String getName() { return name; }
-    public String getPassword() { return password; }
     public String getPreferredLanguage() { return preferredLanguage; }
     public boolean isVoiceEnrolled() { return isVoiceEnrolled; }
     public LocalDateTime getCreatedAt() { return createdAt; }
@@ -89,7 +85,6 @@ public class User {
     public void setId(Long id) { this.id = id; }
     public void setEmail(String email) { this.email = email; }
     public void setName(String name) { this.name = name; }
-    public void setPassword(String password) { this.password = password; }
     public void setPreferredLanguage(String preferredLanguage) { this.preferredLanguage = preferredLanguage; }
     public void setVoiceEnrolled(boolean voiceEnrolled) { isVoiceEnrolled = voiceEnrolled; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
