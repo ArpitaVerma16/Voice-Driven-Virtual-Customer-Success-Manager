@@ -1,0 +1,260 @@
+/* ========================================
+   Dark Mode Styles
+   Voice-Driven Virtual Customer Success Manager
+   ======================================== */
+
+/* Dark Mode Variables */
+.dark-mode {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #16213e;
+    --bg-navbar: #0f0f1a;
+    --bg-input: #1a1a2e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0b8;
+    --text-muted: #8a8aa0;
+    --border-color: #2a2a4a;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --hover-bg: #2a2a4a;
+}
+
+.dark-mode body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Navbar */
+.dark-mode .app-nav {
+    background: linear-gradient(135deg, #0f0f1a, #1a1a2e) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Cards */
+.dark-mode .card,
+.dark-mode .stat-card,
+.dark-mode .event-card,
+.dark-mode .voice-card {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 15px var(--shadow-color) !important;
+}
+
+.dark-mode .card-header,
+.dark-mode .card-footer {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Modals */
+.dark-mode .modal-content {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .btn-close {
+    filter: invert(1);
+}
+
+/* Tables */
+.dark-mode .table {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .table-light {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Forms */
+.dark-mode .form-control,
+.dark-mode .form-select {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode .form-control:focus,
+.dark-mode .form-select:focus {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25) !important;
+}
+
+.dark-mode .form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+.dark-mode .form-label {
+    color: var(--text-secondary) !important;
+}
+
+/* Buttons */
+.dark-mode .btn-secondary {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .btn-secondary:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+.dark-mode .btn-outline-secondary {
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .btn-outline-secondary:hover {
+    background-color: var(--hover-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Badges */
+.dark-mode .badge.bg-secondary {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Text colors */
+.dark-mode .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.dark-mode .text-dark {
+    color: var(--text-primary) !important;
+}
+
+/* Links */
+.dark-mode a:not(.btn):not(.nav-link) {
+    color: #a78bfa;
+}
+
+.dark-mode a:not(.btn):not(.nav-link):hover {
+    color: #c4b5fd;
+}
+
+/* Navbar links */
+.dark-mode .nav-link {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .nav-link:hover,
+.dark-mode .nav-link.active {
+    color: var(--text-primary) !important;
+}
+
+/* Alert boxes */
+.dark-mode .alert-info {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .alert-success {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .alert-danger {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Progress bar */
+.dark-mode .progress {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Dropdown */
+.dark-mode .dropdown-menu {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .dropdown-item {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .dropdown-item:hover {
+    background-color: var(--hover-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Toast notifications in dark mode */
+.dark-mode .toast-notification {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .toast-title {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .toast-message {
+    color: var(--text-secondary) !important;
+}
+
+/* Empty states */
+.dark-mode .empty-state-title {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .empty-state-message {
+    color: var(--text-secondary) !important;
+}
+
+/* Scrollbar */
+.dark-mode ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #4a4a6a;
+}
+
+/* Selection */
+.dark-mode ::selection {
+    background: #8b5cf6;
+    color: white;
+}
+
+/* Smooth transition when toggling */
+body,
+.card,
+.navbar,
+.modal-content,
+.table,
+.form-control,
+.btn {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

@@ -34,9 +34,19 @@ public class Complaint {
     // Auth ownership: residents can only view/manage their own complaints
     private String residentUsername;
 
-
     @Column(length = 500)
     private String resolutionNotes;
+
+    // Priority Auto-Assign Fields
+    @Column(name = "priority")
+    private String priority = "MEDIUM";
+
+    @Column(name = "auto_assigned")
+    private boolean autoAssigned = true;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @PrePersist
     protected void onCreate() {
@@ -63,7 +73,9 @@ public class Complaint {
     public String getResolvedBy() { return resolvedBy; }
     public String getResolutionNotes() { return resolutionNotes; }
     public String getResidentUsername() { return residentUsername; }
-
+    public String getPriority() { return priority; }
+    public boolean isAutoAssigned() { return autoAssigned; }
+    public User getUser() { return user; }
 
     // ---- Setters ----
     public void setId(Long id) { this.id = id; }
@@ -77,9 +89,20 @@ public class Complaint {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public void setResolvedBy(String resolvedBy) { this.resolvedBy = resolvedBy; }
     public void setResidentUsername(String residentUsername) { this.residentUsername = residentUsername; }
-
     public void setResolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; }
+    public void setPriority(String priority) { this.priority = priority; }
+    public void setAutoAssigned(boolean autoAssigned) { this.autoAssigned = autoAssigned; }
+    public void setUser(User user) { this.user = user; }
 
-    public enum ComplaintStatus { OPEN, IN_PROGRESS, RESOLVED, CLOSED }
-    public enum ComplaintCategory { NOISE, MAINTENANCE, SECURITY, CLEANLINESS, PARKING, UTILITIES, OTHER }
+    // ---- Enums ----
+    public enum ComplaintStatus { 
+        OPEN, IN_PROGRESS, RESOLVED, CLOSED 
+    }
+    
+    public enum ComplaintCategory { 
+        NOISE, MAINTENANCE, SECURITY, CLEANLINESS, PARKING, UTILITIES, OTHER 
+    }
+    public enum PriorityLevel {
+    CRITICAL, HIGH, MEDIUM, LOW
+}
 }

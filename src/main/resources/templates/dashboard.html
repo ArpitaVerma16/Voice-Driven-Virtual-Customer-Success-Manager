@@ -2,26 +2,172 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VCSM - Virtual Customer Success Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard - VCSM</title>
+
+    
+    <!-- Favicon & Meta Tags -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
+    <meta name="description" content="Voice-Driven Virtual Customer Success Manager - Dashboard">
+    <meta name="keywords" content="voice assistant, customer success, dashboard, complaints, events">
+    <meta name="author" content="Bhakkti Gautam">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta property="og:title" content="VCSM - Dashboard">
+    <meta property="og:description" content="Voice-driven community support dashboard">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- CSS Dependencies -->
+
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/spinners.css">
+
+    <link rel="stylesheet" href="/css/print.css" media="print">
+    <link rel="stylesheet" href="/css/hover-effects.css">
+    <link rel="stylesheet" href="/css/toast-notifications.css">
+
+    <link rel="stylesheet" href="/css/hover-effects.css">
+
+    <link rel="stylesheet" href="/css/back-to-top.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <link href="/src/main/resources/static/css/mainfile.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="/src/main/resources/static/css/print.css" media="print">
+    <link href="/src/main/resources/static/css/responsive.css" rel="stylesheet">
+
+    <!-- Favicon & Meta Tags -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Voice-Driven Virtual Customer Success Manager - File complaints, track events, use voice commands">
+<meta name="keywords" content="voice assistant, customer success, complaint management, event management, AI">
+<meta name="author" content="Bhakkti Gautam">
+<meta name="theme-color" content="#8b5cf6">
+
+<!-- Open Graph / Social Media -->
+<meta property="og:title" content="VCSM - Virtual Customer Success Manager">
+<meta property="og:description" content="Voice-driven community support platform">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://via.placeholder.com/1200x630/8b5cf6/white?text=VCSM">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VCSM - Virtual Customer Success Manager">
+<meta name="twitter:description" content="Voice-driven community support platform">
+
+    <link rel="stylesheet" href="/css/typing-indicator.css">
+
+    <link rel="stylesheet" href="/css/dark-mode-toggle.css">
+    <link rel="stylesheet" href="/css/shortcuts.css">
+    <link rel="stylesheet" href="/css/dark-mode.css">
+
+
+    <link rel="stylesheet" href="/css/shortcuts.css">
+
+    <link rel="stylesheet" href="/css/confirm-dialogs.css">
+
+    <link rel="stylesheet" href="/css/empty-states.css">
+
+
+    <link rel="stylesheet" href="/css/empty-states.css">
+
+
+
+
+        <!-- Favicon & Meta Tags -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
+    <meta name="description" content="Voice-Driven Virtual Customer Success Manager">
+    <meta name="keywords" content="voice assistant, customer success, complaint management">
+    <meta name="author" content="Bhakkti Gautam">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta property="og:title" content="VCSM - Virtual Customer Success Manager">
+    <meta property="og:description" content="Voice-driven community support platform">
+    <meta name="twitter:card" content="summary_large_image">
+
+
+
+
+    <link rel="stylesheet" href="/css/back-to-top.css">
+    <link rel="stylesheet" href="/css/hover-effects.css">
+    <link rel="stylesheet" href="/css/toast-notifications.css">
+    <link rel="stylesheet" href="/css/spinners.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/dark-mode-toggle.css">
+
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- Page Load Spinner Overlay -->
+<div class="spinner-overlay" id="pageSpinner">
+    <div class="spinner"></div>
+</div>
+
+
+<!-- Back to Top Button (created by JS) -->
+
+<!-- Navbar with mobile toggler -->
+
+<!-- Navbar with Notification Bell -->
+
 <nav class="navbar navbar-expand-lg navbar-dark app-nav">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/">
             <i class="fas fa-robot me-2"></i>Virtual Customer Success Manager
         </a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
-            <a class="nav-link" href="/complaints"><i class="fas fa-exclamation-circle me-1"></i>Complaints</a>
-            <a class="nav-link" href="/events"><i class="fas fa-calendar me-1"></i>Events</a>
-            <a class="nav-link" href="/analytics"><i class="fas fa-chart-bar me-1"></i>Analytics</a>
+        
+
+        <!-- Mobile Toggler Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Collapsible Navbar Links -->
+        <div class="collapse navbar-collapse" id="navMain">
+            <div class="navbar-nav ms-auto text-center">
+                <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
+                <a class="nav-link" href="/complaints"><i class="fas fa-exclamation-circle me-1"></i>Complaints</a>
+                <a class="nav-link" href="/events"><i class="fas fa-calendar me-1"></i>Events</a>
+                <a class="nav-link" href="/interaction-history"><i class="fas fa-history me-1"></i>Interaction History</a>
+                <a class="nav-link" href="/analytics"><i class="fas fa-chart-bar me-1"></i>Analytics</a>
+                <a class="nav-link" href="/voice-analytics">Voice Analytics</a>
+            </div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <!-- Notification Bell -->
+            <div class="dropdown" style="position: relative;">
+                <button class="btn btn-link nav-link position-relative" onclick="toggleNotifications()" style="color: white; font-size: 20px;">
+                    <i class="fas fa-bell"></i>
+                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 10px;">
+                        0
+                    </span>
+                </button>
+                <div id="notificationDropdown" class="dropdown-menu dropdown-menu-end" style="display: none; width: 380px; max-height: 450px; overflow-y: auto; padding: 0;">
+                    <div class="dropdown-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                        <strong><i class="fas fa-bell me-2"></i>Notifications</strong>
+                        <button class="btn btn-sm btn-link text-purple" onclick="markAllRead()" style="text-decoration: none; font-size: 12px;">
+                            Mark all read
+                        </button>
+                    </div>
+                    <div id="notificationList" class="p-2">
+                        <div class="text-center text-muted py-3">Loading notifications...</div>
+                    </div>
+                    <div class="dropdown-footer text-center p-2 border-top">
+                        <small class="text-muted">Real-time updates</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dark Mode Toggle -->
+            <button class="btn btn-link nav-link" onclick="toggleDarkMode()" style="color: white; font-size: 20px;">
+                <i class="fas fa-moon" id="darkModeIcon"></i>
+            </button>
+
         </div>
     </div>
 </nav>
@@ -35,81 +181,107 @@
                 <i class="fas fa-microphone me-2"></i>Voice Assistant (Omnidim.io)
             </h5>
             <p class="text-muted small">Click the microphone or type a command. Try: "I have a noise complaint" or "Show upcoming events"</p>
-            <div class="input-group">
+            <div class="voice-input-group">
                 <input type="text" id="voiceInput" class="form-control" placeholder="Type or speak your command...">
-                <button class="btn btn-purple" id="micBtn" onclick="startVoice()">
-                    <i class="fas fa-microphone" id="micIcon"></i>
-                </button>
-                <button class="btn btn-outline-purple" onclick="sendCommand()">
-                    <i class="fas fa-paper-plane"></i> Send
-                </button>
+                <div class="voice-buttons">
+                    <button class="btn btn-purple" id="micBtn" onclick="startVoice()">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-text"><i class="fas fa-microphone" id="micIcon"></i></span>
+                    </button>
+                    <button class="btn btn-outline-purple" onclick="sendCommand()">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-text"><i class="fas fa-paper-plane"></i> Send</span>
+                    </button>
+                </div>
             </div>
             <div id="voiceResponse" class="mt-3 d-none alert alert-info">
                 <i class="fas fa-robot me-2"></i><span id="responseText"></span>
+                <div class="mt-2" id="feedbackButtons">
+                    <span class="text-muted small me-2">Was this helpful?</span>
+                    <button class="btn btn-sm btn-success" onclick="submitFeedback('UP')">
+                        <i class="fas fa-thumbs-up"></i> Yes
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="submitFeedback('DOWN')">
+                        <i class="fas fa-thumbs-down"></i> No
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Stats Cards - 2 columns on mobile, 4 on desktop -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card stat-card border-0 shadow-sm text-center">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm text-center h-100">
                 <div class="card-body">
                     <div class="stat-icon bg-danger-soft mb-2"><i class="fas fa-exclamation-triangle text-danger"></i></div>
                     <h3 class="fw-bold text-danger" th:text="${complaintStats.open}">0</h3>
-                    <p class="text-muted mb-0">Open Complaints</p>
+                    <p class="text-muted mb-0 small">Open Complaints</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card border-0 shadow-sm text-center">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm text-center h-100">
                 <div class="card-body">
                     <div class="stat-icon bg-warning-soft mb-2"><i class="fas fa-spinner text-warning"></i></div>
                     <h3 class="fw-bold text-warning" th:text="${complaintStats.inProgress}">0</h3>
-                    <p class="text-muted mb-0">In Progress</p>
+                    <p class="text-muted mb-0 small">In Progress</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card border-0 shadow-sm text-center">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm text-center h-100">
                 <div class="card-body">
                     <div class="stat-icon bg-success-soft mb-2"><i class="fas fa-check-circle text-success"></i></div>
                     <h3 class="fw-bold text-success" th:text="${complaintStats.resolved}">0</h3>
-                    <p class="text-muted mb-0">Resolved</p>
+                    <p class="text-muted mb-0 small">Resolved</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card border-0 shadow-sm text-center">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm text-center h-100">
                 <div class="card-body">
                     <div class="stat-icon bg-primary-soft mb-2"><i class="fas fa-calendar-check text-primary"></i></div>
                     <h3 class="fw-bold text-primary" th:text="${activeEvents}">0</h3>
-                    <p class="text-muted mb-0">Active Events</p>
+                    <p class="text-muted mb-0 small">Active Events</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Recent Sections - Stack on mobile -->
     <div class="row g-3">
         <!-- Recent Complaints -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-white fw-bold">
                     <i class="fas fa-list me-2 text-purple"></i>Recent Complaints
                 </div>
                 <div class="card-body p-0">
+
+
                     <div th:if="${recentComplaints.empty}" class="text-center text-muted p-4">
-                        No complaints yet.
+                        No complaints yet. 🎯
+
+                    <div th:if="${recentComplaints.empty}">
+                        <div class="empty-state-small">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-check-circle" style="font-size: 40px; color: #22c55e;"></i>
+                            </div>
+                            <p class="text-muted">No complaints yet! 🎉</p>
+                            <p class="small text-muted">Your community is peaceful</p>
+                        </div>
+
                     </div>
-                    <ul class="list-group list-group-flush">
+                    <ul th:unless="${recentComplaints.empty}" class="list-group list-group-flush">
                         <li class="list-group-item" th:each="c : ${recentComplaints}">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
                                 <div>
                                     <strong th:text="${c.residentName}">Name</strong>
                                     <span class="text-muted small ms-2" th:text="${c.category}">Cat</span>
                                     <p class="mb-0 text-muted small" th:text="${#strings.abbreviate(c.description, 60)}">Desc</p>
                                 </div>
-                                <span class="badge"
+                                <span class="badge align-self-start align-self-sm-center"
                                       th:classappend="${c.status.name() == 'OPEN' ? 'bg-danger' : (c.status.name() == 'IN_PROGRESS' ? 'bg-warning text-dark' : 'bg-success')}"
                                       th:text="${c.status}">Status</span>
                             </div>
@@ -123,16 +295,29 @@
         </div>
 
         <!-- Voice Command History -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-white fw-bold">
                     <i class="fas fa-history me-2 text-purple"></i>Recent Voice Commands
                 </div>
                 <div class="card-body p-0">
+
+
                     <div th:if="${recentCommands.empty}" class="text-center text-muted p-4">
-                        No voice commands yet. Try speaking to the assistant above!
+                        No voice commands yet. Try speaking to the assistant above! 🎤
+
+
+                    <div th:if="${recentCommands.empty}">
+                        <div class="empty-state-small">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-microphone" style="font-size: 40px; color: #8b5cf6;"></i>
+                            </div>
+                            <p class="text-muted">No voice commands yet</p>
+                            <p class="small text-muted">Click the microphone and try speaking!</p>
+                        </div>
+
                     </div>
-                    <ul class="list-group list-group-flush">
+                    <ul th:unless="${recentCommands.empty}" class="list-group list-group-flush">
                         <li class="list-group-item" th:each="cmd : ${recentCommands}">
                             <p class="mb-1 small"><i class="fas fa-microphone text-purple me-1"></i>
                                 <strong th:text="${#strings.abbreviate(cmd.transcript, 50)}">Command</strong>
@@ -146,20 +331,20 @@
         </div>
     </div>
 
-    <!-- Quick File Complaint -->
+    <!-- Quick File Complaint - Responsive form -->
     <div class="card mt-4 shadow-sm">
         <div class="card-header bg-white fw-bold">
             <i class="fas fa-plus-circle me-2 text-purple"></i>Quick File Complaint
         </div>
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
+            <div class="row g-2">
+                <div class="col-12 col-md-3">
                     <input type="text" id="qName" class="form-control" placeholder="Your Name *">
                 </div>
-                <div class="col-md-2">
+                <div class="col-6 col-md-2">
                     <input type="text" id="qApt" class="form-control" placeholder="Apt No.">
                 </div>
-                <div class="col-md-2">
+                <div class="col-6 col-md-2">
                     <select id="qCategory" class="form-select">
                         <option value="">Category</option>
                         <option>NOISE</option>
@@ -171,12 +356,13 @@
                         <option>OTHER</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <input type="text" id="qDesc" class="form-control" placeholder="Describe the issue *">
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <button class="btn btn-purple w-100" onclick="quickFileComplaint()">
-                        <i class="fas fa-paper-plane me-1"></i>Submit
+                        <span class="btn-spinner"></span>
+                        <span class="btn-text"><i class="fas fa-paper-plane me-1"></i>Submit</span>
                     </button>
                 </div>
             </div>
@@ -192,7 +378,325 @@
     <small>Voice-Driven Virtual Customer Success Manager &bull; Built with Spring Boot &amp; Omnidim.io</small>
 </footer>
 
+<!-- JavaScript Dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/app.js"></script>
+<script src="/js/shortcuts.js"></script>
+<script src="/js/toast-notifications.js"></script>
+<script src="/js/spinners.js"></script>
+
+<script src="/js/typing-indicator.js"></script>
+<script src="/js/back-to-top.js"></script>
+<script src="/js/dark-mode.js"></script>
+<script src="/js/confirm-dialogs.js"></script>
+
+<script>
+    // Initialize toast
+    if (typeof toast !== 'undefined') {
+        window.toast = toast;
+    }
+    
+    // Variable to store last command ID
+    let lastCommandId = null;
+    
+    // Hide spinner when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const spinner = document.getElementById('pageSpinner');
+            if (spinner) {
+                spinner.classList.remove('active');
+            }
+        }, 300);
+
+<script src="/js/back-to-top.js"></script>
+<script src="/js/dark-mode.js"></script>
+
+<script>
+    // WebSocket Connection for Notifications
+    let stompClient = null;
+
+    function connectWebSocket() {
+        if (typeof SockJS === 'undefined') {
+            console.warn('SockJS not loaded. Loading dynamically...');
+            loadSockJS();
+            return;
+        }
+        try {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                console.log('✅ Connected to WebSocket');
+                
+                // Subscribe to user-specific notifications
+                stompClient.subscribe('/user/queue/notifications', function(notification) {
+                    const data = JSON.parse(notification.body);
+                    showNotification(data);
+                    updateNotificationCount();
+                });
+                
+                // Subscribe to global notifications
+                stompClient.subscribe('/topic/global', function(notification) {
+                    const data = JSON.parse(notification.body);
+                    showNotification(data);
+                });
+            }, function(error) {
+                console.error('WebSocket connection failed:', error);
+            });
+        } catch (e) {
+            console.error('WebSocket error:', e);
+        }
+    }
+
+    function loadSockJS() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js';
+        script.onload = function() {
+            const stompScript = document.createElement('script');
+            stompScript.src = 'https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js';
+            stompScript.onload = function() { connectWebSocket(); };
+            document.head.appendChild(stompScript);
+        };
+        document.head.appendChild(script);
+    }
+
+    function showNotification(data) {
+        // Show toast
+        if (typeof toast !== 'undefined') {
+            const type = data.type ? data.type.toLowerCase() : 'info';
+            toast[type](data.message || 'New notification', data.title || 'Notification');
+        }
+        // Update badge
+        updateNotificationCount();
+    }
+
+    function updateNotificationCount() {
+        fetch('/api/notifications/count')
+            .then(r => r.json())
+            .then(data => {
+                const badge = document.getElementById('notificationBadge');
+                if (data.count > 0) {
+                    badge.style.display = 'inline';
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(err => console.error('Error fetching notification count:', err));
+    }
+
+    function toggleNotifications() {
+        const dropdown = document.getElementById('notificationDropdown');
+        if (dropdown.style.display === 'none') {
+            loadNotifications();
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    }
+
+    function loadNotifications() {
+        fetch('/api/notifications')
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('notificationList');
+                if (data.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-bell-slash fa-2x mb-2 d-block"></i>
+                            <span>No notifications</span>
+                        </div>
+                    `;
+                    return;
+                }
+                list.innerHTML = data.map(n => `
+                    <div class="dropdown-item notification-item ${n.read ? '' : 'unread'}" 
+                         style="padding: 10px 12px; border-bottom: 1px solid #f0f0f0; ${n.read ? 'opacity: 0.7;' : 'background: #f8f9fa;'}"
+                         onclick="markAsRead(${n.id})">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold ${n.read ? '' : 'text-purple'}">${n.title}</div>
+                                <div class="small text-muted">${n.message}</div>
+                            </div>
+                            <small class="text-muted ms-2" style="font-size: 10px; white-space: nowrap;">
+                                ${new Date(n.createdAt).toLocaleString()}
+                            </small>
+                        </div>
+                        ${!n.read ? '<span class="badge bg-purple" style="font-size: 8px;">NEW</span>' : ''}
+                    </div>
+                `).join('');
+            })
+            .catch(err => console.error('Error loading notifications:', err));
+    }
+
+    function markAsRead(id) {
+        fetch(`/api/notifications/${id}/read`, { method: 'PUT' })
+            .then(() => {
+                updateNotificationCount();
+                loadNotifications();
+            })
+            .catch(err => console.error('Error marking as read:', err));
+    }
+
+    function markAllRead() {
+        fetch('/api/notifications/read-all', { method: 'PUT' })
+            .then(() => {
+                updateNotificationCount();
+                loadNotifications();
+                if (typeof toast !== 'undefined') {
+                    toast.success('All notifications marked as read', 'Success');
+                }
+            })
+            .catch(err => console.error('Error marking all as read:', err));
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const bell = document.querySelector('.btn-link');
+        if (dropdown && dropdown.style.display === 'block') {
+            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide spinner
+        setTimeout(function() {
+            const spinner = document.getElementById('pageSpinner');
+            if (spinner) spinner.classList.remove('active');
+        }, 500);
+        
+        // Connect WebSocket
+        connectWebSocket();
+        
+        // Update notification count
+        updateNotificationCount();
+
+        
+        // Show welcome toast
+        setTimeout(function() {
+            if (typeof toast !== 'undefined') {
+
+                toast.info('Welcome to Voice-Driven Customer Success Manager!', '🎤 Welcome');
+            }
+        }, 1000);
+    });
+
+
+    // Override sendCommand to capture command ID
+    function sendCommand() {
+        const input = document.getElementById('voiceInput');
+        const transcript = input.value.trim();
+        if (!transcript) {
+            toast.warning('Please type a command', 'Warning');
+            return;
+        }
+        
+        fetch('/api/voice/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript: transcript })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const responseDiv = document.getElementById('voiceResponse');
+            const responseText = document.getElementById('responseText');
+            responseDiv.classList.remove('d-none');
+            responseText.textContent = data.response || 'Command processed';
+            
+            // Store command ID for feedback
+            if (data.commandId) {
+                lastCommandId = data.commandId;
+            }
+            
+            // Show feedback buttons
+            const feedbackDiv = document.getElementById('feedbackButtons');
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+            }
+            
+            // Show toast
+            if (typeof toast !== 'undefined') {
+                toast.success('Command processed successfully!', 'Voice');
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Error processing command', 'Error');
+            }
+        });
+    }
+
+    // Submit feedback for voice command
+    function submitFeedback(type) {
+        if (!lastCommandId) {
+            if (typeof toast !== 'undefined') {
+                toast.error('No command to rate. Try a voice command first.', 'Error');
+            }
+            return;
+        }
+        
+        const userId = 1; // Replace with actual user ID
+        
+        fetch(`/api/voice/feedback?commandId=${lastCommandId}&userId=${userId}&feedback=${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof toast !== 'undefined') {
+                    toast.success('Thank you for your feedback!', 'Feedback');
+                }
+                const feedbackDiv = document.getElementById('feedbackButtons');
+                if (feedbackDiv) {
+                    feedbackDiv.innerHTML = '<span class="text-muted">✅ Feedback submitted</span>';
+                }
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.error('Error submitting feedback', 'Error');
+                }
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Network error. Please try again.', 'Error');
+            }
+        });
+    }
+
+                toast.info('Welcome to VCSM Dashboard!', '🎤 Welcome');
+            }
+        }, 1000);
+    });
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+        const isDark = document.documentElement.classList.toggle('dark-mode');
+        const icon = document.getElementById('darkModeIcon');
+        if (isDark) {
+            icon.className = 'fas fa-sun';
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            icon.className = 'fas fa-moon';
+            localStorage.setItem('darkMode', 'false');
+        }
+    }
+
+    // Check saved dark mode preference
+    (function() {
+        const saved = localStorage.getItem('darkMode');
+        if (saved === 'true') {
+            document.documentElement.classList.add('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = 'fas fa-sun';
+        }
+    })();
+
+
+</script>
 </body>
 </html>

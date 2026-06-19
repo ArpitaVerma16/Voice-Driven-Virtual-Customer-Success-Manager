@@ -2,9 +2,13 @@ package com.vcsm.service;
 
 import com.vcsm.model.VoiceCommand;
 import com.vcsm.model.Complaint;
+import com.vcsm.model.User;
 import com.vcsm.repository.VoiceCommandRepository;
+import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +34,15 @@ public class OmnidimService {
     @Autowired
     private VoiceModelRegistryService voiceModelRegistryService;
 
+    @Autowired
+    private VoiceAnalyticsService voiceAnalyticsService;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public Map<String, Object> processVoiceCommand(String transcript) {
+        long startTime = System.currentTimeMillis();
+        
         log.info("Processing: " + transcript);
         String lower = transcript.toLowerCase();
         String intent = detectIntent(lower);
@@ -42,6 +54,8 @@ public class OmnidimService {
             default -> "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
         };
 
+        long responseTime = System.currentTimeMillis() - startTime;
+
         VoiceCommand cmd = new VoiceCommand();
         cmd.setTranscript(transcript);
         cmd.setIntent(intent);
@@ -49,11 +63,31 @@ public class OmnidimService {
         cmd.setProcessed(true);
         voiceCommandRepository.save(cmd);
 
+        // Log voice analytics
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String email = auth != null ? auth.getName() : null;
+            User user = null;
+            if (email != null) {
+                user = userRepository.findByEmail(email).orElse(null);
+            }
+            if (user == null) {
+                user = userRepository.findById(1L).orElse(null); // Fallback to 1L
+            }
+            if (user != null) {
+                boolean success = !intent.equals("UNKNOWN");
+                voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
+            }
+        } catch (Exception e) {
+            log.warning("Failed to log voice analytics: " + e.getMessage());
+        }
+
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("intent", intent);
         result.put("transcript", transcript);
         result.put("response", response);
         result.put("success", true);
+        result.put("responseTime", responseTime);
         voiceModelRegistryService.getActiveModel()
                 .ifPresent(model -> result.put("voiceModelKey", model.modelKey()));
         return result;
@@ -77,8 +111,25 @@ public class OmnidimService {
         else if (t.contains("security")) cat = "security";
         else if (t.contains("parking")) cat = "parking";
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+        User user = null;
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+        if (user == null) {
+            user = userRepository.findById(1L).orElse(null); // Fallback to 1L
+        }
+
         Complaint complaint = new Complaint();
-        complaint.setResidentName("Voice Command");
+        if (user != null) {
+            complaint.setResidentName(user.getName());
+            complaint.setResidentUsername(user.getEmail());
+            complaint.setContactEmail(user.getEmail());
+            complaint.setUser(user);
+        } else {
+            complaint.setResidentName("Voice Command");
+        }
         complaint.setDescription(t);
         complaint.setCategory(Complaint.ComplaintCategory.valueOf(cat.toUpperCase()));
         complaintService.fileComplaint(complaint);

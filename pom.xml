@@ -71,7 +71,45 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- OpenNLP for Sentiment Analysis -->
+<dependency>
+    <groupId>org.apache.opennlp</groupId>
+    <artifactId>opennlp-tools</artifactId>
+    <version>2.3.0</version>
+</dependency>
 
+<!-- JSON processing -->
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.10.1</version>
+</dependency>
+
+<!-- OpenAPI/Swagger Documentation -->
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+
+<!-- OpenCSV for CSV export -->
+<dependency>
+    <groupId>com.opencsv</groupId>
+    <artifactId>opencsv</artifactId>
+    <version>5.8</version>
+</dependency>
+
+<!-- iTextPDF for PDF export -->
+<dependency>
+    <groupId>com.itextpdf</groupId>
+    <artifactId>itextpdf</artifactId>
+    <version>5.5.13.3</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
 
         <!-- Spring Boot Validation -->
         <dependency>
@@ -93,6 +131,27 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <!-- WebSocket -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
+<!-- STOMP -->
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>webjars-locator-core</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>sockjs-client</artifactId>
+    <version>1.5.1</version>
+</dependency>
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>stomp-websocket</artifactId>
+    <version>2.3.4</version>
+</dependency>
 
     <build>
         <plugins>

@@ -3,6 +3,8 @@ package com.vcsm.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -29,6 +31,8 @@ public class Event {
     private String organizer;
     private LocalDateTime createdAt;
 
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -47,6 +51,7 @@ public class Event {
     public String getOrganizer() { return organizer; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
+
     // ---- Setters ----
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
@@ -59,6 +64,7 @@ public class Event {
     public void setActive(boolean active) { this.active = active; }
     public void setOrganizer(String organizer) { this.organizer = organizer; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
 
     public enum EventCategory { SPORTS, CULTURAL, HEALTH, EDUCATION, ENTERTAINMENT, SOCIAL, OTHER }
 }
