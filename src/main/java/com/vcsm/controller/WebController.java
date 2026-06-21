@@ -133,8 +133,13 @@ public String complaintsPage(
     }
 
     @GetMapping("/voice-cloning")
-public String voiceCloning() {
-    return "voice-cloning-ui";
+    public String voiceCloning() {
+       return "voice-cloning-ui";
+    }
+
+    @GetMapping("/live-dashboard")
+public String liveDashboard() {
+    return "live-dashboard";
 }
 
     @GetMapping("/analytics")
