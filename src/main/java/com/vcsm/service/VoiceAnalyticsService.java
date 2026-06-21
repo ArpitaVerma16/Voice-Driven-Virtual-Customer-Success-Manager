@@ -34,6 +34,8 @@ public class VoiceAnalyticsService {
         long uniqueUsers = voiceAnalyticsRepository.getUniqueUsersCount();
         stats.put("uniqueUsers", uniqueUsers);
         
+        return stats;
+    }
 
     public Map<String, Object> getAnalytics() {
         Map<String, Object> stats = new LinkedHashMap<>();
@@ -65,10 +67,6 @@ public class VoiceAnalyticsService {
         stats.put("averageResponseTime", avgResponseTime != null ? Math.round(avgResponseTime) : 0);
         
 
-        // Average response time
-        Double avgResponseTime = voiceAnalyticsRepository.getAverageResponseTime();
-        stats.put("averageResponseTime", avgResponseTime != null ? Math.round(avgResponseTime) : 0);
-        
         // Recent commands (last 7 days)
 
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);

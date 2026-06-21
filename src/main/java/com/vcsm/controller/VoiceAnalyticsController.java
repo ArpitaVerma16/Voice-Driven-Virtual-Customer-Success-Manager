@@ -20,8 +20,7 @@ public class VoiceAnalyticsController {
     public ResponseEntity<Map<String, Object>> getSummary() {
 
         return ResponseEntity.ok(voiceAnalyticsService.getSummary());
-
-        return ResponseEntity.ok(voiceAnalyticsService.getAnalytics());
+        // return ResponseEntity.ok(voiceAnalyticsService.getAnalytics());
 
     }
     

@@ -22,6 +22,14 @@ public class ErrorResponse {
         this.path = path;
         this.timestamp = LocalDateTime.now();
     }
+
+    public ErrorResponse(int status, String error, String message) {
+        this.status = status;
+        this.error = error;
+        this.message = message;
+        this.userMessage = message;
+        this.timestamp = LocalDateTime.now();
+    }
     
     // Getters and Setters
     public int getStatus() { return status; }

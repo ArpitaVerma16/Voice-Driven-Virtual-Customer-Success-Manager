@@ -26,12 +26,12 @@ public class ComplaintService {
     private ComplaintRepository complaintRepository;
 
     @Autowired
+    private AuditLogService auditLogService;
 
-   private AuditLogService auditLogService;
+    @Autowired
+    private NotificationService notificationService;
 
-     @Autowired
-     private NotificationService notificationService;
-
+    @Autowired
     private PriorityClassifierService priorityClassifierService;
 
     @Autowired
@@ -39,12 +39,6 @@ public class ComplaintService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-
-    private AuditLogService auditLogService;
-
-    private NotificationService notificationService;
 
 
 

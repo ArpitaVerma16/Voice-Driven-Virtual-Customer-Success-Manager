@@ -5,35 +5,37 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+/*
 @Autowired
 private RateLimitFilter rateLimitFilter;
 
 // In configure method
 http.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class);
+*/
+/*
 @Configuration
 @EnableWebSecurity
+*/
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-                .antMatchers("/h2-console/**").denyAll()
-                .antMatchers("/api/auth/**").permitAll()
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/h2-console/**").denyAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
-                .and()
-            .formLogin()
+            )
+            .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
-                .and()
-            .logout()
+            )
+            .logout(logout -> logout
                 .permitAll()
-                .and()
-            .csrf()
-                .ignoringAntMatchers("/api/**")
-                .and()
-            .headers()
-                .frameOptions().disable();
+            )
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

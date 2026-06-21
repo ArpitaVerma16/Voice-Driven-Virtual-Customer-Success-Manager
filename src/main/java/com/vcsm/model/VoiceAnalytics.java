@@ -19,8 +19,6 @@ public class VoiceAnalytics {
     private String intent;
     private boolean success;
 
-    private long responseTime;
-
     private long responseTime; // in milliseconds
 
     
@@ -60,22 +58,7 @@ public class VoiceAnalytics {
     public long getResponseTime() { return responseTime; }
     public void setResponseTime(long responseTime) { this.responseTime = responseTime; }
 
-    
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    
-    public String getCommandText() { return commandText; }
-    public void setCommandText(String commandText) { this.commandText = commandText; }
-    
-    public String getIntent() { return intent; }
-    public void setIntent(String intent) { this.intent = intent; }
-    
-    public boolean isSuccess() { return success; }
-    public void setSuccess(boolean success) { this.success = success; }
-    
-    public long getResponseTime() { return responseTime; }
-    public void setResponseTime(long responseTime) { this.responseTime = responseTime; }
-    
+
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
