@@ -3,24 +3,14 @@ package com.vcsm.controller;
 import com.vcsm.model.Complaint;
 import com.vcsm.service.ComplaintService;
 import com.vcsm.service.EventService;
+import com.vcsm.service.InteractionService;
 import com.vcsm.service.OmnidimService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import org.springframework.data.domain.PageRequest;
-
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +33,9 @@ public class WebController {
 
     @Autowired
     private OmnidimService omnidimService;
+
+    @Autowired
+    private InteractionService interactionService;
 
     @GetMapping("/landing")
     public String landing() {
@@ -147,56 +140,6 @@ public String complaintsPage(
         return "dashboard";
     }
 
-    @GetMapping("/complaints")
-    public String complaintsPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-
-            Model model) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Complaint> complaintPage = complaintService.getPaginatedComplaints(pageable);
-        
-        model.addAttribute("complaints", complaintPage.getContent());
-        model.addAttribute("page", complaintPage);
-        model.addAttribute("stats", complaintService.getComplaintStats());
-        
-
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String priority,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            Model model) {
-
-        Sort sort = Sort.by("createdAt").descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        LocalDateTime start = null;
-        LocalDateTime end = null;
-        try {
-            if (startDate != null && !startDate.isEmpty()) {
-                start = LocalDateTime.parse(startDate + "T00:00:00");
-            }
-            if (endDate != null && !endDate.isEmpty()) {
-                end = LocalDateTime.parse(endDate + "T23:59:59");
-            }
-        } catch (Exception e) {
-            // Ignore date parsing errors
-        }
-
-        Page<Complaint> complaintPage = complaintService.searchComplaints(
-            keyword, status, category, priority, start, end, pageable);
-
-        model.addAttribute("complaints", complaintPage.getContent());
-        model.addAttribute("page", complaintPage);
-        model.addAttribute("stats", complaintService.getComplaintStats());
-
-
-        return "complaints";
-    }
-
     @GetMapping("/events")
     public String events(Model model) {
 
@@ -241,22 +184,6 @@ public String complaintsPage(
 
 
 
-    @GetMapping("/voice-analytics")
-    public String voiceAnalytics() {
-        return "voice-analytics";
-    }
-
-    @GetMapping("/profile")
-    public String profile() {
-        return "profile";
-
-    }
-    @GetMapping("/audit-logs")
-public String auditLogs() {
-    return "audit-logs";
-}
-
-
     @GetMapping("/interaction-history")
     public String interactionHistory(Model model) {
         try {
@@ -279,9 +206,5 @@ public String auditLogs() {
 
     }
 
-
-
-    }
-
-
 }
+
