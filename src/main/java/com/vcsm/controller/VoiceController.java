@@ -20,7 +20,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voice")
-@CrossOrigin(origins = "*")
 public class VoiceController {
 
     @Autowired

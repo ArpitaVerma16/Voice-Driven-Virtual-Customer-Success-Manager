@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/events/waitlist")
-@CrossOrigin(origins = "*")
 public class WaitlistController {
     
     @Autowired

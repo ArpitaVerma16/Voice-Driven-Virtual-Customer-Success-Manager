@@ -14,6 +14,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/h2-console/**").denyAll()
                 .requestMatchers("/api/auth/**").permitAll()

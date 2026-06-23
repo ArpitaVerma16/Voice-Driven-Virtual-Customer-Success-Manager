@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/language")
-@CrossOrigin(origins = "*")
 public class LanguageController {
     
     @Autowired

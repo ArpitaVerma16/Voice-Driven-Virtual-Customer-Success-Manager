@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voice/templates")
-@CrossOrigin(origins = "*")
 public class CommandTemplateController {
 
     @Autowired

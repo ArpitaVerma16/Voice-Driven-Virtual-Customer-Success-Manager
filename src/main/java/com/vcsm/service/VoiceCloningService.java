@@ -67,8 +67,13 @@ public class VoiceCloningService {
             Files.createDirectories(uploadPath);
         }
 
-        String fileName = UUID.randomUUID().toString() + "_" + audioFile.getOriginalFilename();
-        Path filePath = uploadPath.resolve(fileName);
+        String originalName = audioFile.getOriginalFilename();
+        String safeName = originalName != null ? originalName.replaceAll("[^a-zA-Z0-9._-]", "_") : "audio";
+        String fileName = UUID.randomUUID().toString() + "_" + safeName;
+        Path filePath = uploadPath.resolve(fileName).normalize();
+        if (!filePath.startsWith(uploadPath)) {
+            throw new SecurityException("Path traversal detected");
+        }
         Files.write(filePath, audioFile.getBytes());
 
         return filePath.toString();

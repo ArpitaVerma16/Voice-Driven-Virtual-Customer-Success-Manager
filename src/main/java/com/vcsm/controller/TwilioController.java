@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/twilio")
-@CrossOrigin(origins = "*")
 public class TwilioController {
 
     @Autowired

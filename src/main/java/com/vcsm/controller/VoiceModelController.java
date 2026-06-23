@@ -18,7 +18,6 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping({"/voice-model", "/api/voice-model"})
-@CrossOrigin(origins = "*")
 @ConditionalOnProperty(name = "voice.model.s3.bucket")
 public class VoiceModelController {
 

@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ratelimit")
-@CrossOrigin(origins = "*")
 public class RateLimitController {
 
     @Autowired

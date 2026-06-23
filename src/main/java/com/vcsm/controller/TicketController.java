@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = "*")
 public class TicketController {
 
     @Autowired

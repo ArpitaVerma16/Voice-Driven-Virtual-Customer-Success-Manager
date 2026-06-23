@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,7 +23,7 @@ public class UserBehaviorMonitor {
     private UserRepository userRepository;
 
     // In-memory user behavior tracking
-    private final Map<Long, UserBehavior> userBehaviorMap = new HashMap<>();
+    private final Map<Long, UserBehavior> userBehaviorMap = new ConcurrentHashMap<>();
 
     /**
      * Track user behavior and detect patterns

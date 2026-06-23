@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/complaints/bulk")
-@CrossOrigin(origins = "*")
 public class BulkComplaintController {
 
     @Autowired

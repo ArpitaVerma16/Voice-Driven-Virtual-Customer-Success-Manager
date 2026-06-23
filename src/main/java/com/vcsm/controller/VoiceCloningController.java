@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voice/cloning")
-@CrossOrigin(origins = "*")
 public class VoiceCloningController {
 
     @Autowired

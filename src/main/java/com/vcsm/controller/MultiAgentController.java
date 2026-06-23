@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agent")
-@CrossOrigin(origins = "*")
 public class MultiAgentController {
 
     @Autowired
