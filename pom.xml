@@ -24,6 +24,116 @@
     </properties>
 
     <dependencies>
+
+    <!-- ElevenLabs API Client -->
+<dependency>
+    <groupId>com.elevenlabs</groupId>
+    <artifactId>elevenlabs-java</artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+<!-- For audio processing -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.12.0</version>
+</dependency>
+
+<!-- Web3j for Ethereum integration -->
+<dependency>
+    <groupId>org.web3j</groupId>
+    <artifactId>core</artifactId>
+    <version>4.9.5</version>
+</dependency>
+
+=
+<!-- Twilio SDK -->
+<dependency>
+    <groupId>com.twilio.sdk</groupId>
+    <artifactId>twilio</artifactId>
+    <version>9.9.0</version>
+</dependency>
+
+<!-- For XML processing (Twilio TwiML) -->
+<dependency>
+
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.3.1</version>
+
+<groupId>jakarta.xml.bind</groupId>
+<artifactId>jakarta.xml.bind-api</artifactId>
+<version>4.0.0</version>
+</dependency>
+
+<!-- OpenNLP for NLP -->
+<dependency>
+    <groupId>org.apache.opennlp</groupId>
+    <artifactId>opennlp-tools</artifactId>
+    <version>2.3.0</version>
+</dependency>
+
+<!-- Kafka for event processing -->
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+
+<!-- MLflow for model tracking -->
+<dependency>
+    <groupId>org.mlflow</groupId>
+    <artifactId>mlflow-client</artifactId>
+    <version>2.9.0</version>
+
+</dependency>
+
+
+<!-- QR Code Generation -->
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>core</artifactId>
+    <version>3.5.3</version>
+</dependency>
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>javase</artifactId>
+    <version>3.5.3</version>
+</dependency>
+
+<!-- Bouncy Castle for hashing -->
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcprov-jdk15on</artifactId>
+    <version>1.70</version>
+</dependency>
+<!-- Google Cloud Translation -->
+<dependency>
+    <groupId>com.google.cloud</groupId>
+    <artifactId>google-cloud-translate</artifactId>
+    <version>2.6.0</version>
+</dependency>
+
+
+<!-- For audio processing -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.12.0</version>
+</dependency>
+
+
+<!-- JSON processing -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+</dependency>
+
+<!-- Audio file handling -->
+<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.13.0</version>
+</dependency>
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -70,13 +180,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- OpenNLP for Sentiment Analysis -->
-        <dependency>
-            <groupId>org.apache.opennlp</groupId>
-            <artifactId>opennlp-tools</artifactId>
-            <version>2.3.0</version>
         </dependency>
 
         <!-- JSON processing -->

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Verification - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/">VCSM</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Dashboard</a>
+            <a class="nav-link" href="/complaints">Complaints</a>
+            <a class="nav-link" href="/events">Events</a>
+            <a class="nav-link active" href="/blockchain-verify">Blockchain Verify</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4><i class="fas fa-link text-purple me-2"></i>Blockchain Verification</h4>
+    <p class="text-muted">Verify complaint authenticity using blockchain technology</p>
+
+    <!-- Search -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <input type="number" id="complaintId" class="form-control" placeholder="Enter Complaint ID to verify...">
+                <button class="btn btn-purple" onclick="verifyComplaint()">
+                    <i class="fas fa-search me-1"></i> Verify
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result -->
+    <div id="verificationResult" style="display: none;">
+        <div class="card shadow-sm mb-3" id="resultCard">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-check-circle text-success me-2" id="statusIcon"></i>Verification Result</span>
+                <span class="badge" id="statusBadge">Verified</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Complaint ID:</strong> <span id="complaintIdDisplay">-</span></p>
+                        <p><strong>Status:</strong> <span id="complaintStatusDisplay">-</span></p>
+                        <p><strong>Block Count:</strong> <span id="blockCountDisplay">-</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Blockchain Hash:</strong> <code id="hashDisplay" class="small">-</code></p>
+                        <p><strong>Verification Link:</strong> <span id="verificationLink">-</span></p>
+                        <p><strong>Blockchain Valid:</strong> <span id="blockchainValidDisplay">-</span></p>
+                    </div>
+                </div>
+                
+                <!-- Blockchain History -->
+                <div class="mt-3">
+                    <h6><i class="fas fa-history me-2"></i>Blockchain History</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Block #</th>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                    <th>Hash</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blockHistoryBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blockchain Status -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white fw-bold">
+            <i class="fas fa-link me-2 text-purple"></i>Blockchain Status
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Total Blocks:</strong> <span id="totalBlocks">-</span></p>
+                    <p><strong>Blockchain Valid:</strong> <span id="blockchainValid" class="badge bg-success">Yes</span></p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshBlockchain()">
+                        <i class="fas fa-sync me-1"></i> Refresh
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="validateBlockchain()">
+                        <i class="fas fa-shield-alt me-1"></i> Validate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/toast-notifications.js"></script>
+
+<script>
+    function verifyComplaint() {
+        const id = document.getElementById('complaintId').value;
+        if (!id) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Please enter a complaint ID', 'Warning');
+            }
+            return;
+        }
+        
+        fetch(`/api/blockchain/verify/${id}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success === false) {
+                    if (typeof toast !== 'undefined') {
+                        toast.error(data.message || 'Complaint not found', 'Error');
+                    }
+                    document.getElementById('verificationResult').style.display = 'none';
+                    return;
+                }
+                
+                document.getElementById('verificationResult').style.display = 'block';
+                document.getElementById('complaintIdDisplay').textContent = data.complaintId;
+                document.getElementById('complaintStatusDisplay').textContent = data.complaintStatus;
+                document.getElementById('blockCountDisplay').textContent = data.blockCount;
+                document.getElementById('hashDisplay').textContent = data.hash || '-';
+                document.getElementById('verificationLink').textContent = data.verificationLink || '-';
+                document.getElementById('blockchainValidDisplay').textContent = data.blockchainValid ? '✅ Valid' : '❌ Invalid';
+                
+                // Update status badge
+                const badge = document.getElementById('statusBadge');
+                const icon = document.getElementById('statusIcon');
+                if (data.blockchainValid) {
+                    badge.className = 'badge bg-success';
+                    badge.textContent = '✅ Verified';
+                    icon.className = 'fas fa-check-circle text-success me-2';
+                } else {
+                    badge.className = 'badge bg-danger';
+                    badge.textContent = '❌ Invalid';
+                    icon.className = 'fas fa-times-circle text-danger me-2';
+                }
+                
+                // Update block history
+                const tbody = document.getElementById('blockHistoryBody');
+                if (data.blockchainHistory && data.blockchainHistory.length > 0) {
+                    tbody.innerHTML = data.blockchainHistory.map(b => `
+                        <tr>
+                            <td>${b.index}</td>
+                            <td>${b.timestamp}</td>
+                            <td>${b.data ? b.data.substring(0, 100) + '...' : '-'}</td>
+                            <td><code class="small">${b.hash ? b.hash.substring(0, 20) + '...' : '-'}</code></td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No blockchain records</td></tr>';
+                }
+                
+                if (typeof toast !== 'undefined') {
+                    toast.success('Complaint verified successfully!', 'Success');
+                }
+            })
+            .catch(err => {
+                if (typeof toast !== 'undefined') {
+                    toast.error('Error verifying complaint', 'Error');
+                }
+                console.error(err);
+            });
+    }
+
+    function refreshBlockchain() {
+        fetch('/api/blockchain/details')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('totalBlocks').textContent = data.blockCount || 0;
+                document.getElementById('blockchainValid').textContent = data.isValid ? '✅ Yes' : '❌ No';
+                document.getElementById('blockchainValid').className = data.isValid ? 'badge bg-success' : 'badge bg-danger';
+            })
+            .catch(err => console.error(err));
+    }
+
+    function validateBlockchain() {
+        fetch('/api/blockchain/validate')
+            .then(r => r.json())
+            .then(data => {
+                if (typeof toast !== 'undefined') {
+                    toast[data.valid ? 'success' : 'error'](data.message, data.valid ? 'Valid' : 'Invalid');
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        refreshBlockchain();
+        
+        document.getElementById('complaintId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyComplaint();
+            }
+        });
+    });
+</script>
+</body>
+</html>

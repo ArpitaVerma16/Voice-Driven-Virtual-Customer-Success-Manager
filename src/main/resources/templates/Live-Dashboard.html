@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Dashboard - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/ui.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/">VCSM</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Dashboard</a>
+            <a class="nav-link" href="/complaints">Complaints</a>
+            <a class="nav-link" href="/events">Events</a>
+            <a class="nav-link active" href="/live-dashboard">Live Dashboard</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4><i class="fas fa-bolt text-purple me-2"></i>Live Dashboard <span class="badge bg-success" id="liveBadge">🟢 LIVE</span></h4>
+    <p class="text-muted">Real-time updates every 5 seconds</p>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0 stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-danger-soft mb-2"><i class="fas fa-exclamation-triangle text-danger"></i></div>
+                    <h3 class="fw-bold text-danger" id="openComplaints">-</h3>
+                    <p class="text-muted mb-0">Open Complaints</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0 stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-success-soft mb-2"><i class="fas fa-check-circle text-success"></i></div>
+                    <h3 class="fw-bold text-success" id="resolvedComplaints">-</h3>
+                    <p class="text-muted mb-0">Resolved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0 stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-info-soft mb-2"><i class="fas fa-users text-info"></i></div>
+                    <h3 class="fw-bold text-info" id="activeUsers">-</h3>
+                    <p class="text-muted mb-0">Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0 stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-purple-soft mb-2"><i class="fas fa-chart-line text-purple"></i></div>
+                    <h3 class="fw-bold text-purple" id="resolutionRate">-<span style="font-size:16px;">%</span></h3>
+                    <p class="text-muted mb-0">Resolution Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">Complaint Trends</div>
+                <div class="card-body">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">Status Distribution</div>
+                <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let eventSource = null;
+    let trendChart = null;
+    let statusChart = null;
+    let dataPoints = [];
+
+    function connectSSE() {
+        eventSource = new EventSource('/api/live/stream');
+        
+        eventSource.addEventListener('init', function(e) {
+            const data = JSON.parse(e.data);
+            updateStats(data);
+            updateCharts(data);
+        });
+        
+        eventSource.addEventListener('update', function(e) {
+            const event = JSON.parse(e.data);
+            const data = event.data;
+            updateStats(data);
+            updateCharts(data);
+        });
+        
+        eventSource.onerror = function(e) {
+            console.error('SSE error:', e);
+            document.getElementById('liveBadge').textContent = '🔴 Disconnected';
+            document.getElementById('liveBadge').className = 'badge bg-danger';
+            
+            // Retry after 5 seconds
+            setTimeout(connectSSE, 5000);
+        };
+    }
+
+    function updateStats(data) {
+        document.getElementById('openComplaints').textContent = data.openComplaints || 0;
+        document.getElementById('resolvedComplaints').textContent = data.resolvedComplaints || 0;
+        document.getElementById('activeUsers').textContent = data.activeUsers || 0;
+        document.getElementById('resolutionRate').innerHTML = (data.resolutionRate || 0) + '<span style="font-size:16px;">%</span>';
+        
+        document.getElementById('liveBadge').textContent = '🟢 LIVE';
+        document.getElementById('liveBadge').className = 'badge bg-success';
+    }
+
+    function updateCharts(data) {
+        // Update trend chart data
+        const now = new Date();
+        dataPoints.push({
+            time: now.toLocaleTimeString(),
+            value: data.openComplaints || 0
+        });
+        
+        // Keep only last 20 points
+        if (dataPoints.length > 20) {
+            dataPoints.shift();
+        }
+        
+        if (trendChart) {
+            trendChart.data.labels = dataPoints.map(d => d.time);
+            trendChart.data.datasets[0].data = dataPoints.map(d => d.value);
+            trendChart.update('none');
+        }
+        
+        // Update status chart
+        if (statusChart) {
+            statusChart.data.datasets[0].data = [
+                data.openComplaints || 0,
+                data.inProgressComplaints || 0,
+                data.resolvedComplaints || 0
+            ];
+            statusChart.update('none');
+        }
+    }
+
+    function initCharts() {
+        // Trend Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Open Complaints',
+                    data: [],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        
+        // Status Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        statusChart = new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Open', 'In Progress', 'Resolved'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#dc3545', '#ffc107', '#28a745']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initCharts();
+        connectSSE();
+    });
+</script>
+</body>
+</html>

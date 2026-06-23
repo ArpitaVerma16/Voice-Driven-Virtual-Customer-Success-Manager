@@ -70,7 +70,7 @@ public class OmnidimService {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth != null ? auth.getName() : null;
-            User user = null;
+            user = null;
             if (email != null) {
                 user = userRepository.findByEmail(email).orElse(null);
             }

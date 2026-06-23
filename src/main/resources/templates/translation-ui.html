@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Translation - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/">VCSM</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Dashboard</a>
+            <a class="nav-link" href="/complaints">Complaints</a>
+            <a class="nav-link" href="/events">Events</a>
+            <a class="nav-link active" href="/translation">Translation</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4><i class="fas fa-language text-purple me-2"></i>Voice-to-Voice Translation</h4>
+    <p class="text-muted">Translate text and speech between multiple languages</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">
+                    <i class="fas fa-microphone me-2 text-purple"></i>Input
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Source Language</label>
+                        <select id="sourceLang" class="form-select" onchange="toggleSourceDetect()">
+                            <option value="auto">Auto-detect</option>
+                            <option value="hi">Hindi</option>
+                            <option value="en">English</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="kn">Kannada</option>
+                            <option value="bn">Bengali</option>
+                            <option value="mr">Marathi</option>
+                            <option value="gu">Gujarati</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text to Translate</label>
+                        <textarea id="inputText" class="form-control" rows="4" placeholder="Type or speak your message..."></textarea>
+                    </div>
+                    <div class="mb-3" id="detectedLanguageDisplay" style="display: none;">
+                        <span class="badge bg-info">Detected: <span id="detectedLang">-</span></span>
+                    </div>
+                    <button class="btn btn-purple" onclick="translateText()">
+                        <i class="fas fa-exchange-alt me-1"></i> Translate
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" onclick="clearInput()">
+                        <i class="fas fa-times me-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">
+                    <i class="fas fa-volume-up me-2 text-purple"></i>Output
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Target Language</label>
+                        <select id="targetLang" class="form-select">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="kn">Kannada</option>
+                            <option value="bn">Bengali</option>
+                            <option value="mr">Marathi</option>
+                            <option value="gu">Gujarati</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Translated Text</label>
+                        <div id="translatedText" class="border rounded p-3 bg-light" style="min-height: 100px;">
+                            <span class="text-muted">Translation will appear here...</span>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="translationInfo" style="display: none;">
+                        <small class="text-muted">
+                            <span id="sourceDisplay">-</span> → <span id="targetDisplay">-</span>
+                        </small>
+                    </div>
+                    <button class="btn btn-outline-success" onclick="speakTranslation()">
+                        <i class="fas fa-volume-up me-1"></i> Listen
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" onclick="copyTranslation()">
+                        <i class="fas fa-copy me-1"></i> Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleSourceDetect() {
+        const sourceLang = document.getElementById('sourceLang').value;
+        const detectDisplay = document.getElementById('detectedLanguageDisplay');
+        if (sourceLang === 'auto') {
+            detectDisplay.style.display = 'block';
+        } else {
+            detectDisplay.style.display = 'none';
+        }
+    }
+
+    function translateText() {
+        const text = document.getElementById('inputText').value.trim();
+        if (!text) {
+            alert('Please enter text to translate');
+            return;
+        }
+        
+        const sourceLang = document.getElementById('sourceLang').value;
+        const targetLang = document.getElementById('targetLang').value;
+        
+        document.getElementById('translatedText').innerHTML = '<span class="text-muted">Translating...</span>';
+        
+        fetch('/api/translation/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: text,
+                sourceLang: sourceLang,
+                targetLang: targetLang
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('translatedText').innerHTML = 
+                    '<span class="text-danger">Error: ' + data.error + '</span>';
+                return;
+            }
+            
+            document.getElementById('translatedText').textContent = data.translated;
+            document.getElementById('translationInfo').style.display = 'block';
+            document.getElementById('sourceDisplay').textContent = 
+                data.sourceLanguageName + ' (' + data.sourceLanguage + ')';
+            document.getElementById('targetDisplay').textContent = 
+                data.targetLanguageName + ' (' + data.targetLanguage + ')';
+            
+            // If auto-detect, show detected language
+            if (data.sourceLanguage) {
+                document.getElementById('detectedLang').textContent = 
+                    data.sourceLanguageName + ' (' + data.sourceLanguage + ')';
+            }
+        })
+        .catch(err => {
+            document.getElementById('translatedText').innerHTML = 
+                '<span class="text-danger">Error: ' + err.message + '</span>';
+        });
+    }
+
+    function speakTranslation() {
+        const text = document.getElementById('translatedText').textContent;
+        if (!text || text.includes('Translation will appear here') || text.includes('Error')) {
+            alert('No translated text to speak');
+            return;
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        const targetLang = document.getElementById('targetLang').value;
+        
+        // Set language for speech
+        if (targetLang === 'hi') utterance.lang = 'hi-IN';
+        else if (targetLang === 'ta') utterance.lang = 'ta-IN';
+        else if (targetLang === 'te') utterance.lang = 'te-IN';
+        else if (targetLang === 'ml') utterance.lang = 'ml-IN';
+        else if (targetLang === 'kn') utterance.lang = 'kn-IN';
+        else if (targetLang === 'bn') utterance.lang = 'bn-IN';
+        else if (targetLang === 'mr') utterance.lang = 'mr-IN';
+        else if (targetLang === 'gu') utterance.lang = 'gu-IN';
+        else utterance.lang = 'en-US';
+        
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+    }
+
+    function copyTranslation() {
+        const text = document.getElementById('translatedText').textContent;
+        if (!text || text.includes('Translation will appear here') || text.includes('Error')) {
+            alert('Nothing to copy');
+            return;
+        }
+        
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Copied to clipboard!');
+        });
+    }
+
+    function clearInput() {
+        document.getElementById('inputText').value = '';
+        document.getElementById('translatedText').innerHTML = 
+            '<span class="text-muted">Translation will appear here...</span>';
+        document.getElementById('translationInfo').style.display = 'none';
+        document.getElementById('detectedLanguageDisplay').style.display = 'none';
+    }
+
+    // Auto-detect when typing
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('inputText');
+        input.addEventListener('input', function() {
+            const sourceLang = document.getElementById('sourceLang').value;
+            if (sourceLang === 'auto' && this.value.trim().length > 2) {
+                fetch('/api/translation/detect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: this.value })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.languageName) {
+                        document.getElementById('detectedLang').textContent = 
+                            data.languageName + ' (' + data.languageCode + ')';
+                        document.getElementById('detectedLanguageDisplay').style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Detection error:', err));
+            }
+        });
+    });
+</script>
+</body>
+</html>

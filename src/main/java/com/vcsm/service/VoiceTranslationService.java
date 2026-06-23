@@ -1,0 +1,161 @@
+package com.vcsm.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
+public class VoiceTranslationService {
+
+    @Autowired
+    private LanguageDetector languageDetector;
+
+    @Value("${google.translate.api.key:}")
+    private String apiKey;
+
+    @Value("${google.speech.api.key:}")
+    private String speechApiKey;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Translate text from source language to target language
+     */
+    public String translateText(String text, String sourceLang, String targetLang) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        
+        if (sourceLang.equals(targetLang)) {
+            return text;
+        }
+
+        // If no API key, use fallback translation
+        if (apiKey == null || apiKey.isEmpty()) {
+            return getFallbackTranslation(text, sourceLang, targetLang);
+        }
+
+        try {
+            String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
+            String urlStr = "https://translation.googleapis.com/language/translate/v2?" +
+                    "key=" + apiKey +
+                    "&q=" + encodedText +
+                    "&source=" + sourceLang +
+                    "&target=" + targetLang;
+            
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(conn.getInputStream())
+            );
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+            
+            // Parse response
+            Map<String, Object> json = objectMapper.readValue(
+                response.toString(), 
+                Map.class
+            );
+            
+            Map<String, Object> data = (Map<String, Object>) json.get("data");
+            if (data != null) {
+                Object translations = data.get("translations");
+                if (translations instanceof java.util.List) {
+                    java.util.List<Map<String, Object>> list = 
+                        (java.util.List<Map<String, Object>>) translations;
+                    if (!list.isEmpty()) {
+                        return (String) list.get(0).get("translatedText");
+                    }
+                }
+            }
+            
+            return text;
+            
+        } catch (Exception e) {
+            // Fallback to mock translation
+            return getFallbackTranslation(text, sourceLang, targetLang);
+        }
+    }
+
+    /**
+     * Auto-detect language and translate to target
+     */
+    public String autoTranslate(String text, String targetLang) {
+        String sourceLang = languageDetector.detectLanguage(text);
+        return translateText(text, sourceLang, targetLang);
+    }
+
+    /**
+     * Mock translation for Hindi/English (fallback when API key is missing)
+     */
+    private String getFallbackTranslation(String text, String sourceLang, String targetLang) {
+        // If translation is Hindi -> English or vice versa
+        if (sourceLang.equals("hi") && targetLang.equals("en")) {
+            return getHindiToEnglishMock(text);
+        } else if (sourceLang.equals("en") && targetLang.equals("hi")) {
+            return getEnglishToHindiMock(text);
+        }
+        return text + " [translated to " + targetLang + "]";
+    }
+
+    private String getHindiToEnglishMock(String text) {
+        // Simple mock translations for common phrases
+        String lower = text.toLowerCase();
+        if (lower.contains("शिकायत") || lower.contains("shikayat")) {
+            return "Complaint filed successfully";
+        } else if (lower.contains("नमस्ते") || lower.contains("namaste")) {
+            return "Hello! How can I help you?";
+        } else if (lower.contains("धन्यवाद") || lower.contains("dhanyavaad")) {
+            return "You're welcome!";
+        } else if (lower.contains("मदद") || lower.contains("madad")) {
+            return "I'm here to help you";
+        } else if (lower.contains("स्टेटस") || lower.contains("status")) {
+            return "Your complaint status is: In Progress";
+        } else if (lower.contains("इवेंट") || lower.contains("event")) {
+            return "Events are available on the Events page";
+        } else {
+            return "I understand your query. Our team will look into it.";
+        }
+    }
+
+    private String getEnglishToHindiMock(String text) {
+        String lower = text.toLowerCase();
+        if (lower.contains("complaint")) {
+            return "शिकायत सफलतापूर्वक दर्ज की गई";
+        } else if (lower.contains("hello") || lower.contains("hi")) {
+            return "नमस्ते! मैं आपकी कैसे मदद कर सकता हूँ?";
+        } else if (lower.contains("thank")) {
+            return "आपका स्वागत है!";
+        } else if (lower.contains("help")) {
+            return "मैं आपकी मदद के लिए यहाँ हूँ";
+        } else if (lower.contains("status")) {
+            return "आपकी शिकायत का स्टेटस: प्रगति पर है";
+        } else if (lower.contains("event")) {
+            return "इवेंट पेज पर इवेंट उपलब्ध हैं";
+        } else {
+            return "मैं आपका प्रश्न समझ गया। हमारी टीम इस पर ध्यान देगी।";
+        }
+    }
+
+    /**
+     * Get supported languages for the UI
+     */
+    public Map<String, String> getSupportedLanguages() {
+        return languageDetector.getSupportedLanguages();
+    }
+}

@@ -2,14 +2,11 @@ package com.vcsm.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-@Autowired
-private RateLimitFilter rateLimitFilter;
 
-// In configure method
-http.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class);
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -17,23 +14,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-                .antMatchers("/h2-console/**").denyAll()
-                .antMatchers("/api/auth/**").permitAll()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/h2-console/**").denyAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
-                .and()
-            .formLogin()
+            )
+            .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
-                .and()
-            .logout()
-                .permitAll()
-                .and()
-            .csrf()
-                .ignoringAntMatchers("/api/**")
-                .and()
-            .headers()
-                .frameOptions().disable();
+            )
+            .logout(Customizer.withDefaults())
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**")
+            )
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.disable())
+            );
 
         return http.build();
     }
