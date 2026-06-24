@@ -41,15 +41,7 @@ public class ComplaintService {
     private UserRepository userRepository;
 
     @Autowired
-
     private BlockchainService blockchainService;
-
-
-    private AuditLogService auditLogService;
-
-    private NotificationService notificationService;
-
-
 
 
     private boolean isAdmin() {
@@ -332,22 +324,6 @@ public class ComplaintService {
             blockchainService.addBlock(updated, "PRIORITY_UPDATED");
         } catch (Exception e) {
             log.warning("Failed to add block to blockchain: " + e.getMessage());
-
-
-        } catch (Exception e) {
-            log.warning("Failed to log user activity: " + e.getMessage());
-
-        }
-
-        // Add to blockchain
-        try {
-            blockchainService.addBlock(updated, "PRIORITY_UPDATED");
-        } catch (Exception e) {
-            log.warning("Failed to add block to blockchain: " + e.getMessage());
-
-        } catch (Exception e) {
-            log.warning("Failed to log user activity: " + e.getMessage());
-
         }
 
         return updated;
@@ -357,7 +333,7 @@ public class ComplaintService {
         if (!isAdmin()) {
             throw new AccessDeniedException("Only admins can delete complaints");
         }
-e
+
 
 
         Complaint complaint = complaintRepository.findById(id)
