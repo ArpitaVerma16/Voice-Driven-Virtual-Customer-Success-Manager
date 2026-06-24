@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/twilio")
@@ -36,7 +37,7 @@ public class TwilioController {
     private UserRepository userRepository;
 
     // Store call sessions (in production, use Redis or database)
-    private final Map<String, Map<String, Object>> callSessions = new HashMap<>();
+    private final Map<String, Map<String, Object>> callSessions = new ConcurrentHashMap<>();
 
     /**
      * Initiate a call
