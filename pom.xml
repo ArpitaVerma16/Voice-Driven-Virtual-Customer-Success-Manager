@@ -47,12 +47,6 @@
     <version>9.9.0</version>
 </dependency>
 
- <dependency>
-    <groupId>com.bucket4j</groupId>
-    <artifactId>bucket4j-core</artifactId>
-    <version>8.10.1</version>
-</dependency>
-
 <!-- For XML processing (Twilio TwiML) -->
 <dependency>
     <groupId>javax.xml.bind</groupId>
@@ -203,10 +197,10 @@
 
         <!-- AWS S3 SDK for voice model uploads -->
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-            <version>2.25.60</version>
-        </dependency>
+           <groupId>software.amazon.awssdk</groupId>
+           <artifactId>s3</artifactId>
+           <version>2.25.53</version>
+      </dependency>
 
         <!-- WebSocket -->
         <dependency>
