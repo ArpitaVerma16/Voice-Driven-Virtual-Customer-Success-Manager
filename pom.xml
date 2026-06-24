@@ -25,12 +25,6 @@
 
     <dependencies>
 
-    <!-- ElevenLabs API Client -->
-<dependency>
-    <groupId>com.elevenlabs</groupId>
-    <artifactId>elevenlabs-java</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
 <!-- For audio processing -->
 <dependency>
