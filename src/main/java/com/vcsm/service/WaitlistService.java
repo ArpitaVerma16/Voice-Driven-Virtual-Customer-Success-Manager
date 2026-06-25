@@ -157,7 +157,7 @@ public class WaitlistService {
      * Clean expired waitlist entries (run by scheduler)
      */
     @Transactional
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void cleanExpiredWaitlist() {
         LocalDateTime now = LocalDateTime.now();
         List<EventWaitlist> expired = waitlistRepository.findByConfirmedFalseAndExpiresAtBefore(now);

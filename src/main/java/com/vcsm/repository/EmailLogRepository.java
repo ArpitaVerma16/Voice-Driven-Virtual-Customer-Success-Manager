@@ -18,4 +18,5 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
     List<EmailLog> findByStatusAndSentAtBefore(String status, LocalDateTime date);
     
     long countByEventAndStatus(Event event, String status);
+    void deleteByEvent(Event event);
 }

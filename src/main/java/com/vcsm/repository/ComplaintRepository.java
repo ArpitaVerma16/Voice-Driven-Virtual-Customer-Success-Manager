@@ -1,20 +1,28 @@
 package com.vcsm.repository;
 
 import com.vcsm.model.Complaint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Repository
-public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
+public interface ComplaintRepository extends JpaRepository<Complaint, Long>, JpaSpecificationExecutor<Complaint> {
 
     List<Complaint> findByStatus(Complaint.ComplaintStatus status);
 
     List<Complaint> findByResidentName(String residentName);
 
     List<Complaint> findByResidentUsernameOrderByCreatedAtDesc(String residentUsername);
+
+    Page<Complaint> findByResidentUsername(String residentUsername, Pageable pageable);
 
     List<Complaint> findByPriority(String priority);
 
@@ -37,4 +45,14 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 
     @Query("SELECT c.priority, COUNT(c) FROM Complaint c GROUP BY c.priority")
     List<Object[]> countByPriority();
+
+    @Query("SELECT c.id FROM Complaint c")
+List<Long> findAllIds();
+
+@Query("SELECT c.id FROM Complaint c WHERE c.status = :status")
+List<Long> findIdsByStatus(@Param("status") Complaint.ComplaintStatus status);
+
+
+
+    Page<Complaint> findAll(Pageable pageable);
 }

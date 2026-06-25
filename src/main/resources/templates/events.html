@@ -110,6 +110,33 @@
     <meta property="og:description" content="Voice-driven community support platform">
     <meta name="twitter:card" content="summary_large_image">
 
+    <!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+<!-- Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+
+<!-- Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(reg) {
+                    console.log('✅ Service Worker registered successfully:', reg);
+                })
+                .catch(function(err) {
+                    console.warn('❌ Service Worker registration failed:', err);
+                });
+        });
+    }
+</script>
 
 </head>
 <body>

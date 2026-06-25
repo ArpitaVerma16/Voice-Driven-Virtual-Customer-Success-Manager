@@ -1,15 +1,22 @@
 package com.vcsm.controller;
 
+import com.vcsm.model.Complaint;
 import com.vcsm.service.ComplaintService;
 import com.vcsm.service.EventService;
-import com.vcsm.service.OmnidimService;
 import com.vcsm.service.InteractionService;
+import com.vcsm.service.OmnidimService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,12 +41,68 @@ public class WebController {
     public String landing() {
         return "landing";
     }
+    @GetMapping("/login")
+     public String login() {
+    return "login";
+    }
+
+
+    @GetMapping("/chatbot")
+    public String chatbot() {
+        return "chatbot-ui";
+    }
+
+    @GetMapping("/voice-templates")
+    public String voiceTemplates() {
+        return "voice-templates";
+    }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "profile";
+    }
+
+
+    @GetMapping("/onboarding")
+    public String onboarding() {
+        return "onboarding";
+    }
+
+
+
+    @GetMapping("/complaints")
+public String complaintsPage(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        Model model) {
+    
+    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+    Page<Complaint> complaintPage = complaintService.getPaginatedComplaints(pageable);
+    
+    model.addAttribute("complaints", complaintPage.getContent());
+    model.addAttribute("page", complaintPage);
+    model.addAttribute("stats", complaintService.getComplaintStats());
+    
+    return "complaints";
+}
+
+
+    @GetMapping("/voice-analytics")
+    public String voiceAnalytics() {
+        return "voice-analytics";
+    }
+
+    @GetMapping("/audit-logs")
+    public String auditLogs() {
+        return "audit-logs";
+    }
+
+
 
     @GetMapping("/")
     public String dashboard(Model model) {
 
         Map<String, Long> stats = complaintService.getComplaintStats();
-
 
         if (stats == null) {
             stats = new HashMap<>();
@@ -81,22 +144,6 @@ public class WebController {
         return "dashboard";
     }
 
-    @GetMapping("/complaints")
-    public String complaints(Model model) {
-
-        model.addAttribute("complaints",
-                complaintService.getAllComplaints() != null
-                        ? complaintService.getAllComplaints()
-                        : new ArrayList<>());
-
-        model.addAttribute("stats",
-                complaintService.getComplaintStats() != null
-                        ? complaintService.getComplaintStats()
-                        : new HashMap<>());
-
-        return "complaints";
-    }
-
     @GetMapping("/events")
     public String events(Model model) {
 
@@ -112,6 +159,23 @@ public class WebController {
 
         return "events";
     }
+
+    @GetMapping("/voice-cloning")
+    public String voiceCloning() {
+       return "voice-cloning-ui";
+    }
+
+    @GetMapping("/live-dashboard")
+public String liveDashboard() {
+    return "live-dashboard";
+}
+
+
+@GetMapping("/translation")
+public String translation() {
+    return "translation-ui";
+}
+
 
     @GetMapping("/analytics")
     public String analytics(Model model) {
@@ -139,6 +203,27 @@ public class WebController {
         return "analytics";
     }
 
+
+    
+    @GetMapping("/blockchain-verify")
+public String blockchainVerify() {
+    return "blockchain-verify";
+}
+
+
+@GetMapping("/offline")
+public String offline() {
+    return "offline";
+}
+
+
+@GetMapping("/twilio-demo")
+public String twilioDemo() {
+    return "twilio-demo";
+}
+
+
+
     @GetMapping("/interaction-history")
     public String interactionHistory(Model model) {
         try {
@@ -158,5 +243,8 @@ public class WebController {
             model.addAttribute("interactionStats", new HashMap<>());
         }
         return "interaction-history";
+
     }
+
 }
+

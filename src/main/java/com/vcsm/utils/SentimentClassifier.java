@@ -1,10 +1,5 @@
 package com.vcsm.utils;
 
-import opennlp.tools.sentiment.SentimentModel;
-import opennlp.tools.sentiment.SentimentAnalyzer;
-import opennlp.tools.sentiment.SentimentAnalyzerME;
-import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.tokenize.SimpleTokenizer;
 import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 

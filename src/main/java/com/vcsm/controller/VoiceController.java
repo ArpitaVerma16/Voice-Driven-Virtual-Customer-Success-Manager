@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import com.vcsm.dto.ErrorResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,20 @@ public class VoiceController {
             return ResponseEntity.badRequest().body(Map.of("error", "Transcript required", "success", false));
         }
         
+        // Authentication check FIRST
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", 401);
+            error.put("error", "Unauthorized");
+            error.put("message", "Authentication required");
+            error.put("success", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+        
+        User user = userRepository.findByEmail(auth.getName())
+            .orElseThrow(() -> new IllegalArgumentException("User not found: " + auth.getName()));
+        
         // Detect language
         String language = languageDetectionService.detectLanguage(transcript);
         
@@ -72,18 +88,7 @@ public class VoiceController {
         }
         
         // Analyze sentiment dynamically from authenticated user
-        Long userId = 1L;
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null) {
-                User user = userRepository.findByEmail(auth.getName()).orElse(null);
-                if (user != null) {
-                    userId = user.getId();
-                }
-            }
-        } catch (Exception e) {
-            // Fallback to default
-        }
+        Long userId = user.getId();
         sentimentService.analyzeAndProcess(userId, transcript);
         
         return ResponseEntity.ok(response);

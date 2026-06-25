@@ -5,6 +5,8 @@ import com.vcsm.model.UserActivity;
 import com.vcsm.repository.UserRepository;
 import com.vcsm.service.UserActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,13 +82,13 @@ public class UserProfileController {
     }
     
     @GetMapping("/{id}/activity")
-    public ResponseEntity<?> getActivity(@PathVariable Long id) {
+    public ResponseEntity<?> getActivity(@PathVariable Long id, Pageable pageable) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         
-        List<UserActivity> activities = userActivityService.getUserActivities(userOpt.get());
+        Page<UserActivity> activities = userActivityService.getUserActivities(userOpt.get(), pageable);
         return ResponseEntity.ok(activities);
     }
     

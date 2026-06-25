@@ -18,6 +18,11 @@ public class VoiceAnalyticsController {
     
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Object>> getSummary() {
+        return ResponseEntity.ok(voiceAnalyticsService.getSummary());
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<Map<String, Object>> getAnalytics() {
         return ResponseEntity.ok(voiceAnalyticsService.getAnalytics());
     }
     

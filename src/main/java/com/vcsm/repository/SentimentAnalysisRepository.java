@@ -18,6 +18,8 @@ public interface SentimentAnalysisRepository extends JpaRepository<SentimentAnal
     
     List<SentimentAnalysis> findByWasEscalated(boolean wasEscalated);
     
+    long countByWasEscalated(boolean wasEscalated);
+    
     @Query("SELECT s FROM SentimentAnalysis s WHERE s.createdAt BETWEEN :start AND :end")
     List<SentimentAnalysis> findByDateRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     

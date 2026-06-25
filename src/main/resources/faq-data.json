@@ -1,0 +1,64 @@
+{
+  "faqs": [
+    {
+      "id": 1,
+      "keywords": ["complaint", "file complaint", "how to complain", "raise complaint"],
+      "question": "How do I file a complaint?",
+      "answer": "You can file a complaint in three ways:\n1. Click the 'New Complaint' button on the Complaints page\n2. Use voice command: 'I have a complaint'\n3. Use the Quick File Complaint form on the Dashboard"
+    },
+    {
+      "id": 2,
+      "keywords": ["status", "check status", "complaint status", "track complaint"],
+      "question": "How do I check my complaint status?",
+      "answer": "You can check your complaint status by:\n1. Going to the Complaints page\n2. Using voice command: 'Check my complaint status'\n3. Looking at the status badge (Open, In Progress, Resolved, Closed)"
+    },
+    {
+      "id": 3,
+      "keywords": ["event", "register event", "join event", "upcoming events"],
+      "question": "How do I register for an event?",
+      "answer": "To register for an event:\n1. Go to the Events page\n2. Find the event you want to join\n3. Click the 'Register' button\n4. Or use voice command: 'Show upcoming events'"
+    },
+    {
+      "id": 4,
+      "keywords": ["voice", "voice command", "speak", "microphone"],
+      "question": "How do I use voice commands?",
+      "answer": "To use voice commands:\n1. Click the microphone button on the Dashboard\n2. Speak your command clearly\n3. Examples: 'I have a noise complaint', 'Show upcoming events', 'How many complaints are open?'"
+    },
+    {
+      "id": 5,
+      "keywords": ["analytics", "dashboard", "stats", "statistics"],
+      "question": "How do I view analytics?",
+      "answer": "You can view analytics by:\n1. Going to the Analytics page\n2. See complaint statistics and charts\n3. Track resolution rates and category breakdowns"
+    },
+    {
+      "id": 6,
+      "keywords": ["priority", "high priority", "critical", "urgent"],
+      "question": "How are complaint priorities assigned?",
+      "answer": "Complaints are auto-assigned priority based on keywords:\n- CRITICAL: emergency, fire, medical, danger (1 hour response)\n- HIGH: security, water leak, flood (4 hours)\n- MEDIUM: noise, parking, maintenance (24 hours)\n- LOW: suggestion, query, feedback (48 hours)"
+    },
+    {
+      "id": 7,
+      "keywords": ["notification", "alert", "bell", "reminder"],
+      "question": "How do I get notifications?",
+      "answer": "You receive notifications when:\n1. Complaint status changes\n2. New events are created\n3. Events are approaching\nCheck the bell icon in the navbar!"
+    },
+    {
+      "id": 8,
+      "keywords": ["2fa", "two factor", "authentication", "secure"],
+      "question": "How do I enable 2FA for my account?",
+      "answer": "Admins can enable 2FA for extra security:\n1. Go to Profile settings\n2. Click 'Setup 2FA'\n3. Scan QR code with Google Authenticator\n4. Enter verification code\n5. Save backup codes"
+    },
+    {
+      "id": 9,
+      "keywords": ["profile", "update profile", "change name", "edit profile"],
+      "question": "How do I update my profile?",
+      "answer": "To update your profile:\n1. Go to Profile page\n2. Click 'Edit Profile'\n3. Update your name, email, or phone number\n4. Click 'Save'"
+    },
+    {
+      "id": 10,
+      "keywords": ["contact", "help", "support", "assistance"],
+      "question": "How can I get help?",
+      "answer": "You can get help by:\n1. Using the voice assistant on Dashboard\n2. Asking the chatbot (me!)\n3. Contacting admin via complaints page\n4. Checking FAQs in this chatbot"
+    }
+  ]
+}

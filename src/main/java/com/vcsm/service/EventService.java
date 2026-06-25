@@ -6,8 +6,11 @@ import com.vcsm.model.EventRegistration;
 import com.vcsm.repository.EventRepository;
 import com.vcsm.repository.UserRepository;
 import com.vcsm.repository.EventRegistrationRepository;
+import com.vcsm.repository.EventWaitlistRepository;
+import com.vcsm.repository.EmailLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +26,12 @@ public class EventService {
 
     @Autowired
     private EventRegistrationRepository eventRegistrationRepository;
+
+    @Autowired
+    private EventWaitlistRepository eventWaitlistRepository;
+
+    @Autowired
+    private EmailLogRepository emailLogRepository;
 
     public Event createEvent(Event event) { return eventRepository.save(event); }
 
@@ -97,5 +106,15 @@ public class EventService {
         }
     }
 
-    public void deleteEvent(Long id) { eventRepository.deleteById(id); }
+    @Transactional
+    public void deleteEvent(Long id) {
+        Optional<Event> eventOpt = eventRepository.findById(id);
+        if (eventOpt.isPresent()) {
+            Event event = eventOpt.get();
+            eventWaitlistRepository.deleteByEvent(event);
+            emailLogRepository.deleteByEvent(event);
+            eventRegistrationRepository.deleteByEvent(event);
+            eventRepository.delete(event);
+        }
+    }
 }

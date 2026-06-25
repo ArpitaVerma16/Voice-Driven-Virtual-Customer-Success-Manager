@@ -22,6 +22,50 @@ It enables users to:
 
 ---
 
+## 🎤 Example Voice Commands
+
+The Voice Assistant supports natural language commands and automatically routes them to the appropriate module using intent detection.
+
+### 📋 Complaint Management
+
+| Example Command                                | Action                              |
+| ---------------------------------------------- | ----------------------------------- |
+| "File a complaint about excessive noise"       | Creates a noise complaint           |
+| "There is a maintenance issue in my apartment" | Creates a maintenance complaint     |
+| "Report a broken facility"                     | Creates a maintenance complaint     |
+| "I have a parking complaint"                   | Creates a parking-related complaint |
+| "I want to report a security issue"            | Creates a security complaint        |
+
+### 🔍 Complaint Status
+
+| Example Command             | Action                          |
+| --------------------------- | ------------------------------- |
+| "Check my complaint status" | Displays complaint statistics   |
+| "Show my complaint status"  | Retrieves complaint information |
+| "Check complaint progress"  | Shows current complaint status  |
+
+### 📅 Event Queries
+
+| Example Command                           | Action                             |
+| ----------------------------------------- | ---------------------------------- |
+| "Show upcoming events"                    | Displays upcoming community events |
+| "Are there any sports events?"            | Retrieves sports-related events    |
+| "What cultural activities are available?" | Lists cultural events              |
+| "Show community activities"               | Displays available activities      |
+
+### 📊 Analytics
+
+| Example Command                 | Action                       |
+| ------------------------------- | ---------------------------- |
+| "Show analytics"                | Displays community analytics |
+| "How many complaints are open?" | Shows complaint statistics   |
+| "Show complaint summary"        | Displays complaint summary   |
+| "Show total complaints"         | Retrieves complaint counts   |
+
+> The assistant uses keyword-based intent detection and may support additional natural language variations of these commands.
+
+---
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
