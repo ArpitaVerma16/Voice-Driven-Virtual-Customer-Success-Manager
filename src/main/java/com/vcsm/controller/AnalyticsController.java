@@ -31,8 +31,8 @@ public class AnalyticsController {
         data.put("totalEvents", (long) eventService.getAllEvents().size());
         data.put("activeEvents", (long) eventService.getActiveEvents().size());
         data.put("upcomingEvents", (long) eventService.getUpcomingEvents().size());
-        long total = cStats.get("total");
-        long resolved = cStats.get("resolved") + cStats.get("closed");
+        long total = cStats.getOrDefault("total", 0L);
+        long resolved = cStats.getOrDefault("resolved", 0L) + cStats.getOrDefault("closed", 0L);
         data.put("resolutionRate", total > 0 ? Math.round((double) resolved / total * 1000.0) / 10.0 : 0.0);
         return ResponseEntity.ok(data);
     }
