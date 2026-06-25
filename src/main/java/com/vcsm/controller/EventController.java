@@ -1,15 +1,14 @@
 package com.vcsm.controller;
 
 import com.vcsm.model.Event;
-import com.vcsm.repository.UserRepository;
 import com.vcsm.service.EventService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.vcsm.security.service.CustomUserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/events")
@@ -19,15 +18,11 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @PostMapping
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Event> create(@Valid @RequestBody Event event) {
         return ResponseEntity.ok(eventService.createEvent(event));
     }
-
 
     @GetMapping
     public ResponseEntity<List<Event>> getAll() {
@@ -62,30 +57,24 @@ public class EventController {
         return ResponseEntity.ok(eventService.updateEvent(id, event));
     }
 
-
     @PostMapping("/{id}/register")
     public ResponseEntity<?> register(
             @PathVariable Long id,
-            @RequestParam(required = false) Long userId) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        Long resolvedUserId = userId;
-        if (resolvedUserId == null) {
-            resolvedUserId = 1L; // fallback
-            try {
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                if (auth != null) {
-                    com.vcsm.model.User user = userRepository.findByEmail(auth.getName()).orElse(null);
-                    if (user != null) {
-                        resolvedUserId = user.getId();
-                    }
-                }
-            } catch (Exception e) {
-                // ignore
-            }
+        // Security fix:
+        // Always use the authenticated user's profile ID instead of
+        // accepting a userId from the client request. This prevents
+        // users from registering events on behalf of other accounts.
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("Unable to resolve authenticated user");
         }
 
+        Long resolvedUserId = userDetails.getId();
+
         try {
-            return ResponseEntity.ok(eventService.registerForEvent(id, resolvedUserId));
+            return ResponseEntity.ok(
+                    eventService.registerForEvent(id, resolvedUserId));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
