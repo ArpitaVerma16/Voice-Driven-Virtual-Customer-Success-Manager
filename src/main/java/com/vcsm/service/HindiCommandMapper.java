@@ -81,6 +81,7 @@ public class HindiCommandMapper {
             case "event": return "show_events";
             case "status": return "complaint_status";
             case "help": return "help";
+            case "cancel": return "cancel_registration";
             default: return null;
         }
     }
