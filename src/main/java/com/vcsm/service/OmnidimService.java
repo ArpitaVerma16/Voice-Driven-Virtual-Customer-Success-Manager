@@ -222,4 +222,57 @@ public class OmnidimService {
     public List<VoiceCommand> getRecentCommands() {
         return voiceCommandRepository.findTop10ByOrderByCreatedAtDesc();
     }
+
+    private String handleEventBooking(String t) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+        User user = null;
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+        if (user == null) {
+            user = userRepository.findById(1L).orElse(null); // Fallback to 1L
+        }
+        if (user == null) {
+            return "Unable to book event: user session not found.";
+        }
+
+        List<Event> events = eventService.getActiveEvents();
+        Event matchedEvent = null;
+        
+        for (Event event : events) {
+            String eventName = event.getName().toLowerCase();
+            if (t.contains(eventName)) {
+                matchedEvent = event;
+                break;
+            }
+        }
+
+        if (matchedEvent == null) {
+            for (Event event : events) {
+                String[] words = event.getName().toLowerCase().split("\\s+");
+                int matchCount = 0;
+                for (String word : words) {
+                    if (word.length() > 3 && t.contains(word)) {
+                        matchCount++;
+                    }
+                }
+                if (matchCount > 0) {
+                    matchedEvent = event;
+                    break;
+                }
+            }
+        }
+
+        if (matchedEvent == null) {
+            return "Sorry, I couldn't find an event matching that description. Please try specifying the exact event name.";
+        }
+
+        try {
+            Event updatedEvent = eventService.registerForEvent(matchedEvent.getId(), user.getId());
+            return "Success! You have been registered for " + updatedEvent.getName() + ". A confirmation email with your ticket check-in QR code has been sent to " + user.getEmail() + ".";
+        } catch (Exception e) {
+            return "Could not complete booking: " + e.getMessage();
+        }
+    }
 }

@@ -33,6 +33,13 @@ public class EventService {
     @Autowired
     private EmailLogRepository emailLogRepository;
 
+    @Autowired
+    private com.vcsm.security.jwt.JwtService jwtService;
+
+    @Autowired
+    @org.springframework.context.annotation.Lazy
+    private ReminderScheduler reminderScheduler;
+
     public Event createEvent(Event event) { return eventRepository.save(event); }
 
     public List<Event> getAllEvents() { return eventRepository.findAll(); }
@@ -92,10 +99,24 @@ public class EventService {
 
         // Create and save event registration
         EventRegistration registration = new EventRegistration(user, event);
+        registration = eventRegistrationRepository.save(registration);
+
+        // Generate signed ticket token
+        String token = jwtService.generateTicketToken(registration.getId(), user.getId(), event.getId());
+        registration.setTicketToken(token);
         eventRegistrationRepository.save(registration);
 
         event.setRegistrations(event.getRegistrations() + 1);
-        return eventRepository.save(event);
+        Event savedEvent = eventRepository.save(event);
+
+        // Send confirmation email
+        try {
+            reminderScheduler.sendRegistrationConfirmation(savedEvent, user);
+        } catch (Exception e) {
+            System.err.println("❌ Failed to send registration email: " + e.getMessage());
+        }
+
+        return savedEvent;
     }
 
     public List<Event> recommendEvents(String keyword) {

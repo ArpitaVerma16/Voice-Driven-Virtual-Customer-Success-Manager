@@ -23,6 +23,9 @@ public class EventRegistrationService {
     @Autowired
     private ReminderScheduler reminderScheduler;
 
+    @Autowired
+    private com.vcsm.security.jwt.JwtService jwtService;
+
     /**
      * Register a user for an event
      */
@@ -44,6 +47,11 @@ public class EventRegistrationService {
 
         // Create and save event registration
         EventRegistration registration = new EventRegistration(user, event);
+        registration = eventRegistrationRepository.save(registration);
+
+        // Generate signed ticket token
+        String token = jwtService.generateTicketToken(registration.getId(), user.getId(), event.getId());
+        registration.setTicketToken(token);
         eventRegistrationRepository.save(registration);
 
         event.setRegistrations(event.getRegistrations() + 1);

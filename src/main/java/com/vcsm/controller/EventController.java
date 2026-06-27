@@ -18,6 +18,12 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private com.vcsm.security.jwt.JwtService jwtService;
+
+    @Autowired
+    private com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
+
     @PostMapping
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Event> create(@Valid @RequestBody Event event) {
@@ -92,4 +98,57 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/verify-ticket/{token}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> verifyTicket(@PathVariable String token) {
+        try {
+            io.jsonwebtoken.Claims claims = jwtService.parseTicketToken(token);
+            Long registrationId = claims.get("registrationId", Long.class);
+            Long userId = claims.get("userId", Long.class);
+            Long eventId = claims.get("eventId", Long.class);
+
+            java.util.Optional<com.vcsm.model.EventRegistration> regOpt = eventRegistrationRepository.findById(registrationId);
+            if (regOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("valid", false, "message", "Ticket registration not found."));
+            }
+
+            com.vcsm.model.EventRegistration reg = regOpt.get();
+            if (!token.equals(reg.getTicketToken()) || 
+                !reg.getUser().getId().equals(userId) || 
+                !reg.getEvent().getId().equals(eventId)) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("valid", false, "message", "Ticket token mismatch or invalid details."));
+            }
+
+            if (reg.isCheckedIn()) {
+                java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String checkInTime = reg.getCheckedInAt() != null ? reg.getCheckedInAt().format(timeFormatter) : "N/A";
+                return ResponseEntity.ok(java.util.Map.of(
+                    "valid", true,
+                    "alreadyCheckedIn", true,
+                    "message", "Ticket is valid, but attendee is ALREADY checked-in.",
+                    "checkedInAt", checkInTime,
+                    "attendeeName", reg.getUser().getName(),
+                    "attendeeEmail", reg.getUser().getEmail(),
+                    "eventName", reg.getEvent().getName()
+                ));
+            }
+
+            reg.setCheckedIn(true);
+            reg.setCheckedInAt(java.time.LocalDateTime.now());
+            eventRegistrationRepository.save(reg);
+
+            return ResponseEntity.ok(java.util.Map.of(
+                "valid", true,
+                "alreadyCheckedIn", false,
+                "message", "Ticket successfully verified! Guest checked in.",
+                "attendeeName", reg.getUser().getName(),
+                "attendeeEmail", reg.getUser().getEmail(),
+                "eventName", reg.getEvent().getName()
+            ));
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            return ResponseEntity.status(400).body(java.util.Map.of("valid", false, "message", "Invalid ticket signature."));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(java.util.Map.of("valid", false, "message", "Invalid or malformed ticket token: " + e.getMessage()));
+        }
+    }
 }
