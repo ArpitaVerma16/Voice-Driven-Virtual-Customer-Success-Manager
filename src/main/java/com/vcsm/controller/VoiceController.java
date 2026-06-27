@@ -11,6 +11,8 @@ import com.vcsm.model.User;
 import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import com.vcsm.dto.ErrorResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
@@ -41,10 +43,10 @@ public class VoiceController {
     private HindiCommandMapper hindiCommandMapper;
 
     @Autowired
-    private IvrService ivrService;
+    private com.vcsm.service.EventRegistrationService eventRegistrationService;
 
     @PostMapping("/command")
-    public ResponseEntity<Map<String, Object>> command(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> command(@RequestBody Map<String, String> body) {
         String transcript = body.get("transcript");
         
         if (transcript == null || transcript.isBlank()) {
@@ -78,7 +80,48 @@ public class VoiceController {
             String action = hindiCommandMapper.mapCommand(transcript);
             if (action != null) {
                 response.put("action", action);
-                response.put("response", hindiCommandMapper.getResponse(action, null));
+                
+                String extraData = null;
+                if ("cancel_registration".equals(action)) {
+                    try {
+                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                        User user = null;
+                        if (auth != null && auth.getName() != null) {
+                            user = userRepository.findByEmail(auth.getName()).orElse(null);
+                        }
+                        if (user == null) {
+                            user = userRepository.findById(1L).orElse(null);
+                        }
+                        
+                        if (user != null) {
+                            List<com.vcsm.model.Event> userEvents = eventRegistrationService.getUserEvents(user);
+                            com.vcsm.model.Event matchedEvent = null;
+                            if (!userEvents.isEmpty()) {
+                                String lowerTranscript = transcript.toLowerCase();
+                                for (com.vcsm.model.Event e : userEvents) {
+                                    if (lowerTranscript.contains(e.getName().toLowerCase())) {
+                                        matchedEvent = e;
+                                        break;
+                                    }
+                                }
+                                if (matchedEvent == null && userEvents.size() == 1) {
+                                    matchedEvent = userEvents.get(0);
+                                }
+                            }
+                            
+                            if (matchedEvent != null) {
+                                eventRegistrationService.cancelRegistration(matchedEvent, user);
+                                extraData = ": " + matchedEvent.getName();
+                            } else {
+                                extraData = " (इवेंट नहीं मिला)";
+                            }
+                        }
+                    } catch (Exception e) {
+                        extraData = " (त्रुटि: " + e.getMessage() + ")";
+                    }
+                }
+                
+                response.put("response", hindiCommandMapper.getResponse(action, extraData));
                 response.put("success", true);
             } else {
                 response.put("action", "unknown");

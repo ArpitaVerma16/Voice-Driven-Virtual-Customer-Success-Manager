@@ -17,6 +17,11 @@ public class AuthResponse {
         this.message = "Authentication successful";
     }
 
+    public AuthResponse(String token) {
+        this.token = token;
+        this.message = "Authentication successful";
+    }
+
     // Getters and Setters
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
