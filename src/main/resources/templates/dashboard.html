@@ -253,6 +253,54 @@
         </div>
     </div>
 
+    <!-- Proactive Customer Retention Board (High Dissatisfaction Risk) -->
+    <div class="card mb-4 shadow-sm border-danger" th:if="${highRiskUsers != null and not highRiskUsers.empty}">
+        <div class="card-header bg-danger text-white fw-bold d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-exclamation-triangle me-2"></i>Proactive Customer Retention Board (High Churn Risk)</span>
+            <span class="badge bg-white text-danger" th:text="${highRiskUsers.size()} + ' Residents at Risk'">0 Users</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Resident Name</th>
+                            <th>Email</th>
+                            <th>Dissatisfaction Score</th>
+                            <th>Status</th>
+                            <th>Preemptive Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${highRiskUsers}">
+                            <td><strong th:text="${u.name}">Name</strong></td>
+                            <td th:text="${u.email}">Email</td>
+                            <td style="width: 30%;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height: 8px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" 
+                                             th:style="'width: ' + ${u.dissatisfactionScore} + '%'" 
+                                             th:aria-valuenow="${u.dissatisfactionScore}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <span class="fw-bold text-danger" th:text="${#numbers.formatDecimal(u.dissatisfactionScore, 1, 1)} + '%'">0%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger">HIGH CHURN RISK</span>
+                            </td>
+                            <td>
+                                <a th:href="'mailto:' + ${u.email} + '?subject=VCSM%20Support%20Check-in&body=Hello%20' + ${u.name} + ','" 
+                                   class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-paper-plane me-1"></i>Preemptive Outreach
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Recent Sections - Stack on mobile -->
     <div class="row g-3">
         <!-- Recent Complaints -->

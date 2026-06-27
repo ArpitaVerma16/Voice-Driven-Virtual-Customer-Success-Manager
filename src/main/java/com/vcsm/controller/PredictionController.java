@@ -39,4 +39,17 @@ public class PredictionController {
     public ResponseEntity<Map<String, Object>> getPeakTimes() {
         return ResponseEntity.ok(predictionService.getPeakTimes());
     }
+
+    @PostMapping("/dissatisfaction/run")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> runDissatisfactionAnalysis() {
+        predictionService.runDissatisfactionAnalysis();
+        return ResponseEntity.ok(Map.of("success", true, "message", "Weekly dissatisfaction analysis run completed."));
+    }
+
+    @GetMapping("/dissatisfaction/high-risk")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<com.vcsm.model.User>> getHighRiskUsers() {
+        return ResponseEntity.ok(predictionService.getHighRiskUsers());
+    }
 }

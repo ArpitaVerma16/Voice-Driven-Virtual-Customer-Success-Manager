@@ -68,13 +68,6 @@ public class ModelEvolutionService {
     }
 
     /**
-     * Train new version of a model
-     */
-    public ModelVersion trainModel(String modelName) {
-        return autoTrainer.trainNewModel(modelName);
-    }
-
-    /**
      * Get model evolution history
      */
     public List<ModelVersion> getEvolutionHistory(String modelName) {

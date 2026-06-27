@@ -37,6 +37,9 @@ public class WebController {
     @Autowired
     private InteractionService interactionService;
 
+    @Autowired
+    private com.vcsm.repository.UserRepository userRepository;
+
     @GetMapping("/landing")
     public String landing() {
         return "landing";
@@ -123,6 +126,11 @@ public class WebController {
 
         model.addAttribute("recentCommands",
                 commands.stream().limit(5).toList());
+
+        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll().stream()
+                .filter(u -> u.getDissatisfactionScore() >= 75.0)
+                .toList();
+        model.addAttribute("highRiskUsers", highRiskUsers);
 
         return "dashboard";
     }
