@@ -141,8 +141,18 @@ public class VoiceCloningController {
             return ResponseEntity.badRequest().body(Map.of("error", "Text is required"));
         }
 
+        String sentiment = request.get("sentiment");
+        Double confidence = null;
+        if (request.containsKey("confidence") && request.get("confidence") != null) {
+            try {
+                confidence = Double.parseDouble(String.valueOf(request.get("confidence")));
+            } catch (Exception e) {
+                // Ignore parsing errors
+            }
+        }
+
         try {
-            byte[] audio = voiceCloningService.synthesizeSpeech(user, text);
+            byte[] audio = voiceCloningService.synthesizeSpeech(user, text, sentiment, confidence);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(audio);
