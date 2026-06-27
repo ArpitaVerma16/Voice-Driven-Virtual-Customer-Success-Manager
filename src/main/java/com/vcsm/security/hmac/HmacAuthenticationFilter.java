@@ -88,8 +88,28 @@ public class HmacAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        CachedBodyHttpServletRequestWrapper wrappedRequest =
+                new CachedBodyHttpServletRequestWrapper(request);
+
+        String computedSignature = signatureValidator.generateSignature(
+                wrappedRequest.getMethod(),
+                wrappedRequest.getRequestURI(),
+                wrappedRequest.getBody(),
+                timestamp,
+                nonce
+        );
+
+        if (!computedSignature.equals(signature)) {
+
+            response.sendError(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "Invalid signature");
+
+            return;
+        }
+
         nonceCacheService.save(nonce);
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(wrappedRequest, response);
     }
 }

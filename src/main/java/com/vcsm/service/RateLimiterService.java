@@ -40,8 +40,12 @@ public class RateLimiterService {
 
     public RateLimitStatus getStatus(String userId) {
         long remaining = getRemainingTokens(userId);
-        boolean canConsume = remaining > 0;
-        return new RateLimitStatus(remaining, canConsume, DEFAULT_LIMIT);
+
+        return new RateLimitStatus(
+                remaining,
+                remaining > 0,
+                DEFAULT_LIMIT
+        );
     }
 
     public static class RateLimitStatus {

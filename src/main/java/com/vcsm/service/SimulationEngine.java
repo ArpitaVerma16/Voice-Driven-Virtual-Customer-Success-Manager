@@ -30,8 +30,8 @@ public class SimulationEngine {
         List<Event> prodEvents = eventRepository.findAll();
 
         // Apply scenario to twin data
-        List<Complaint> twinComplaints = applyComplaintScenario(prodComplaints, scenario);
-        List<Event> twinEvents = applyEventScenario(prodEvents, scenario);
+        List<Complaint> twinComplaints = applyScenarioToComplaints(prodComplaints, scenario);
+        List<Event> twinEvents = applyScenarioToEvents(prodEvents, scenario);
 
         // Run simulation
         long startTime = System.currentTimeMillis();
@@ -46,7 +46,7 @@ public class SimulationEngine {
         return result;
     }
 
-    private List<Complaint> applyComplaintScenario(List<Complaint> complaints, SimulationScenario scenario) {
+    private List<Complaint> applyScenarioToComplaints(List<Complaint> complaints, SimulationScenario scenario) {
         List<Complaint> simulated = complaints.stream()
             .map(c -> copyComplaint(c))
             .collect(Collectors.toList());
@@ -85,7 +85,7 @@ public class SimulationEngine {
         return simulated;
     }
 
-    private List<Event> applyEventScenario(List<Event> events, SimulationScenario scenario) {
+    private List<Event> applyScenarioToEvents(List<Event> events, SimulationScenario scenario) {
         List<Event> simulated = events.stream()
             .map(e -> copyEvent(e))
             .collect(Collectors.toList());

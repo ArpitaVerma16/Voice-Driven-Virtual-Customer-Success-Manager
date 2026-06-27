@@ -72,13 +72,6 @@
     <artifactId>spring-kafka</artifactId>
 </dependency>
 
-<!-- Web3j for Ethereum integration -->
-<dependency>
-    <groupId>org.web3j</groupId>
-    <artifactId>core</artifactId>
-    <version>4.9.5</version>
-</dependency>
-
 
 
 <!-- MLflow for model tracking -->

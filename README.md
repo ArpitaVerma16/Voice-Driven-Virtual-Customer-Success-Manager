@@ -12,6 +12,22 @@ It enables users to:
 
 ---
 
+## Table of Contents
+
+- [🚀 Features](#-features)
+- [🎤 Example Voice Commands](#-example-voice-commands)
+- [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
+- [🏗️ Architecture](#%EF%B8%8F-architecture)
+- [▶️ Installation and Setup](#%EF%B8%8F-installation-and-setup)
+- [📁 Project Structure](#-project-structure)
+- [📸 Screenshots](#-screenshots)
+- [🚀 Deployment](#-deployment)
+- [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
+- [🤝 Contributing](#-contributing)
+- [🚀 Future Enhancements](#-future-enhancements)
+
+---
+
 ## 🚀 Features
 
 - **🎤 Voice Assistant** — Web Speech API + Omnidim.io integration for natural language commands
@@ -204,6 +220,12 @@ The application is currently not deployed. It can be run locally using the setup
 3. Commit changes
 4. Push branch
 5. Open PR
+
+### 👥 Contributors
+
+Thanks to all contributors ❤️
+
+[![Contributors](https://contrib.rocks/image?repo=ArpitaVerma16/Voice-Driven-Virtual-Customer-Success-Manager)](https://github.com/ArpitaVerma16/Voice-Driven-Virtual-Customer-Success-Manager/graphs/contributors)
 
 ---
 
