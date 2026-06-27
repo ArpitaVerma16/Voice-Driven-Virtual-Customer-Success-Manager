@@ -69,7 +69,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/chatbot/**").permitAll()
                         .requestMatchers("/api/iot/alert").permitAll()
                         .requestMatchers("/api/translation/**").permitAll()
-                        .requestMatchers("/api/genai/summarize").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -84,6 +83,10 @@ public class SecurityConfig {
                 .addFilterBefore(
                         rateLimitingFilter,
                         HmacAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        hmacAuthenticationFilter,
+                        JwtAuthFilter.class
                 )
                 .httpBasic(Customizer.withDefaults());
 
@@ -123,7 +126,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));

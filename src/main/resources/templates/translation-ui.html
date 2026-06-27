@@ -253,6 +253,8 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- Tab 2: Live Support Call Overlay -->
         <div class="tab-pane fade" id="call-pane" role="tabpanel">
@@ -339,40 +341,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- AI Summary Modal -->
-<div class="modal fade" id="summaryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-purple text-white">
-                <h5 class="modal-title"><i class="fas fa-magic me-2"></i>AI Call Summary &amp; Action Items</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="mb-3">
-                    <h6 class="fw-bold text-purple"><i class="fas fa-file-alt me-2"></i>Call Summary</h6>
-                    <p id="summaryText" class="text-muted small mb-0"></p>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <h6 class="fw-bold text-purple"><i class="fas fa-exclamation-circle me-2"></i>Identified Issues</h6>
-                    <ul id="issuesList" class="small text-muted mb-0"></ul>
-                </div>
-                <hr>
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <h6 class="fw-bold text-purple"><i class="fas fa-tachometer-alt me-2"></i>Urgency Level</h6>
-                        <span id="priorityBadge" class="badge"></span>
-                    </div>
-                    <div class="col-6">
-                        <h6 class="fw-bold text-purple"><i class="fas fa-ticket-alt me-2"></i>Ticket Status</h6>
-                        <span id="ticketBadge" class="badge"></span>
-                    </div>
-                </div>
                 <hr>
                 <div>
                     <h6 class="fw-bold text-purple"><i class="fas fa-list-ol me-2"></i>Next Steps</h6>
@@ -397,11 +365,9 @@
 
 <script>
     // ===== CONFIGURATION & RECOGNITION SETUP =====
-    const loggedInUserEmail = "[[${#authentication.name}]]";
     let isCallActive = false;
     let recognition = null;
     let isResidentSpeaking = false;
-    let callTranscriptText = "";
 
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -584,7 +550,6 @@
         if (!isCallActive) {
             // Connect Call
             isCallActive = true;
-            callTranscriptText = "";
             btn.className = 'btn btn-danger btn-lg w-100 mb-2';
             btn.innerHTML = '<i class="fas fa-phone-slash me-2"></i> End Call';
             badge.className = 'badge bg-success p-2 px-3 fs-6';
@@ -624,65 +589,6 @@
             // Reset Speech recognition
             if (isResidentSpeaking && recognition) {
                 recognition.stop();
-            }
-
-            // Trigger AI Summarization
-            if (callTranscriptText.trim()) {
-                if (typeof toast !== 'undefined') {
-                    toast.info('Generating AI session summary...', 'AI Summary');
-                }
-                
-                fetch('/api/genai/summarize', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        transcript: callTranscriptText,
-                        residentEmail: loggedInUserEmail
-                    })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    document.getElementById('summaryText').textContent = data.summary;
-                    
-                    const issuesList = document.getElementById('issuesList');
-                    issuesList.innerHTML = '';
-                    data.identifiedIssues.forEach(issue => {
-                        const li = document.createElement('li');
-                        li.textContent = issue;
-                        issuesList.appendChild(li);
-                    });
-
-                    const nextStepsList = document.getElementById('nextStepsList');
-                    nextStepsList.innerHTML = '';
-                    data.nextSteps.forEach(step => {
-                        const li = document.createElement('li');
-                        li.textContent = step;
-                        nextStepsList.appendChild(li);
-                    });
-
-                    const priorityBadge = document.getElementById('priorityBadge');
-                    priorityBadge.textContent = data.priority;
-                    if (data.priority === 'CRITICAL') priorityBadge.className = 'badge bg-danger text-white';
-                    else if (data.priority === 'HIGH') priorityBadge.className = 'badge bg-warning text-dark';
-                    else priorityBadge.className = 'badge bg-info text-dark';
-
-                    const ticketBadge = document.getElementById('ticketBadge');
-                    if (data.ticketGenerated) {
-                        ticketBadge.innerHTML = `<i class="fas fa-check-circle me-1"></i> Ticket Created (ID: ${data.generatedTicketId})`;
-                        ticketBadge.className = 'badge bg-success text-white';
-                        if (typeof toast !== 'undefined') {
-                            toast.success('New ticket auto-filed successfully!', 'Auto Ticket');
-                        }
-                    } else {
-                        ticketBadge.textContent = 'No Action Required';
-                        ticketBadge.className = 'badge bg-secondary text-white';
-                    }
-
-                    // Show Bootstrap summary modal
-                    const myModal = new bootstrap.Modal(document.getElementById('summaryModal'));
-                    myModal.show();
-                })
-                .catch(err => console.error('Error generating summary:', err));
             }
 
             // Restore empty state
@@ -742,9 +648,6 @@
             const originalText = data.original;
             const translatedText = data.translated;
             
-            // Append to running transcript
-            callTranscriptText += `Resident: ${originalText} (Translated: ${translatedText})\n`;
-
             // Display bubble on Agent console
             const bubble = document.createElement('div');
             bubble.className = 'bubble bubble-resident';
@@ -775,9 +678,6 @@
 
         // Clear input
         input.value = '';
-
-        // Append to running transcript
-        callTranscriptText += `Agent: ${text}\n`;
 
         // Translate agent English response back to Resident native language
         fetch('/api/translation/translate', {

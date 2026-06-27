@@ -2,6 +2,8 @@ package com.vcsm.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Future;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,11 @@ public class Event {
     private EventCategory category;
 
     private String location;
+
+    @Future(message = "Event date must be in the future")
     private LocalDateTime eventDate;
+
+    @Min(value = 1, message = "Maximum capacity must be at least 1")
     private int maxCapacity;
     private int registrations = 0;
     private boolean active = true;
