@@ -2,113 +2,401 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Voice Translation - VCSM</title>
+    
+    <!-- Favicon & Stylesheets -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🗣️%3C/text%3E%3C/svg%3E">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/dark-mode-toggle.css">
+    <link rel="stylesheet" href="/css/hover-effects.css">
+    <link rel="stylesheet" href="/css/toast-notifications.css">
+    <link rel="stylesheet" href="/css/spinners.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <style>
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-muted, #6c757d);
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.2s ease;
+        }
+        .nav-tabs .nav-link.active {
+            border-bottom: 3px solid #8b5cf6;
+            color: #8b5cf6 !important;
+            background: transparent;
+        }
+        .call-container {
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dark-mode .call-container {
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .transcript-area {
+            height: 380px;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--card-bg, #f8f9fa);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dark-mode .transcript-area {
+            background: #121212;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .bubble {
+            max-width: 80%;
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .bubble-resident {
+            background: #f1f5f9;
+            color: #334155;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .dark-mode .bubble-resident {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+        .bubble-agent {
+            background: #ede9fe;
+            color: #5c30a6;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+        .dark-mode .bubble-agent {
+            background: #2e1065;
+            color: #f5f3ff;
+        }
+        .waveform {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 40px;
+        }
+        .wave-bar {
+            width: 3px;
+            height: 8px;
+            background-color: #8b5cf6;
+            border-radius: 2px;
+            animation: quiet 1.2s ease-in-out infinite alternate;
+        }
+        .waveform.active .wave-bar {
+            animation: loud 1.2s ease-in-out infinite alternate;
+        }
+        .waveform.active .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .waveform.active .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .waveform.active .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+        .waveform.active .wave-bar:nth-child(5) { animation-delay: 0.8s; }
+        @keyframes quiet {
+            0% { height: 8px; }
+            100% { height: 12px; }
+        }
+        @keyframes loud {
+            0% { height: 8px; }
+            100% { height: 35px; }
+        }
+    </style>
 </head>
 <body>
 
+<!-- Navbar with toggler -->
 <nav class="navbar navbar-expand-lg navbar-dark app-nav">
     <div class="container">
-        <a class="navbar-brand" href="/">VCSM</a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="/">Dashboard</a>
-            <a class="nav-link" href="/complaints">Complaints</a>
-            <a class="nav-link" href="/events">Events</a>
-            <a class="nav-link active" href="/translation">Translation</a>
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fas fa-robot me-2"></i>VCSM
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <div class="navbar-nav ms-auto text-center">
+                <a class="nav-link" href="/">Dashboard</a>
+                <a class="nav-link" href="/complaints">Complaints</a>
+                <a class="nav-link" href="/events">Events</a>
+                <a class="nav-link active" href="/translation">Translation Overlay</a>
+            </div>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <!-- Dark Mode Toggle -->
+                <button class="btn btn-link nav-link" onclick="toggleDarkMode()" style="color: white; font-size: 20px;">
+                    <i class="fas fa-moon" id="darkModeIcon"></i>
+                </button>
+            </div>
         </div>
     </div>
 </nav>
 
 <div class="container mt-4">
-    <h4><i class="fas fa-language text-purple me-2"></i>Voice-to-Voice Translation</h4>
-    <p class="text-muted">Translate text and speech between multiple languages</p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold"><i class="fas fa-language text-purple me-2"></i>Live Call &amp; Text Translation Overlay</h4>
+            <p class="text-muted small">Translate resident speech in real-time, overlay subtitles on the agent console, and synthesize voice responses.</p>
+        </div>
+    </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-bold">
-                    <i class="fas fa-microphone me-2 text-purple"></i>Input
+    <!-- Tabs Container -->
+    <ul class="nav nav-tabs mb-4" id="translationTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-pane" type="button" role="tab"><i class="fas fa-exchange-alt me-2"></i>Quick Text Translator</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="call-tab" data-bs-toggle="tab" data-bs-target="#call-pane" type="button" role="tab"><i class="fas fa-phone-alt me-2"></i>Live Support Call Overlay</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="translationTabsContent">
+        <!-- Tab 1: Text Translator -->
+        <div class="tab-pane fade show active" id="text-pane" role="tabpanel">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center border-0 py-3">
+                            <span><i class="fas fa-microphone me-2 text-purple"></i>Input Panel</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Source Language</label>
+                                <select id="sourceLang" class="form-select" onchange="toggleSourceDetect()">
+                                    <option value="auto">Auto-detect</option>
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="es">Spanish (Español)</option>
+                                    <option value="en">English</option>
+                                    <option value="ta">Tamil (தமிழ்)</option>
+                                    <option value="te">Telugu (తెలుగు)</option>
+                                    <option value="ml">Malayalam (മലയാളം)</option>
+                                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                    <option value="bn">Bengali (বাংলা)</option>
+                                    <option value="mr">Marathi (मराठी)</option>
+                                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Text to Translate</label>
+                                <textarea id="inputText" class="form-control" rows="5" placeholder="Type or paste your message here..."></textarea>
+                            </div>
+                            <div class="mb-3" id="detectedLanguageDisplay" style="display: none;">
+                                <span class="badge bg-purple-soft text-purple">Detected: <span id="detectedLang">-</span></span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-purple px-4" onclick="translateText()">
+                                    <i class="fas fa-exchange-alt me-1"></i> Translate
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearInput()">
+                                    <i class="fas fa-times me-1"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Source Language</label>
-                        <select id="sourceLang" class="form-select" onchange="toggleSourceDetect()">
-                            <option value="auto">Auto-detect</option>
-                            <option value="hi">Hindi</option>
-                            <option value="en">English</option>
-                            <option value="ta">Tamil</option>
-                            <option value="te">Telugu</option>
-                            <option value="ml">Malayalam</option>
-                            <option value="kn">Kannada</option>
-                            <option value="bn">Bengali</option>
-                            <option value="mr">Marathi</option>
-                            <option value="gu">Gujarati</option>
-                        </select>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center border-0 py-3">
+                            <span><i class="fas fa-volume-up me-2 text-purple"></i>Output Panel</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Target Language</label>
+                                <select id="targetLang" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="es">Spanish (Español)</option>
+                                    <option value="ta">Tamil (தமிழ்)</option>
+                                    <option value="te">Telugu (తెలుగు)</option>
+                                    <option value="ml">Malayalam (മലയാളം)</option>
+                                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                    <option value="bn">Bengali (বাংলা)</option>
+                                    <option value="mr">Marathi (मराठी)</option>
+                                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Translated Subtitles / Text</label>
+                                <div id="translatedText" class="border rounded p-3 bg-light" style="min-height: 120px;">
+                                    <span class="text-muted">Translation will appear here...</span>
+                                </div>
+                            </div>
+                            <div class="mb-3" id="translationInfo" style="display: none;">
+                                <small class="text-muted">
+                                    <span id="sourceDisplay">-</span> → <span id="targetDisplay">-</span>
+                                </small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-success" onclick="speakTranslation()">
+                                    <i class="fas fa-volume-up me-1"></i> Listen
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="copyTranslation()">
+                                    <i class="fas fa-copy me-1"></i> Copy
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Text to Translate</label>
-                        <textarea id="inputText" class="form-control" rows="4" placeholder="Type or speak your message..."></textarea>
-                    </div>
-                    <div class="mb-3" id="detectedLanguageDisplay" style="display: none;">
-                        <span class="badge bg-info">Detected: <span id="detectedLang">-</span></span>
-                    </div>
-                    <button class="btn btn-purple" onclick="translateText()">
-                        <i class="fas fa-exchange-alt me-1"></i> Translate
-                    </button>
-                    <button class="btn btn-outline-secondary ms-2" onclick="clearInput()">
-                        <i class="fas fa-times me-1"></i> Clear
-                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-bold">
-                    <i class="fas fa-volume-up me-2 text-purple"></i>Output
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Target Language</label>
-                        <select id="targetLang" class="form-select">
-                            <option value="en">English</option>
-                            <option value="hi">Hindi</option>
-                            <option value="ta">Tamil</option>
-                            <option value="te">Telugu</option>
-                            <option value="ml">Malayalam</option>
-                            <option value="kn">Kannada</option>
-                            <option value="bn">Bengali</option>
-                            <option value="mr">Marathi</option>
-                            <option value="gu">Gujarati</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Translated Text</label>
-                        <div id="translatedText" class="border rounded p-3 bg-light" style="min-height: 100px;">
-                            <span class="text-muted">Translation will appear here...</span>
+        <!-- Tab 2: Live Support Call Overlay -->
+        <div class="tab-pane fade" id="call-pane" role="tabpanel">
+            <div class="row g-3">
+                <!-- Control Panel -->
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white fw-bold border-0 py-3">
+                            <i class="fas fa-sliders-h me-2 text-purple"></i>Call Controller
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Resident Preferred Language</label>
+                                <select id="callSourceLang" class="form-select">
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="es">Spanish (Español)</option>
+                                    <option value="ta">Tamil (தமிழ்)</option>
+                                    <option value="te">Telugu (తెలుగు)</option>
+                                    <option value="ml">Malayalam (മലയാളം)</option>
+                                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                    <option value="bn">Bengali (বাংলা)</option>
+                                </select>
+                            </div>
+                            <hr>
+                            <div class="text-center py-3">
+                                <div class="mb-3">
+                                    <span class="badge bg-secondary p-2 px-3 fs-6" id="callStatusBadge">🔴 Disconnected</span>
+                                </div>
+                                <button class="btn btn-success btn-lg w-100 mb-2" id="startCallBtn" onclick="toggleCall()">
+                                    <i class="fas fa-phone-alt me-2"></i> Start Call Simulation
+                                </button>
+                                <p class="text-muted small mb-0">Simulates a resident call with real-time browser voice translation.</p>
+                            </div>
+                            
+                            <!-- Call Waveform indicator -->
+                            <div class="d-none" id="callWaveformContainer">
+                                <div class="waveform active" id="waveform">
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                </div>
+                                <p class="text-center small text-purple-soft mt-1">Live Audio Channel Active</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3" id="translationInfo" style="display: none;">
-                        <small class="text-muted">
-                            <span id="sourceDisplay">-</span> → <span id="targetDisplay">-</span>
-                        </small>
+                </div>
+
+                <!-- Live Subtitles & Transcript Overlay -->
+                <div class="col-md-8">
+                    <div class="call-container shadow-sm">
+                        <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                            <strong class="text-purple"><i class="fas fa-headset me-2"></i>Agent Console: Live Two-way Subtitles</strong>
+                            <span class="badge bg-danger d-none" id="recordingIndicator">🎙️ RESIDENT TALKING</span>
+                        </div>
+                        
+                        <div class="transcript-area d-flex flex-column" id="callTranscript">
+                            <div class="text-center my-auto text-muted" id="emptyCallState">
+                                <i class="fas fa-headset fa-3x mb-3 text-purple-soft"></i>
+                                <p>Start a call to view the real-time translation overlay.</p>
+                            </div>
+                        </div>
+
+                        <!-- Action controls -->
+                        <div class="p-3 bg-white border-top">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-auto">
+                                    <button class="btn btn-purple" id="speakResidentBtn" disabled onclick="startResidentSpeech()">
+                                        <i class="fas fa-microphone"></i> Speak (Resident)
+                                    </button>
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="agentResponseText" disabled placeholder="Agent types English response..." onkeydown="handleAgentKey(event)">
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-purple" id="sendAgentResponseBtn" disabled onclick="sendAgentResponse()">
+                                        <i class="fas fa-paper-plane"></i> Send (Agent)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button class="btn btn-outline-success" onclick="speakTranslation()">
-                        <i class="fas fa-volume-up me-1"></i> Listen
-                    </button>
-                    <button class="btn btn-outline-secondary ms-2" onclick="copyTranslation()">
-                        <i class="fas fa-copy me-1"></i> Copy
-                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<footer class="mt-5 py-4 text-center text-muted border-top bg-light">
+    <small>Voice-Driven Virtual Customer Success Manager &bull; Real-time Speech Translation Service</small>
+</footer>
+
+<!-- JavaScript Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/toast-notifications.js"></script>
+<script src="/js/dark-mode.js"></script>
+
 <script>
+    // ===== CONFIGURATION & RECOGNITION SETUP =====
+    let isCallActive = false;
+    let recognition = null;
+    let isResidentSpeaking = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = function() {
+            isResidentSpeaking = true;
+            document.getElementById('recordingIndicator').classList.remove('d-none');
+            document.getElementById('speakResidentBtn').className = 'btn btn-danger';
+            document.getElementById('speakResidentBtn').innerHTML = '<i class="fas fa-stop"></i> Listening...';
+        };
+
+        recognition.onend = function() {
+            isResidentSpeaking = false;
+            document.getElementById('recordingIndicator').classList.add('d-none');
+            document.getElementById('speakResidentBtn').className = 'btn btn-purple';
+            document.getElementById('speakResidentBtn').innerHTML = '<i class="fas fa-microphone"></i> Speak (Resident)';
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            if (transcript.trim()) {
+                handleResidentSpeech(transcript);
+            }
+        };
+
+        recognition.onerror = function(e) {
+            console.error('Speech recognition error:', e.error);
+            if (typeof toast !== 'undefined') {
+                toast.error('Voice input error: ' + e.error, 'Speech Error');
+            }
+        };
+    } else {
+        console.warn('SpeechRecognition not supported in this browser.');
+    }
+
+    // ===== TEXT TRANSLATOR CONTROLS =====
     function toggleSourceDetect() {
         const sourceLang = document.getElementById('sourceLang').value;
         const detectDisplay = document.getElementById('detectedLanguageDisplay');
@@ -155,7 +443,6 @@
             document.getElementById('targetDisplay').textContent = 
                 data.targetLanguageName + ' (' + data.targetLanguage + ')';
             
-            // If auto-detect, show detected language
             if (data.sourceLanguage) {
                 document.getElementById('detectedLang').textContent = 
                     data.sourceLanguageName + ' (' + data.sourceLanguage + ')';
@@ -177,8 +464,9 @@
         const utterance = new SpeechSynthesisUtterance(text);
         const targetLang = document.getElementById('targetLang').value;
         
-        // Set language for speech
+        // Match browser synthesis locale
         if (targetLang === 'hi') utterance.lang = 'hi-IN';
+        else if (targetLang === 'es') utterance.lang = 'es-ES';
         else if (targetLang === 'ta') utterance.lang = 'ta-IN';
         else if (targetLang === 'te') utterance.lang = 'te-IN';
         else if (targetLang === 'ml') utterance.lang = 'ml-IN';
@@ -200,7 +488,11 @@
         }
         
         navigator.clipboard.writeText(text).then(() => {
-            alert('Copied to clipboard!');
+            if (typeof toast !== 'undefined') {
+                toast.success('Copied to clipboard!', 'Success');
+            } else {
+                alert('Copied to clipboard!');
+            }
         });
     }
 
@@ -212,29 +504,235 @@
         document.getElementById('detectedLanguageDisplay').style.display = 'none';
     }
 
-    // Auto-detect when typing
+    // Auto-detect as user types
     document.addEventListener('DOMContentLoaded', function() {
         const input = document.getElementById('inputText');
-        input.addEventListener('input', function() {
-            const sourceLang = document.getElementById('sourceLang').value;
-            if (sourceLang === 'auto' && this.value.trim().length > 2) {
-                fetch('/api/translation/detect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: this.value })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.languageName) {
-                        document.getElementById('detectedLang').textContent = 
-                            data.languageName + ' (' + data.languageCode + ')';
-                        document.getElementById('detectedLanguageDisplay').style.display = 'block';
-                    }
-                })
-                .catch(err => console.error('Detection error:', err));
-            }
-        });
+        if (input) {
+            input.addEventListener('input', function() {
+                const sourceLang = document.getElementById('sourceLang').value;
+                if (sourceLang === 'auto' && this.value.trim().length > 2) {
+                    fetch('/api/translation/detect', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: this.value })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.languageName) {
+                            document.getElementById('detectedLang').textContent = 
+                                data.languageName + ' (' + data.languageCode + ')';
+                            document.getElementById('detectedLanguageDisplay').style.display = 'block';
+                        }
+                    })
+                    .catch(err => console.error('Detection error:', err));
+                }
+            });
+        }
     });
+
+    // ===== TWO-WAY VOICE CALL TRANSLATION SIMULATION =====
+    function toggleCall() {
+        const btn = document.getElementById('startCallBtn');
+        const badge = document.getElementById('callStatusBadge');
+        const waveform = document.getElementById('callWaveformContainer');
+        const transcript = document.getElementById('callTranscript');
+
+        if (!isCallActive) {
+            // Connect Call
+            isCallActive = true;
+            btn.className = 'btn btn-danger btn-lg w-100 mb-2';
+            btn.innerHTML = '<i class="fas fa-phone-slash me-2"></i> End Call';
+            badge.className = 'badge bg-success p-2 px-3 fs-6';
+            badge.textContent = '🟢 Connected (LIVE)';
+            waveform.classList.remove('d-none');
+            
+            // Clear transcript & welcome
+            document.getElementById('emptyCallState').style.display = 'none';
+            transcript.innerHTML = `
+                <div class="text-center text-muted small my-2 border-bottom pb-2">
+                    📞 Call started at ${new Date().toLocaleTimeString()}
+                </div>
+            `;
+
+            // Enable call controls
+            document.getElementById('speakResidentBtn').disabled = false;
+            document.getElementById('agentResponseText').disabled = false;
+            document.getElementById('sendAgentResponseBtn').disabled = false;
+
+            if (typeof toast !== 'undefined') {
+                toast.success('Live two-way translation call session started!', 'Call Connected');
+            }
+        } else {
+            // Disconnect Call
+            isCallActive = false;
+            btn.className = 'btn btn-success btn-lg w-100 mb-2';
+            btn.innerHTML = '<i class="fas fa-phone-alt me-2"></i> Start Call Simulation';
+            badge.className = 'badge bg-secondary p-2 px-3 fs-6';
+            badge.textContent = '🔴 Disconnected';
+            waveform.classList.add('d-none');
+
+            // Disable controls
+            document.getElementById('speakResidentBtn').disabled = true;
+            document.getElementById('agentResponseText').disabled = true;
+            document.getElementById('sendAgentResponseBtn').disabled = true;
+
+            // Reset Speech recognition
+            if (isResidentSpeaking && recognition) {
+                recognition.stop();
+            }
+
+            // Restore empty state
+            transcript.innerHTML = `
+                <div class="text-center my-auto text-muted" id="emptyCallState">
+                    <i class="fas fa-headset fa-3x mb-3 text-purple-soft"></i>
+                    <p>Start a call to view the real-time translation overlay.</p>
+                </div>
+            `;
+
+            if (typeof toast !== 'undefined') {
+                toast.info('Live call session disconnected.', 'Call Ended');
+            }
+        }
+    }
+
+    function startResidentSpeech() {
+        if (!recognition) {
+            alert('Browser speech recognition not supported in this browser. Please use Chrome/Edge or type inside the input tab.');
+            return;
+        }
+
+        if (isResidentSpeaking) {
+            recognition.stop();
+        } else {
+            const lang = document.getElementById('callSourceLang').value;
+            // Map code to recognition locales
+            if (lang === 'hi') recognition.lang = 'hi-IN';
+            else if (lang === 'es') recognition.lang = 'es-ES';
+            else if (lang === 'ta') recognition.lang = 'ta-IN';
+            else if (lang === 'te') recognition.lang = 'te-IN';
+            else if (lang === 'ml') recognition.lang = 'ml-IN';
+            else if (lang === 'kn') recognition.lang = 'kn-IN';
+            else if (lang === 'bn') recognition.lang = 'bn-IN';
+            else recognition.lang = 'en-US';
+
+            recognition.start();
+        }
+    }
+
+    function handleResidentSpeech(transcript) {
+        const lang = document.getElementById('callSourceLang').value;
+        const transcriptContainer = document.getElementById('callTranscript');
+
+        // Translate speech to English (for Agent display)
+        fetch('/api/translation/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: transcript,
+                sourceLang: lang,
+                targetLang: 'en'
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const originalText = data.original;
+            const translatedText = data.translated;
+            
+            // Display bubble on Agent console
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble bubble-resident';
+            bubble.innerHTML = `
+                <div class="small text-muted fw-bold mb-1"><i class="fas fa-user-circle me-1"></i>Resident (${lang.toUpperCase()})</div>
+                <div class="mb-1">${originalText}</div>
+                <div class="small text-purple-soft border-top pt-1 mt-1"><i class="fas fa-language me-1"></i>Subtitles: ${translatedText}</div>
+            `;
+            transcriptContainer.appendChild(bubble);
+            transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+        })
+        .catch(err => console.error('Call translation error:', err));
+    }
+
+    function handleAgentKey(event) {
+        if (event.key === 'Enter') {
+            sendAgentResponse();
+        }
+    }
+
+    function sendAgentResponse() {
+        const input = document.getElementById('agentResponseText');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const lang = document.getElementById('callSourceLang').value;
+        const transcriptContainer = document.getElementById('callTranscript');
+
+        // Clear input
+        input.value = '';
+
+        // Translate agent English response back to Resident native language
+        fetch('/api/translation/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: text,
+                sourceLang: 'en',
+                targetLang: lang
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const originalText = data.original;
+            const translatedText = data.translated;
+
+            // Display bubble on Agent console
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble bubble-agent';
+            bubble.innerHTML = `
+                <div class="small text-muted fw-bold mb-1"><i class="fas fa-headset me-1"></i>Agent (EN)</div>
+                <div class="mb-1">${originalText}</div>
+                <div class="small text-muted border-top pt-1 mt-1"><i class="fas fa-language me-1"></i>Voice overlay: ${translatedText}</div>
+            `;
+            transcriptContainer.appendChild(bubble);
+            transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+
+            // Read the translation aloud to the resident in their native language
+            const utterance = new SpeechSynthesisUtterance(translatedText);
+            if (lang === 'hi') utterance.lang = 'hi-IN';
+            else if (lang === 'es') utterance.lang = 'es-ES';
+            else if (lang === 'ta') utterance.lang = 'ta-IN';
+            else if (lang === 'te') utterance.lang = 'te-IN';
+            else if (lang === 'ml') utterance.lang = 'ml-IN';
+            else if (lang === 'kn') utterance.lang = 'kn-IN';
+            else if (lang === 'bn') utterance.lang = 'bn-IN';
+            else utterance.lang = 'en-US';
+
+            utterance.rate = 0.95;
+            speechSynthesis.speak(utterance);
+        })
+        .catch(err => console.error('Agent response translation error:', err));
+    }
+
+    // ===== DARK MODE TOGGLE =====
+    function toggleDarkMode() {
+        const isDark = document.documentElement.classList.toggle('dark-mode');
+        const icon = document.getElementById('darkModeIcon');
+        if (isDark) {
+            icon.className = 'fas fa-sun';
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            icon.className = 'fas fa-moon';
+            localStorage.setItem('darkMode', 'false');
+        }
+    }
+
+    (function() {
+        const saved = localStorage.getItem('darkMode');
+        if (saved === 'true') {
+            document.documentElement.classList.add('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = 'fas fa-sun';
+        }
+    })();
 </script>
 </body>
 </html>

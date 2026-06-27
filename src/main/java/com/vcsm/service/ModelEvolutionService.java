@@ -41,10 +41,14 @@ public class ModelEvolutionService {
     }
 
     /**
-     * Train model manually by name
+     * Train new model
      */
     public ModelVersion trainModel(String modelName) {
-        return autoTrainer.trainNewModel(modelName);
+        try {
+            return autoTrainer.trainNewModel(modelName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to train model: " + e.getMessage(), e);
+        }
     }
 
     private void retrainAllModels() {

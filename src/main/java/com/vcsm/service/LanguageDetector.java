@@ -19,6 +19,7 @@ public class LanguageDetector {
     static {
         LANGUAGE_NAMES.put("hi", "Hindi");
         LANGUAGE_NAMES.put("en", "English");
+        LANGUAGE_NAMES.put("es", "Spanish");
         LANGUAGE_NAMES.put("ta", "Tamil");
         LANGUAGE_NAMES.put("te", "Telugu");
         LANGUAGE_NAMES.put("ml", "Malayalam");
@@ -30,6 +31,7 @@ public class LanguageDetector {
         
         LANGUAGE_CODES.put("Hindi", "hi");
         LANGUAGE_CODES.put("English", "en");
+        LANGUAGE_CODES.put("Spanish", "es");
         LANGUAGE_CODES.put("Tamil", "ta");
         LANGUAGE_CODES.put("Telugu", "te");
         LANGUAGE_CODES.put("Malayalam", "ml");
@@ -43,6 +45,15 @@ public class LanguageDetector {
     public String detectLanguage(String text) {
         if (text == null || text.isEmpty()) {
             return "en";
+        }
+
+        // Check for Spanish vocabulary/accents
+        String lower = text.toLowerCase();
+        if (lower.contains("hola") || lower.contains("gracias") || 
+            lower.contains("queja") || lower.contains("ayuda") ||
+            lower.contains("estado") || lower.contains("evento") ||
+            lower.contains("problema")) {
+            return "es";
         }
         
         // Check for Hindi characters

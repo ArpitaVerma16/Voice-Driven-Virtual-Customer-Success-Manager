@@ -7,11 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Repository
 public interface ComplaintRepository extends JpaRepository<Complaint, Long>, JpaSpecificationExecutor<Complaint> {
@@ -30,7 +29,6 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>, Jpa
 
     Optional<Complaint> findByIdAndResidentUsername(Long id, String residentUsername);
 
-
     List<Complaint> findByCategory(Complaint.ComplaintCategory category);
 
     List<Complaint> findByApartmentNumber(String apartmentNumber);
@@ -47,12 +45,8 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>, Jpa
     List<Object[]> countByPriority();
 
     @Query("SELECT c.id FROM Complaint c")
-List<Long> findAllIds();
+    List<Long> findAllIds();
 
-@Query("SELECT c.id FROM Complaint c WHERE c.status = :status")
-List<Long> findIdsByStatus(@Param("status") Complaint.ComplaintStatus status);
-
-
-
-    Page<Complaint> findAll(Pageable pageable);
+    @Query("SELECT c.id FROM Complaint c WHERE c.status = :status")
+    List<Long> findIdsByStatus(@Param("status") Complaint.ComplaintStatus status);
 }
