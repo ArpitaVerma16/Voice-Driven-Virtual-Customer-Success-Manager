@@ -53,7 +53,7 @@ public class EventController {
 
     @PutMapping("/{id}")
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Event> update(@PathVariable Long id, @RequestBody Event event) {
+    public ResponseEntity<Event> update(@PathVariable Long id, @Valid @RequestBody Event event) {
         return ResponseEntity.ok(eventService.updateEvent(id, event));
     }
 

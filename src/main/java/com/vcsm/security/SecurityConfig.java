@@ -82,6 +82,10 @@ public class SecurityConfig {
                         rateLimitingFilter,
                         HmacAuthenticationFilter.class
                 )
+                .addFilterBefore(
+                        hmacAuthenticationFilter,
+                        JwtAuthFilter.class
+                )
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

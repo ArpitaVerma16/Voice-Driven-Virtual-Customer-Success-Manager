@@ -40,6 +40,17 @@ public class ModelEvolutionService {
         System.out.println("✅ Evolution cycle completed");
     }
 
+    /**
+     * Train new model
+     */
+    public ModelVersion trainModel(String modelName) {
+        try {
+            return autoTrainer.trainNewModel(modelName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to train model: " + e.getMessage(), e);
+        }
+    }
+
     private void retrainAllModels() {
         List<String> modelNames = getModelNames();
         for (String modelName : modelNames) {
