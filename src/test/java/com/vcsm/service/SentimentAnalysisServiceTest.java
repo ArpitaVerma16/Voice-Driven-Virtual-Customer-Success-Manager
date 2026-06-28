@@ -1,109 +1,49 @@
 package com.vcsm.service;
 
-import com.vcsm.model.SentimentAnalysis;
-import com.vcsm.model.User;
-import com.vcsm.repository.SentimentAnalysisRepository;
-import com.vcsm.repository.UserRepository;
-import com.vcsm.utils.SentimentClassifier;
+import com.vcsm.dto.SentimentResult;
+import com.vcsm.model.Sentiment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class SentimentAnalysisServiceTest {
+public class SentimentAnalysisServiceTest {
 
-    @Mock
-    private SentimentClassifier sentimentClassifier;
-
-    @Mock
-    private SentimentAnalysisRepository sentimentRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private SentimentAnalysisService sentimentService;
-
-    private User testUser;
-    private SentimentClassifier.SentimentResult positiveResult;
-    private SentimentClassifier.SentimentResult negativeResult;
+    private SentimentAnalysisServiceImpl service;
 
     @BeforeEach
-    void setUp() {
-        testUser = new User();
-        testUser.setId(1L);
-        testUser.setName("Test User");
-        testUser.setEmail("test@example.com");
-
-        positiveResult = new SentimentClassifier.SentimentResult("POSITIVE", 0.85);
-        negativeResult = new SentimentClassifier.SentimentResult("NEGATIVE", 0.75);
-
-        // Stub shouldEscalate calls on mocked classifier
-        lenient().when(sentimentClassifier.shouldEscalate("NEGATIVE")).thenReturn(true);
-        lenient().when(sentimentClassifier.shouldEscalate("VERY_NEGATIVE")).thenReturn(true);
-        lenient().when(sentimentClassifier.shouldEscalate("POSITIVE")).thenReturn(false);
-        lenient().when(sentimentClassifier.shouldEscalate("NEUTRAL")).thenReturn(false);
+    public void setUp() {
+        service = new SentimentAnalysisServiceImpl();
     }
 
     @Test
-    void testAnalyzePositiveSentiment() {
-        when(sentimentClassifier.analyze("I am very happy with this service"))
-            .thenReturn(positiveResult);
-        
-        SentimentClassifier.SentimentResult result = sentimentClassifier.analyze("I am very happy with this service");
-        
-        assertNotNull(result);
-        assertEquals("POSITIVE", result.getSentiment());
-        assertTrue(result.getConfidence() > 0.8);
+    public void testPositiveSentiment() {
+        SentimentResult result = service.analyzeTranscript("Thank you so much! Great service and excellent support");
+        assertEquals(Sentiment.POSITIVE, result.getSentiment());
+        assertFalse(result.isRequiresEscalation());
     }
 
     @Test
-    void testAnalyzeNegativeSentiment() {
-        when(sentimentClassifier.analyze("This is terrible service"))
-            .thenReturn(negativeResult);
-        
-        SentimentClassifier.SentimentResult result = sentimentClassifier.analyze("This is terrible service");
-        
-        assertNotNull(result);
-        assertEquals("NEGATIVE", result.getSentiment());
+    public void testNegativeSentiment() {
+        SentimentResult result = service.analyzeTranscript("This is broken and not working properly");
+        assertEquals(Sentiment.NEGATIVE, result.getSentiment());
     }
 
     @Test
-    void testShouldEscalateOnNegative() {
-        boolean shouldEscalate = sentimentClassifier.shouldEscalate("NEGATIVE");
-        assertTrue(shouldEscalate);
+    public void testDistressedSentiment() {
+        SentimentResult result = service.analyzeTranscript("This is the worst system ever! I'm angry and frustrated with this broken service!");
+        assertEquals(Sentiment.DISTRESSED, result.getSentiment());
+        assertTrue(result.isRequiresEscalation());
     }
 
     @Test
-    void testShouldNotEscalateOnPositive() {
-        boolean shouldEscalate = sentimentClassifier.shouldEscalate("POSITIVE");
-        assertFalse(shouldEscalate);
+    public void testEscalationThreshold() {
+        SentimentResult result = service.analyzeTranscript("problem error broken issue complaint frustrated angry");
+        assertTrue(result.isRequiresEscalation());
     }
 
     @Test
-    void testShouldNotEscalateOnNeutral() {
-        boolean shouldEscalate = sentimentClassifier.shouldEscalate("NEUTRAL");
-        assertFalse(shouldEscalate);
-    }
-
-    @Test
-    void testAnalyzeAndProcess_SavesSentiment() {
-        String text = "I am happy";
-        when(userRepository.findById(testUser.getId())).thenReturn(java.util.Optional.of(testUser));
-        when(sentimentClassifier.analyze(text)).thenReturn(positiveResult);
-        when(sentimentRepository.save(any(SentimentAnalysis.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        SentimentAnalysis result = sentimentService.analyzeAndProcess(testUser.getId(), text);
-
-        assertNotNull(result);
-        assertEquals("POSITIVE", result.getSentiment());
-        verify(sentimentRepository, times(1)).save(any(SentimentAnalysis.class));
+    public void testEmptyTranscriptHandling() {
+        SentimentResult result = service.analyzeTranscript("");
+        assertEquals(Sentiment.NEUTRAL, result.getSentiment());
     }
 }
