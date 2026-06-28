@@ -1,10 +1,11 @@
 # 🎙️ Voice-Driven Virtual Customer Success Manager (VCSM)
 
-## Project Overview 
+## 📖 Project Overview
 
 Voice-Driven Virtual Customer Success Manager (VCSM) is a Spring Boot web application that serves as a **Voice-enabled Virtual Community Manager** for resident support and community engagement.
 
 It enables users to:
+
 - File complaints and track status.
 - Interact using Voice Assistant.
 - View visuals of stats related to complaints and engagement.
@@ -12,7 +13,7 @@ It enables users to:
 
 ---
 
-## Table of Contents
+## 📑 Table of Contents
 
 - [🚀 Features](#-features)
 - [🎤 Example Voice Commands](#-example-voice-commands)
@@ -84,13 +85,13 @@ The Voice Assistant supports natural language commands and automatically routes 
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Spring Boot 3.2, Spring Data JPA |
-| Frontend | Thymeleaf, Bootstrap 5, Chart.js |
-| Database | H2 (in-memory, dev) |
-| Voice AI | Omnidim.io API + Web Speech API |
-| Build | Maven |
+| Layer    | Technology                         |
+| -------- | ---------------------------------- |
+| Backend  | Spring Boot 3.2, Spring Data JPA   |
+| Frontend | Thymeleaf, Bootstrap 5, Chart.js   |
+| Database | H2 (in-memory, dev)                |
+| Voice AI | Omnidim.io API + Web Speech API    |
+| Build    | Maven                             |
 
 ---
 
@@ -146,7 +147,7 @@ omnidim.api.key=YOUR_ACTUAL_API_KEY
 
 ---
 
-## 📡  API 
+## 📡 API 
 
 ### Complaints
 | Method | Endpoint | Description |
@@ -200,16 +201,18 @@ Screenshots will be added once a stable or deployed version of the application i
 ---
 
 ## 🚀 Deployment
-- Live Demo: Not available currently
-The application is currently not deployed. It can be run locally using the setup instructions below.
+
+- **Live Demo:** Not available currently.
+
+The application is currently not deployed. It can be run locally using the setup instructions above.
 
 ---
 
 ## 🛠️ Troubleshooting
 
-- Ensure Java 17+ is installed
-- Run `mvn clean install` if build fails
-- H2 console: http://localhost:8080/h2-console
+- Ensure Java 17 or later is installed.
+- Run `mvn clean install` if the build fails.
+- Access the H2 console at `http://localhost:8080/h2-console`.
 
 ---
 
