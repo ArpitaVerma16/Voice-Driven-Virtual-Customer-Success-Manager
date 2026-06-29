@@ -23,7 +23,7 @@ public class SelfHealingEngine {
      */
     @Scheduled(fixedDelay = 300000) // 5 minutes
     public void runHealingCycle() {
-        System.out.println("🔍 Running self-healing cycle...");
+        log.info("🔍 Running self-healing cycle...");
 
         // Collect system metrics
         Map<String, Double> metrics = collectMetrics();
@@ -32,15 +32,15 @@ public class SelfHealingEngine {
         AnomalyDetector.AnomalyResult result = anomalyDetector.detectAnomalies(metrics);
 
         if (!result.isHasAnomalies()) {
-            System.out.println("✅ No anomalies detected. System is healthy.");
+            log.info("✅ No anomalies detected. System is healthy.");
             return;
         }
 
-        System.out.println("⚠️ " + result.getAnomalies().size() + " anomalies detected!");
+        log.info("⚠️ " + result.getAnomalies().size() + " anomalies detected!");
 
         // Handle each anomaly
         for (AnomalyDetector.Anomaly anomaly : result.getAnomalies()) {
-            System.out.println("🔄 Executing recovery for: " + anomaly.getMetricName());
+            log.info("🔄 Executing recovery for: " + anomaly.getMetricName());
             AutoRecoveryService.RecoveryResult recovery = autoRecoveryService.executeRecovery(anomaly);
 
             healingCount++;
@@ -53,7 +53,7 @@ public class SelfHealingEngine {
             );
             healingReports.add(report);
 
-            System.out.println("✅ Recovery " + recovery.getStatus() + ": " + recovery.getMessage());
+            log.info("✅ Recovery " + recovery.getStatus() + ": " + recovery.getMessage());
         }
     }
 

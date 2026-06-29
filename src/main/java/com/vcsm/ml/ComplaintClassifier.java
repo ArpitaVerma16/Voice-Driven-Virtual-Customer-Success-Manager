@@ -114,10 +114,10 @@ public class ComplaintClassifier {
 
             categorizer = new DocumentCategorizerME(model);
 
-            System.out.println("✅ Complaint classifier trained with " + samples.size() + " samples");
+            log.info("✅ Complaint classifier trained with " + samples.size() + " samples");
 
         } catch (IOException e) {
-            System.err.println("❌ Failed to train classification model: " + e.getMessage());
+            log.error("❌ Failed to train classification model: " + e.getMessage());
         }
     }
 
@@ -192,3 +192,4 @@ public class ComplaintClassifier {
         }
     }
 }
+

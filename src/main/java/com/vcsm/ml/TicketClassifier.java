@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
+    private static final Logger log = LoggerFactory.getLogger(TicketClassifier.class);
+
 public class TicketClassifier {
 
     private DoccatModel model;
@@ -106,10 +108,10 @@ public class TicketClassifier {
 );
             categorizer = new DocumentCategorizerME(model);
 
-            System.out.println("✅ Ticket classifier trained with " + samples.size() + " samples");
+            log.info("✅ Ticket classifier trained with " + samples.size() + " samples");
 
         } catch (IOException e) {
-            System.err.println("❌ Failed to train classification model: " + e.getMessage());
+            log.error("❌ Failed to train classification model: " + e.getMessage());
         }
     }
 
@@ -177,3 +179,5 @@ public class TicketClassifier {
         public void close() throws IOException {}
     }
 }
+
+

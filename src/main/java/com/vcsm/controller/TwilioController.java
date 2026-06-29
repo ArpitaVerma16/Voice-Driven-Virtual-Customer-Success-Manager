@@ -143,7 +143,7 @@ public class TwilioController {
             @RequestParam(required = false) String CallSid) {
         
         // In production, process the recording using speech-to-text
-        System.out.println("📹 Recording URL: " + RecordingUrl);
+        log.info("📹 Recording URL: " + RecordingUrl);
         
         // Acknowledge receipt
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

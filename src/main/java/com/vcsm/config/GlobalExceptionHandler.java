@@ -157,7 +157,7 @@ public class GlobalExceptionHandler {
             Exception ex, HttpServletRequest request) {
         
         // Log the error for debugging
-        System.err.println("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+        log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         ex.printStackTrace();
         
         Map<String, Object> response = new HashMap<>();

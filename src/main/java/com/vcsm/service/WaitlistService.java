@@ -96,26 +96,9 @@ public class WaitlistService {
             Optional<EventWaitlist> firstWaitlist = waitlistRepository
                 .findFirstByEventAndConfirmedFalseAndNotifiedAtIsNullOrderByJoinedAtAsc(event);
             
-            if (firstWaitlist.isEmpty()) {
-                break;
-            }
-            
-            EventWaitlist waitlistEntry = firstWaitlist.get();
-            User user = waitlistEntry.getUser();
-            
-            // Notify the user
-            try {
-                emailService.sendEventSlotAvailable(event, user);
-                waitlistEntry.setNotifiedAt(LocalDateTime.now());
-                waitlistEntry.setExpiresAt(LocalDateTime.now().plusHours(24));
-                waitlistRepository.save(waitlistEntry);
-                
-                System.out.println("✅ Notification sent to user: " + user.getEmail());
-            } catch (Exception e) {
-                System.err.println("❌ Failed to send notification: " + e.getMessage());
-                // Break to avoid infinite looping on the same failing user in this loop execution
-                break;
-            }
+            log.info("✅ Notification sent to user: " + user.getEmail());
+        } catch (Exception e) {
+            log.error("❌ Failed to send notification: " + e.getMessage());
         }
     }
     
@@ -172,7 +155,7 @@ public class WaitlistService {
         for (EventWaitlist entry : expired) {
             Event event = entry.getEvent();
             waitlistRepository.delete(entry);
-            System.out.println("🗑️ Removed expired waitlist entry: " + entry.getId());
+            log.info("🗑️ Removed expired waitlist entry: " + entry.getId());
             processWaitlist(event);
         }
     }
