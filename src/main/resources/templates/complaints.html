@@ -4,116 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Complaints - VCSM</title>
-
     
     <!-- Favicon & Meta Tags -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
     <meta name="description" content="Voice-Driven Virtual Customer Success Manager - Complaint Management">
-
-
-    <meta name="keywords" content="voice assistant, customer success, complaints, tracking">
-    <meta name="author" content="Bhakkti Gautam">
-    <meta name="theme-color" content="#8b5cf6">
-    <meta property="og:title" content="VCSM - Complaint Management">
-    <meta property="og:description" content="File and track community complaints">
-
-
-    <meta name="keywords" content="voice assistant, customer success, complaints, tracking, priority">
+    <meta name="keywords" content="voice assistant, customer success, complaints, tracking, priority, search, filter">
     <meta name="author" content="Bhakkti Gautam">
     <meta name="theme-color" content="#8b5cf6">
     <meta property="og:title" content="VCSM - Complaint Management">
     <meta property="og:description" content="File and track community complaints with priority levels">
-
     <meta name="twitter:card" content="summary_large_image">
     
     <!-- CSS Dependencies -->
-
-    <!-- Favicon & SEO -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E🎙️%3C/text%3E%3C/svg%3E">
-    <meta name="description" content="Voice-Driven Virtual Customer Success Manager - File complaints, track events, use voice commands">
-    <meta name="keywords" content="voice assistant, customer success, complaint management, event management">
-    <meta name="author" content="Bhakkti Gautam">
-    <meta name="theme-color" content="#8b5cf6">
-    <meta property="og:title" content="VCSM - Virtual Customer Success Manager">
-    <meta property="og:description" content="Voice-driven community support platform">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    
-
-
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/ui.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/back-to-top.css">
-
     <link rel="stylesheet" href="/css/print.css" media="print">
     <link rel="stylesheet" href="/css/hover-effects.css">
     <link rel="stylesheet" href="/css/toast-notifications.css">
-
-    <link rel="stylesheet" href="/css/hover-effects.css">
-
-    <link rel="stylesheet" href="/css/spinners.css">
-    <link rel="stylesheet" href="/css/responsive.css">
-
-
-
-    <link rel="stylesheet" href="/css/confirm-dialogs.css">
-
-    <link rel="stylesheet" href="/css/shortcuts.css">
-
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/src/main/resources/static/css/mainfile.css" rel="stylesheet">
-    <link href="/src/main/resources/static/css/responsive.css" rel="stylesheet">
-
-
-
-
-    <link rel="stylesheet" href="/css/print.css" media="print">
-    <link rel="stylesheet" href="/css/hover-effects.css">
-    <link rel="stylesheet" href="/css/toast-notifications.css">
-
-    <link rel="stylesheet" href="/css/hover-effects.css">
-
-    <link rel="stylesheet" href="/css/print.css" media="print">
-    <link rel="stylesheet" href="/css/hover-effects.css">
-
-    <link rel="stylesheet" href="/css/toast-notifications.css">
-
     <link rel="stylesheet" href="/css/dark-mode.css">
     <link rel="stylesheet" href="/css/dark-mode-toggle.css">
-
     <link rel="stylesheet" href="/css/spinners.css">
     <link rel="stylesheet" href="/css/responsive.css">
-
-
-
-    <link rel="stylesheet" href="/css/confirm-dialogs.css">
-
     <link rel="stylesheet" href="/css/shortcuts.css">
-
-
-
-
-
-
-
     <link rel="stylesheet" href="/css/typing-indicator.css">
-
-    <link rel="stylesheet" href="/css/confirm-dialogs.css">
-
-
-    <link rel="stylesheet" href="/css/empty-states.css">
-
-
-    <link rel="stylesheet" href="/src/main/resources/static/css/print.css" media="print">
-    
-
-
     <link rel="stylesheet" href="/css/confirm-dialogs.css">
     <link rel="stylesheet" href="/css/empty-states.css">
+
 
 
 
@@ -128,6 +47,33 @@
     <meta property="og:description" content="Voice-driven community support platform">
     <meta name="twitter:card" content="summary_large_image">
 
+    <!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+<!-- Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+
+<!-- Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(reg) {
+                    console.log('✅ Service Worker registered successfully:', reg);
+                })
+                .catch(function(err) {
+                    console.warn('❌ Service Worker registration failed:', err);
+                });
+        });
+    }
+</script>
 
 </head>
 <body>
@@ -155,7 +101,6 @@
                 <a class="nav-link" href="/">Dashboard</a>
                 <a class="nav-link active" href="/complaints">Complaints</a>
                 <a class="nav-link" href="/events">Events</a>
-                <a class="nav-link" href="/interaction-history">Interaction History</a>
                 <a class="nav-link" href="/analytics">Analytics</a>
                 <a class="nav-link" href="/voice-analytics">Voice Analytics</a>
             </div>
@@ -166,21 +111,21 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
         <h4 class="fw-bold mb-0"><i class="fas fa-exclamation-circle text-purple me-2"></i>Complaint Management</h4>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             <button class="btn btn-success btn-sm" onclick="exportCSV()">
                 <i class="fas fa-file-csv me-1"></i> CSV
             </button>
             <button class="btn btn-danger btn-sm" onclick="exportPDF()">
                 <i class="fas fa-file-pdf me-1"></i> PDF
             </button>
-            <button class="btn btn-purple w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#fileComplaintModal">
+            <button class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#fileComplaintModal">
                 <span class="btn-spinner"></span>
                 <span class="btn-text"><i class="fas fa-plus me-1"></i>New Complaint</span>
             </button>
         </div>
     </div>
 
-    <!-- Stats Row - 2 columns on mobile, 4 on desktop -->
+    <!-- Stats Row -->
     <div class="row g-2 mb-4">
         <div class="col-6 col-md-3">
             <div class="card text-center border-danger h-100 stat-card">
@@ -217,7 +162,7 @@
         </div>
         <div class="col-6 col-md-3">
             <div class="card text-center border-secondary h-100 stat-card">
-                <div class="card-body py-2">
+                <div class-card-body py-2">
                     <div class="stat-icon bg-secondary-soft mb-1">
                         <i class="fas fa-chart-bar text-secondary"></i>
                     </div>
@@ -228,7 +173,95 @@
         </div>
     </div>
 
+
+    <!-- Bulk Actions Toolbar -->
+    <div th:unless="${complaints.empty}" class="d-flex flex-wrap align-items-center gap-2 mb-3 p-2 bg-light rounded border">
+        <button class="btn btn-sm btn-outline-primary" onclick="selectAll()">
+            <i class="fas fa-check-double me-1"></i> Select All
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">
+            <i class="fas fa-times me-1"></i> Deselect All
+        </button>
+        <span class="text-muted small mx-2" id="selectedCount">0 selected</span>
+        <div class="vr"></div>
+        <select id="bulkStatus" class="form-select form-select-sm" style="width: auto;">
+            <option value="">Change Status...</option>
+            <option value="OPEN">Open</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="RESOLVED">Resolved</option>
+            <option value="CLOSED">Closed</option>
+        </select>
+        <button class="btn btn-sm btn-success" onclick="bulkUpdateStatus()">
+            <i class="fas fa-sync me-1"></i> Apply Status
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="bulkResolve()">
+            <i class="fas fa-check-circle me-1"></i> Bulk Resolve
+        </button>
+    </div>
+
     <!-- Complaints Table with horizontal scroll on mobile -->
+
+    <!-- Search & Filter Bar -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <input type="text" id="searchKeyword" class="form-control" placeholder="🔍 Search complaints...">
+                </div>
+                <div class="col-md-2">
+                    <select id="filterStatus" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="OPEN">Open</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="RESOLVED">Resolved</option>
+                        <option value="CLOSED">Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select id="filterCategory" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="NOISE">Noise</option>
+                        <option value="MAINTENANCE">Maintenance</option>
+                        <option value="SECURITY">Security</option>
+                        <option value="CLEANLINESS">Cleanliness</option>
+                        <option value="PARKING">Parking</option>
+                        <option value="UTILITIES">Utilities</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select id="filterPriority" class="form-select">
+                        <option value="">All Priority</option>
+                        <option value="CRITICAL">Critical</option>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-purple w-100" onclick="applyFilters()">
+                        <i class="fas fa-search me-1"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+            <div class="row g-2 mt-2">
+                <div class="col-md-4">
+                    <input type="date" id="filterStartDate" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <input type="date" id="filterEndDate" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-secondary w-100" onclick="clearFilters()">
+                        <i class="fas fa-undo me-1"></i> Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaints Table -->
+
     <div class="card shadow-sm">
         <div class="table-responsive">
             <div th:if="${complaints.empty}">
@@ -236,8 +269,8 @@
                     <div class="empty-state-icon">
                         <i class="fas fa-inbox"></i>
                     </div>
-                    <h3 class="empty-state-title">No complaints yet</h3>
-                    <p class="empty-state-message">Your community is peaceful! When residents file complaints, they'll appear here.</p>
+                    <h3 class="empty-state-title">No complaints found</h3>
+                    <p class="empty-state-message" id="emptyStateMessage">Try adjusting your filters or file a new complaint.</p>
                     <button class="empty-state-btn" data-bs-toggle="modal" data-bs-target="#fileComplaintModal">
                         <i class="fas fa-plus me-1"></i> File First Complaint
                     </button>
@@ -246,6 +279,9 @@
             <table th:unless="${complaints.empty}" class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th>
+                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes(this)">
+                        </th>
                         <th>#</th>
                         <th>Resident</th>
                         <th>Apt</th>
@@ -258,13 +294,10 @@
                     </tr>
                 </thead>
                 <tbody>
-
-
-                    <tr th:if="${complaints.empty}">
-                        <td colspan="8" class="text-center text-muted py-4">No complaints found. File your first complaint! 🎯</td>
-                    </tr>
-n
                     <tr th:each="c : ${complaints}">
+                        <td>
+                            <input type="checkbox" class="complaint-checkbox" th:value="${c.id}">
+                        </td>
                         <td th:text="${c.id}">1</td>
                         <td th:text="${c.residentName}">Name</td>
                         <td th:text="${c.apartmentNumber ?: '-'}">Apt</td>
@@ -272,7 +305,6 @@ n
                             <span class="badge bg-secondary" th:text="${c.category}">CAT</span>
                         </td>
                         <td th:text="${#strings.abbreviate(c.description, 50)}">Desc</td>
-                        <!-- Priority Badge -->
                         <td>
                             <span class="badge" 
                                   th:classappend="${c.priority == 'CRITICAL' ? 'bg-danger' : 
@@ -281,7 +313,6 @@ n
                                   th:text="${c.priority}">MEDIUM</span>
                             <small th:if="${!c.autoAssigned}" class="text-muted d-block" style="font-size: 10px;">(manual)</small>
                         </td>
-                        <!-- Status Badge -->
                         <td>
                             <span class="badge"
                                   th:classappend="${c.status.name() == 'OPEN' ? 'bg-danger' : 
@@ -308,10 +339,45 @@ n
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        <div th:unless="${complaints.empty}" class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 p-3 border-top">
+            <div>
+                <span class="text-muted small">
+                    Showing <span th:text="${page.number * page.size + 1}">1</span> 
+                    to <span th:text="${page.number * page.size + page.numberOfElements}">10</span> 
+                    of <span th:text="${page.totalElements}">0</span> complaints
+                </span>
+            </div>
+            <div class="d-flex flex-column flex-sm-row align-items-center gap-2">
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${page.first} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/complaints(page=${page.number - 1}, size=${page.size})}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" 
+                            th:classappend="${i == page.number} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/complaints(page=${i}, size=${page.size})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${page.last} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/complaints(page=${page.number + 1}, size=${page.size})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div>
+                    <select class="form-select form-select-sm" onchange="changePageSize(this.value)">
+                        <option value="5" th:selected="${page.size == 5}">5</option>
+                        <option value="10" th:selected="${page.size == 10}">10</option>
+                        <option value="25" th:selected="${page.size == 25}">25</option>
+                        <option value="50" th:selected="${page.size == 50}">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- File Complaint Modal - Responsive on mobile -->
+<!-- File Complaint Modal -->
 <div class="modal fade" id="fileComplaintModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -368,21 +434,11 @@ n
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/app.js"></script>
 <script src="/js/spinners.js"></script>
-
 <script src="/js/shortcuts.js"></script>
 <script src="/js/toast-notifications.js"></script>
 <script src="/js/back-to-top.js"></script>
 <script src="/js/dark-mode.js"></script>
 <script src="/js/typing-indicator.js"></script>
-
-<script src="/js/confirm-dialogs.js"></script>
-
-
-<script src="/js/confirm-dialogs.js"></script>
-
-<script src="/js/confirm-dialogs.js"></script>
-
-
 <script src="/js/confirm-dialogs.js"></script>
 
 <script>
@@ -400,7 +456,6 @@ n
             }
         }, 300);
         
-        // Show welcome toast
         setTimeout(function() {
             if (typeof toast !== 'undefined') {
                 toast.info('Manage your complaints here!', '📋 Complaints');
@@ -408,8 +463,169 @@ n
         }, 1000);
     });
 
+    // ===== SEARCH & FILTER FUNCTIONS =====
+    function applyFilters() {
+        const keyword = document.getElementById('searchKeyword').value;
+        const status = document.getElementById('filterStatus').value;
+        const category = document.getElementById('filterCategory').value;
+        const priority = document.getElementById('filterPriority').value;
+        const startDate = document.getElementById('filterStartDate').value;
+        const endDate = document.getElementById('filterEndDate').value;
+        
+        let url = '/complaints?page=0&size=' + (document.getElementById('pageSize')?.value || 10);
+        
+        if (keyword) url += '&keyword=' + encodeURIComponent(keyword);
+        if (status) url += '&status=' + status;
+        if (category) url += '&category=' + category;
+        if (priority) url += '&priority=' + priority;
+        if (startDate) url += '&startDate=' + startDate;
+        if (endDate) url += '&endDate=' + endDate;
+        
+        window.location.href = url;
+    }
 
-    // Export Functions
+    function clearFilters() {
+        document.getElementById('searchKeyword').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterCategory').value = '';
+        document.getElementById('filterPriority').value = '';
+        document.getElementById('filterStartDate').value = '';
+        document.getElementById('filterEndDate').value = '';
+        window.location.href = '/complaints';
+    }
+
+
+    // Bulk Operations
+    let selectedIds = [];
+
+    function toggleAllCheckboxes(master) {
+        document.querySelectorAll('.complaint-checkbox').forEach(cb => {
+            cb.checked = master.checked;
+        });
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        selectedIds = [];
+        document.querySelectorAll('.complaint-checkbox:checked').forEach(cb => {
+            selectedIds.push(parseInt(cb.value));
+        });
+        document.getElementById('selectedCount').textContent = selectedIds.length + ' selected';
+    }
+
+    function selectAll() {
+        document.querySelectorAll('.complaint-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+    }
+
+    function deselectAll() {
+        document.querySelectorAll('.complaint-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+    }
+
+    // Event listeners for checkboxes
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.complaint-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateSelectedCount);
+        });
+    });
+
+    function bulkUpdateStatus() {
+        const status = document.getElementById('bulkStatus').value;
+        if (!status) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Please select a status', 'Warning');
+            }
+            return;
+        }
+        if (selectedIds.length === 0) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Please select at least one complaint', 'Warning');
+            }
+            return;
+        }
+
+        fetch('/api/complaints/bulk/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                complaintIds: selectedIds,
+                status: status
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success > 0) {
+                if (typeof toast !== 'undefined') {
+                    toast.success(data.message, 'Success');
+                }
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.error('Bulk update failed', 'Error');
+                }
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Network error', 'Error');
+            }
+        });
+    }
+
+    function bulkResolve() {
+        if (selectedIds.length === 0) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Please select at least one complaint', 'Warning');
+            }
+            return;
+        }
+
+        if (!confirm('Are you sure you want to resolve ' + selectedIds.length + ' complaints?')) {
+            return;
+        }
+
+        fetch('/api/complaints/bulk/resolve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                complaintIds: selectedIds,
+                resolutionNotes: 'Resolved via bulk action'
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success > 0) {
+                if (typeof toast !== 'undefined') {
+                    toast.success(data.message, 'Success');
+                }
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.error('Bulk resolve failed', 'Error');
+                }
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Network error', 'Error');
+            }
+        });
+    }
+
+
+    // Change page size
+
+    // ===== PAGINATION =====
+
+    function changePageSize(size) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('size', size);
+        url.searchParams.set('page', 0);
+        window.location.href = url.toString();
+    }
+
+    // ===== EXPORT FUNCTIONS =====
     function exportCSV() {
         if (typeof toast !== 'undefined') {
             toast.info('Downloading CSV...', '📥 Export');
@@ -424,7 +640,7 @@ n
         window.location.href = '/api/export/complaints/pdf';
     }
 
-    // Submit complaint with toast
+    // ===== SUBMIT COMPLAINT =====
     function submitComplaint() {
         const btn = event.target.closest('button');
         if (btn && btn.classList) {
@@ -462,24 +678,12 @@ n
             if (btn) btn.classList.remove('loading');
             if (data.id) {
                 if (typeof toast !== 'undefined') {
-
-                    toast.success(`Complaint #${data.id} filed successfully!`, 'Success');
-
-
-                    toast.success(`Complaint #${data.id} filed successfully!`, 'Success');
-
                     toast.success(`Complaint #${data.id} filed with priority ${data.priority || 'MEDIUM'}!`, 'Success');
-
-
-                } else {
-                    alert('Complaint filed! ID: ' + data.id);
                 }
                 setTimeout(() => location.reload(), 1500);
             } else {
                 if (typeof toast !== 'undefined') {
                     toast.error('Failed to file complaint', 'Error');
-                } else {
-                    alert('Error: ' + JSON.stringify(data));
                 }
             }
         })
@@ -487,13 +691,11 @@ n
             if (btn) btn.classList.remove('loading');
             if (typeof toast !== 'undefined') {
                 toast.error('Network error. Please try again.', 'Error');
-            } else {
-                alert('Network error. Please try again.');
             }
         });
     }
 
-    // Update complaint status with toast
+    // ===== UPDATE STATUS =====
     function updateComplaintStatus(btn, id) {
         btn.classList.add('loading');
         
@@ -513,15 +715,11 @@ n
             if (data.id) {
                 if (typeof toast !== 'undefined') {
                     toast.success(`Complaint #${id} status updated to ${newStatus}`, 'Updated');
-                } else {
-                    alert('Status updated!');
                 }
                 setTimeout(() => location.reload(), 1000);
             } else {
                 if (typeof toast !== 'undefined') {
                     toast.error('Error updating status', 'Error');
-                } else {
-                    alert('Error updating status');
                 }
             }
         })
@@ -529,15 +727,11 @@ n
             btn.classList.remove('loading');
             if (typeof toast !== 'undefined') {
                 toast.error('Network error. Please try again.', 'Error');
-            } else {
-                alert('Network error. Please try again.');
             }
         });
     }
 
-
-
-    // Update priority manually
+    // ===== UPDATE PRIORITY =====
     function updatePriority(id) {
         const newPriority = prompt('Enter new priority (CRITICAL, HIGH, MEDIUM, LOW):');
         if (!newPriority) return;
@@ -551,29 +745,22 @@ n
             if (data.id) {
                 if (typeof toast !== 'undefined') {
                     toast.success(`Complaint #${id} priority updated to ${newPriority.toUpperCase()}`, 'Priority Updated');
-                } else {
-                    alert('Priority updated!');
                 }
                 setTimeout(() => location.reload(), 1000);
             } else {
                 if (typeof toast !== 'undefined') {
                     toast.error('Error updating priority', 'Error');
-                } else {
-                    alert('Error updating priority');
                 }
             }
         })
         .catch(err => {
             if (typeof toast !== 'undefined') {
                 toast.error('Network error. Please try again.', 'Error');
-            } else {
-                alert('Network error: ' + err.message);
             }
         });
     }
 
-
-    // Delete complaint with confirmation dialog
+    // ===== DELETE COMPLAINT =====
     function confirmDeleteComplaint(id) {
         if (typeof showConfirmDialog !== 'undefined') {
             showConfirmDialog({
@@ -601,55 +788,18 @@ n
             if (response.ok) {
                 if (typeof toast !== 'undefined') {
                     toast.success(`Complaint #${id} deleted successfully`, 'Deleted');
-                } else {
-                    alert('Complaint deleted successfully!');
                 }
                 setTimeout(() => location.reload(), 1000);
             } else {
                 if (typeof toast !== 'undefined') {
                     toast.error('Error deleting complaint', 'Error');
-                } else {
-                    alert('Error deleting complaint');
                 }
             }
         })
         .catch(err => {
             if (typeof toast !== 'undefined') {
                 toast.error('Network error. Please try again.', 'Error');
-            } else {
-                alert('Network error: ' + err.message);
             }
-        });
-    }
-
-    // Delete complaint with confirmation
-    function confirmDeleteComplaint(id) {
-        showConfirmDialog({
-            title: 'Delete Complaint',
-            message: 'Are you sure you want to delete this complaint? This action cannot be undone.',
-            confirmText: 'Delete',
-            simple: false
-        }).then((confirmed) => {
-            if (confirmed) {
-                deleteComplaint(id);
-            }
-        });
-    }
-
-    function deleteComplaint(id) {
-        fetch(`/api/complaints/${id}`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('Complaint deleted successfully!');
-                location.reload();
-            } else {
-                alert('Error deleting complaint');
-            }
-        })
-        .catch(err => {
-            alert('Network error: ' + err.message);
         });
     }
 </script>

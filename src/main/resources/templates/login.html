@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VCSM - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        h1 { text-align: center; color: #6d28d9; margin-bottom: 8px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 28px; font-size: 14px; }
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .success {
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        label { display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 18px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: #8b5cf6; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #6d28d9; }
+        .footer { text-align: center; margin-top: 20px; font-size: 13px; color: #666; }
+        .footer a { color: #8b5cf6; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🎙️ VCSM</h1>
+    <p class="subtitle">Voice-Driven Customer Success Manager</p>
+
+    <div class="error" th:if="${param.error}">
+        Invalid username or password. Please try again.
+    </div>
+    <div class="success" th:if="${param.logout}">
+        You have been logged out successfully.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+        <button type="submit">Sign In</button>
+    </form>
+
+    <div class="footer">
+        <a th:href="@{/landing}">← Back to Landing Page</a>
+    </div>
+</div>
+</body>
+</html>

@@ -26,9 +26,17 @@ public class VoiceBiometricsService {
     
     @Autowired
     private VoiceFeatureService featureService;
+
+    @Autowired
+    private LanguageDetectionService languageDetectionService;
     
     @Transactional
     public VoiceVerificationResponse enrollVoice(Long userId, String base64Audio, double durationSeconds) {
+        return enrollVoice(userId, base64Audio, durationSeconds, "en", "My voice is my secure password");
+    }
+
+    @Transactional
+    public VoiceVerificationResponse enrollVoice(Long userId, String base64Audio, double durationSeconds, String language, String text) {
         Optional<User> userOpt = userRepository.findById(userId);
         
         if (userOpt.isEmpty()) {
@@ -36,6 +44,18 @@ public class VoiceBiometricsService {
         }
         
         User user = userOpt.get();
+        String targetLanguage = (language != null && !language.isBlank()) ? language.toLowerCase() : "en";
+        
+        if (text == null || text.isBlank()) {
+            return new VoiceVerificationResponse(false, 0, 
+                "Enrollment failed: Verification text is required");
+        }
+        
+        String detectedLanguage = languageDetectionService.detectLanguage(text);
+        if (!detectedLanguage.equalsIgnoreCase(targetLanguage)) {
+            return new VoiceVerificationResponse(false, 0, 
+                "Enrollment failed: Voice pattern does not match the chosen language context (" + targetLanguage.toUpperCase() + ")");
+        }
         
         try {
             byte[] audioData = Base64.getDecoder().decode(base64Audio);
@@ -48,9 +68,10 @@ public class VoiceBiometricsService {
                 VoicePrint voicePrint = existingPrint.get();
                 voicePrint.setVoiceFeatures(featuresJson);
                 voicePrint.setSampleDuration(durationSeconds);
+                voicePrint.setLanguage(targetLanguage);
                 voicePrintRepository.save(voicePrint);
             } else {
-                VoicePrint voicePrint = new VoicePrint(user, featuresJson, durationSeconds);
+                VoicePrint voicePrint = new VoicePrint(user, featuresJson, durationSeconds, targetLanguage);
                 voicePrintRepository.save(voicePrint);
             }
             
@@ -68,6 +89,11 @@ public class VoiceBiometricsService {
     
     @Transactional
     public VoiceVerificationResponse verifyVoice(Long userId, String base64Audio) {
+        return verifyVoice(userId, base64Audio, "My voice is my secure password");
+    }
+
+    @Transactional
+    public VoiceVerificationResponse verifyVoice(Long userId, String base64Audio, String text) {
         Optional<User> userOpt = userRepository.findById(userId);
         
         if (userOpt.isEmpty()) {
@@ -88,11 +114,28 @@ public class VoiceBiometricsService {
                 "Voice print not found. Please enroll your voice first.");
         }
         
+        VoicePrint voicePrint = voicePrintOpt.get();
+        String enrolledLanguage = voicePrint.getLanguage();
+        if (enrolledLanguage == null || enrolledLanguage.isBlank()) {
+            enrolledLanguage = "en";
+        }
+        
+        if (text == null || text.isBlank()) {
+            return new VoiceVerificationResponse(false, 0, 
+                "Verification failed: Verification text is required");
+        }
+        
+        String detectedLanguage = languageDetectionService.detectLanguage(text);
+        if (!detectedLanguage.equalsIgnoreCase(enrolledLanguage)) {
+            return new VoiceVerificationResponse(false, 0, 
+                "Verification failed: Spoken phrase language (" + detectedLanguage.toUpperCase() + 
+                ") does not match enrolled language context (" + enrolledLanguage.toUpperCase() + ")");
+        }
+        
         try {
             byte[] audioData = Base64.getDecoder().decode(base64Audio);
             double[] newFeatures = featureService.extractFeatures(audioData, SAMPLE_RATE);
             
-            VoicePrint voicePrint = voicePrintOpt.get();
             double[] storedFeatures = featureService.jsonToFeatures(voicePrint.getVoiceFeatures());
             
             double similarity = featureService.calculateCosineSimilarity(newFeatures, storedFeatures);

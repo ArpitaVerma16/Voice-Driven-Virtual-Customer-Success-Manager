@@ -125,6 +125,7 @@ class ComplaintServiceTest {
 
     @Test
     void testDeleteComplaint() {
+        when(complaintRepository.findById(1L)).thenReturn(Optional.of(testComplaint));
         doNothing().when(complaintRepository).deleteById(1L);
         
         complaintService.deleteComplaint(1L);

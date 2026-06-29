@@ -83,32 +83,39 @@ public class WaitlistService {
      */
     @Transactional
     public void processWaitlist(Event event) {
-        // Check if there are available slots
-        if (event.getRegistrations() >= event.getMaxCapacity()) {
+        // Calculate actual available slots: maxCapacity - registrations - pendingUnexpiredInvitations
+        long pendingUnexpired = waitlistRepository.countByEventAndConfirmedFalseAndExpiresAtAfter(event, LocalDateTime.now());
+        long availableSlots = event.getMaxCapacity() - event.getRegistrations() - pendingUnexpired;
+        
+        if (availableSlots <= 0) {
             return; // No slots available
         }
         
-        // Get first waiting user (FIFO)
-        Optional<EventWaitlist> firstWaitlist = waitlistRepository
-            .findFirstByEventAndConfirmedFalseOrderByJoinedAtAsc(event);
-        
-        if (firstWaitlist.isEmpty()) {
-            return;
-        }
-        
-        EventWaitlist waitlistEntry = firstWaitlist.get();
-        User user = waitlistEntry.getUser();
-        
-        // Notify the user
-        try {
-            emailService.sendEventSlotAvailable(event, user);
-            waitlistEntry.setNotifiedAt(LocalDateTime.now());
-            waitlistEntry.setExpiresAt(LocalDateTime.now().plusHours(24));
-            waitlistRepository.save(waitlistEntry);
+        // Loop and promote the first availableSlots unnotified users
+        for (int i = 0; i < availableSlots; i++) {
+            Optional<EventWaitlist> firstWaitlist = waitlistRepository
+                .findFirstByEventAndConfirmedFalseAndNotifiedAtIsNullOrderByJoinedAtAsc(event);
             
-            System.out.println("✅ Notification sent to user: " + user.getEmail());
-        } catch (Exception e) {
-            System.err.println("❌ Failed to send notification: " + e.getMessage());
+            if (firstWaitlist.isEmpty()) {
+                break;
+            }
+            
+            EventWaitlist waitlistEntry = firstWaitlist.get();
+            User user = waitlistEntry.getUser();
+            
+            // Notify the user
+            try {
+                emailService.sendEventSlotAvailable(event, user);
+                waitlistEntry.setNotifiedAt(LocalDateTime.now());
+                waitlistEntry.setExpiresAt(LocalDateTime.now().plusHours(24));
+                waitlistRepository.save(waitlistEntry);
+                
+                System.out.println("✅ Notification sent to user: " + user.getEmail());
+            } catch (Exception e) {
+                System.err.println("❌ Failed to send notification: " + e.getMessage());
+                // Break to avoid infinite looping on the same failing user in this loop execution
+                break;
+            }
         }
     }
     
@@ -157,7 +164,7 @@ public class WaitlistService {
      * Clean expired waitlist entries (run by scheduler)
      */
     @Transactional
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void cleanExpiredWaitlist() {
         LocalDateTime now = LocalDateTime.now();
         List<EventWaitlist> expired = waitlistRepository.findByConfirmedFalseAndExpiresAtBefore(now);

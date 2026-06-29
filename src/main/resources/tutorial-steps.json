@@ -1,0 +1,46 @@
+{
+  "steps": [
+    {
+      "id": 1,
+      "title": "👋 Welcome to VCSM!",
+      "message": "Welcome to the Voice-Driven Virtual Customer Success Manager! Let's take a quick tour to help you get started.",
+      "highlight": null,
+      "voiceText": "Welcome to VCSM. Let's take a quick tour to help you get started."
+    },
+    {
+      "id": 2,
+      "title": "📝 File a Complaint",
+      "message": "To file a complaint, click the 'New Complaint' button or use the voice command: 'I have a complaint'.",
+      "highlight": ".btn-purple",
+      "voiceText": "To file a complaint, click the New Complaint button or say 'I have a complaint'."
+    },
+    {
+      "id": 3,
+      "title": "📋 Check Complaint Status",
+      "message": "Visit the Complaints page to track your complaint status. You can also say 'Check my complaint status'.",
+      "highlight": "a[href='/complaints']",
+      "voiceText": "Visit the Complaints page to track your complaint status."
+    },
+    {
+      "id": 4,
+      "title": "📅 Register for Events",
+      "message": "Check out upcoming community events and register with one click. Say 'Show upcoming events' to get started.",
+      "highlight": "a[href='/events']",
+      "voiceText": "Check out upcoming community events and register with one click."
+    },
+    {
+      "id": 5,
+      "title": "🎤 Voice Commands",
+      "message": "Use the microphone button to speak commands. Try saying 'How many complaints are open?' or 'Show upcoming events'.",
+      "highlight": "#micBtn",
+      "voiceText": "Use the microphone button to speak commands."
+    },
+    {
+      "id": 6,
+      "title": "🎉 You're Ready!",
+      "message": "You've completed the tutorial! Start managing your community with VCSM. You can always revisit this tutorial from the settings.",
+      "highlight": null,
+      "voiceText": "You've completed the tutorial! Start managing your community with VCSM."
+    }
+  ]
+}

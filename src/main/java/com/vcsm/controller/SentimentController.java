@@ -56,6 +56,11 @@ public class SentimentController {
         return ResponseEntity.ok(sentimentService.getRecentAnalyses(50));
     }
     
+    @GetMapping("/trends")
+    public ResponseEntity<List<Map<String, Object>>> getSentimentTrends(@RequestParam(defaultValue = "7") int days) {
+        return ResponseEntity.ok(sentimentService.getSentimentTrends(days));
+    }
+    
     @GetMapping("/escalations/pending")
     public ResponseEntity<?> getPendingEscalations() {
         return ResponseEntity.ok(sentimentService.getPendingEscalations());

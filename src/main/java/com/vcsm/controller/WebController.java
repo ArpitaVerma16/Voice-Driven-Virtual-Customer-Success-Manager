@@ -1,15 +1,22 @@
 package com.vcsm.controller;
 
+import com.vcsm.model.Complaint;
 import com.vcsm.service.ComplaintService;
 import com.vcsm.service.EventService;
-import com.vcsm.service.OmnidimService;
 import com.vcsm.service.InteractionService;
+import com.vcsm.service.OmnidimService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,16 +37,58 @@ public class WebController {
     @Autowired
     private InteractionService interactionService;
 
+    @Autowired
+    private com.vcsm.repository.UserRepository userRepository;
+
     @GetMapping("/landing")
     public String landing() {
         return "landing";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/chatbot")
+    public String chatbot() {
+        return "chatbot-ui";
+    }
+
+    @GetMapping("/voice-templates")
+    public String voiceTemplates() {
+        return "voice-templates";
+    }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "profile";
+    }
+
+    @GetMapping("/onboarding")
+    public String onboarding() {
+        return "onboarding";
+    }
+
+    @GetMapping("/voice-analytics")
+    public String voiceAnalytics() {
+        return "voice-analytics";
+    }
+
+    @GetMapping("/audit-logs")
+    public String auditLogs() {
+        return "audit-logs";
+    }
+
+    @GetMapping("/ivr-builder")
+    public String ivrBuilder() {
+        return "ivr-builder";
     }
 
     @GetMapping("/")
     public String dashboard(Model model) {
 
         Map<String, Long> stats = complaintService.getComplaintStats();
-
 
         if (stats == null) {
             stats = new HashMap<>();
@@ -78,21 +127,48 @@ public class WebController {
         model.addAttribute("recentCommands",
                 commands.stream().limit(5).toList());
 
+        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll().stream()
+                .filter(u -> u.getDissatisfactionScore() >= 75.0)
+                .toList();
+        model.addAttribute("highRiskUsers", highRiskUsers);
+
         return "dashboard";
     }
 
     @GetMapping("/complaints")
-    public String complaints(Model model) {
+    public String complaintsPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            Model model) {
 
-        model.addAttribute("complaints",
-                complaintService.getAllComplaints() != null
-                        ? complaintService.getAllComplaints()
-                        : new ArrayList<>());
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        model.addAttribute("stats",
-                complaintService.getComplaintStats() != null
-                        ? complaintService.getComplaintStats()
-                        : new HashMap<>());
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        try {
+            if (startDate != null && !startDate.isEmpty()) {
+                start = LocalDateTime.parse(startDate + "T00:00:00");
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                end = LocalDateTime.parse(endDate + "T23:59:59");
+            }
+        } catch (Exception e) {
+            // Ignore date parsing errors
+        }
+
+        Page<Complaint> complaintPage = complaintService.searchComplaints(
+            keyword, status, category, priority, start, end, pageable);
+
+        model.addAttribute("complaints", complaintPage.getContent());
+        model.addAttribute("page", complaintPage);
+        model.addAttribute("stats", complaintService.getComplaintStats());
 
         return "complaints";
     }
@@ -111,6 +187,21 @@ public class WebController {
                         : 0);
 
         return "events";
+    }
+
+    @GetMapping("/voice-cloning")
+    public String voiceCloning() {
+       return "voice-cloning-ui";
+    }
+
+    @GetMapping("/live-dashboard")
+    public String liveDashboard() {
+        return "live-dashboard";
+    }
+
+    @GetMapping("/translation")
+    public String translation() {
+        return "translation-ui";
     }
 
     @GetMapping("/analytics")
@@ -139,6 +230,21 @@ public class WebController {
         return "analytics";
     }
 
+    @GetMapping("/blockchain-verify")
+    public String blockchainVerify() {
+        return "blockchain-verify";
+    }
+
+    @GetMapping("/offline")
+    public String offline() {
+        return "offline";
+    }
+
+    @GetMapping("/twilio-demo")
+    public String twilioDemo() {
+        return "twilio-demo";
+    }
+
     @GetMapping("/interaction-history")
     public String interactionHistory(Model model) {
         try {
@@ -159,4 +265,5 @@ public class WebController {
         }
         return "interaction-history";
     }
+
 }

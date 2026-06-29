@@ -1,7 +1,9 @@
 package com.vcsm.service;
 
+import com.vcsm.model.EmailQueue;
 import com.vcsm.model.Event;
 import com.vcsm.model.User;
+import com.vcsm.repository.EmailQueueRepository;
 import com.vcsm.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +25,9 @@ public class ReminderScheduler {
     @Autowired
     @org.springframework.context.annotation.Lazy
     private EventRegistrationService eventRegistrationService;
+
+    @Autowired
+    private EmailQueueRepository emailQueueRepository;
     
     /**
      * Runs every hour to check for events
@@ -63,6 +68,18 @@ public class ReminderScheduler {
     public void sendRegistrationConfirmation(Event event, User user) {
         if (user.isEmailNotifications()) {
             emailService.sendEventReminder(event, user, "CONFIRMATION");
+        }
+    }
+
+    /**
+     * Polls the email queue and processes pending emails that are due
+     */
+    @Scheduled(fixedDelay = 10000) // Every 10 seconds
+    public void processEmailQueue() {
+        LocalDateTime now = LocalDateTime.now();
+        List<EmailQueue> pendingEmails = emailQueueRepository.findByStatusAndNextAttemptAtBefore("PENDING", now);
+        for (EmailQueue email : pendingEmails) {
+            emailService.processQueuedEmail(email);
         }
     }
 }

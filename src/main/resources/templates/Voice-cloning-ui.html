@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Cloning - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/">VCSM</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Dashboard</a>
+            <a class="nav-link" href="/complaints">Complaints</a>
+            <a class="nav-link" href="/events">Events</a>
+            <a class="nav-link active" href="/voice-cloning">Voice Cloning</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4><i class="fas fa-microphone-alt text-purple me-2"></i>AI Voice Cloning</h4>
+    <p class="text-muted">Clone your voice and make the assistant speak like you!</p>
+
+    <!-- Upload Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white fw-bold">
+            <i class="fas fa-upload me-2 text-purple"></i>Upload Voice Sample
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Profile Name</label>
+                        <input type="text" id="profileName" class="form-control" placeholder="My Voice">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Audio File (MP3/WAV) - Max 10MB</label>
+                        <input type="file" id="audioFile" class="form-control" accept=".mp3,.wav,.m4a">
+                    </div>
+                    <button class="btn btn-purple" onclick="cloneVoice()">
+                        <i class="fas fa-clone me-1"></i> Clone Voice
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Instructions:</strong>
+                        <ul class="mb-0 mt-1">
+                            <li>Record 5-10 seconds of clear speech</li>
+                            <li>Use a quiet environment</li>
+                            <li>Speak naturally</li>
+                            <li>Supported formats: MP3, WAV, M4A</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profiles Section -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white fw-bold d-flex justify-content-between">
+            <span><i class="fas fa-users me-2 text-purple"></i>Your Voice Profiles</span>
+            <span class="badge bg-purple" id="profileCount">0</span>
+        </div>
+        <div class="card-body" id="profilesContainer">
+            <p class="text-muted text-center py-4">No voice profiles yet. Upload your first voice sample!</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/toast-notifications.js"></script>
+
+<script>
+    function loadProfiles() {
+        fetch('/api/voice/cloning/profiles')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('profilesContainer');
+                const count = document.getElementById('profileCount');
+                
+                if (data.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-4">No voice profiles yet. Upload your first voice sample!</p>';
+                    count.textContent = '0';
+                    return;
+                }
+                
+                count.textContent = data.length;
+                container.innerHTML = data.map(p => `
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                        <div>
+                            <strong>${p.name}</strong>
+                            <span class="badge ${p.active ? 'bg-success' : 'bg-secondary'} ms-2">
+                                ${p.active ? 'Active' : 'Inactive'}
+                            </span>
+                            <span class="badge ${p.isDefault ? 'bg-info' : 'bg-secondary'} ms-1">
+                                ${p.isDefault ? 'Default' : ''}
+                            </span>
+                            <div class="small text-muted mt-1">
+                                Created: ${new Date(p.createdAt).toLocaleDateString()}
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="selectProfile(${p.id})">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteProfile(${p.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(err => {
+                console.error('Error loading profiles:', err);
+                if (typeof toast !== 'undefined') {
+                    toast.error('Failed to load profiles', 'Error');
+                }
+            });
+    }
+
+    function cloneVoice() {
+        const name = document.getElementById('profileName').value.trim();
+        const file = document.getElementById('audioFile').files[0];
+        
+        if (!name) {
+            if (typeof toast !== 'undefined') {
+                toast.error('Please enter a profile name', 'Error');
+            }
+            return;
+        }
+        
+        if (!file) {
+            if (typeof toast !== 'undefined') {
+                toast.error('Please select an audio file', 'Error');
+            }
+            return;
+        }
+        
+        if (file.size > 10 * 1024 * 1024) {
+            if (typeof toast !== 'undefined') {
+                toast.error('File too large. Max 10MB', 'Error');
+            }
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', name);
+        
+        if (typeof toast !== 'undefined') {
+            toast.info('Cloning voice... This may take a moment', 'Processing');
+        }
+        
+        fetch('/api/voice/cloning/clone', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof toast !== 'undefined') {
+                    toast.success('Voice cloned successfully!', 'Success');
+                }
+                document.getElementById('profileName').value = '';
+                document.getElementById('audioFile').value = '';
+                loadProfiles();
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.error(data.error || 'Failed to clone voice', 'Error');
+                }
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Network error. Please try again.', 'Error');
+            }
+        });
+    }
+
+    function selectProfile(id) {
+        fetch('/api/voice/cloning/profiles/select', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ profileId: id })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof toast !== 'undefined') {
+                    toast.success(data.message, 'Success');
+                }
+                loadProfiles();
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.error(data.error || 'Failed to select profile', 'Error');
+                }
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Network error. Please try again.', 'Error');
+            }
+        });
+    }
+
+    function deleteProfile(id) {
+        if (!confirm('Are you sure you want to delete this voice profile?')) return;
+        
+        fetch(`/api/voice/cloning/profiles/${id}`, {
+            method: 'DELETE'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof toast !== 'undefined') {
+                    toast.success(data.message, 'Success');
+                }
+                loadProfiles();
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.error(data.error || 'Failed to delete profile', 'Error');
+                }
+            }
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Network error. Please try again.', 'Error');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProfiles();
+    });
+</script>
+</body>
+</html>
