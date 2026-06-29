@@ -43,6 +43,9 @@ public class ComplaintService {
     @Autowired
     private BlockchainService blockchainService;
 
+    @Autowired
+    private EmailService emailService;
+
 
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -207,7 +210,28 @@ public class ComplaintService {
         if (notes != null && !notes.isBlank()) complaint.setResolutionNotes(notes);
         
         Complaint updated = complaintRepository.save(complaint);
+        try {
+            User user = getComplaintUser(id);
 
+            if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+                String subject = "Complaint Status Updated - #" + id;
+
+                String emailBody =
+                        "<p>Hello " + user.getName() + ",</p>" +
+                        "<p>Your complaint status has been updated.</p>" +
+                        "<p><strong>Complaint ID:</strong> " + id + "</p>" +
+                        "<p><strong>Previous Status:</strong> " + oldStatus + "</p>" +
+                        "<p><strong>New Status:</strong> " + newStatus + "</p>" +
+                        "<p><strong>Resolution Notes:</strong> " +
+                        (notes != null && !notes.isBlank() ? notes : "No resolution notes provided.") +
+                        "</p>" +
+                        "<p>Regards,<br>VCSM Team</p>";
+
+                emailService.sendSimpleEmail(user.getEmail(), subject, emailBody);
+            }
+        } catch (Exception e) {
+            log.warning("Failed to send complaint status update email: " + e.getMessage());
+        }
         // Log user activity
         try {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
