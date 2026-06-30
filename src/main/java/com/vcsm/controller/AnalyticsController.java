@@ -21,6 +21,9 @@ public class AnalyticsController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private com.vcsm.service.AnalyticsService analyticsService;
+
     @GetMapping
     public ResponseEntity<Map<String, Object>> analytics() {
         Map<String, Object> data = new HashMap<>();
@@ -34,5 +37,22 @@ public class AnalyticsController {
         long resolved = cStats.getOrDefault("resolved", 0L) + cStats.getOrDefault("closed", 0L);
         data.put("resolutionRate", total > 0 ? Math.round((double) resolved / total * 1000.0) / 10.0 : 0.0);
         return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/daily-sentiment")
+    public ResponseEntity<Map<String, Object>> getDailySentiment(
+            @RequestParam(defaultValue = "30") int days) {
+        return ResponseEntity.ok(analyticsService.getDailySentiment(days));
+    }
+
+    @GetMapping("/top-intents")
+    public ResponseEntity<Map<String, Long>> getTopIntents(
+            @RequestParam(defaultValue = "30") int days) {
+        return ResponseEntity.ok(analyticsService.getTopIntents(days));
+    }
+
+    @GetMapping("/escalation-rate")
+    public ResponseEntity<Map<String, Object>> getEscalationRate() {
+        return ResponseEntity.ok(analyticsService.getEscalationRate());
     }
 }
