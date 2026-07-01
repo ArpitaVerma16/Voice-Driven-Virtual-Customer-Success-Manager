@@ -3,24 +3,14 @@ package com.vcsm.controller;
 import com.vcsm.model.Complaint;
 import com.vcsm.service.ComplaintService;
 import com.vcsm.service.EventService;
+import com.vcsm.service.InteractionService;
 import com.vcsm.service.OmnidimService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import org.springframework.data.domain.PageRequest;
-
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,11 +34,21 @@ public class WebController {
     @Autowired
     private OmnidimService omnidimService;
 
+    @Autowired
+    private InteractionService interactionService;
+
+    @Autowired
+    private com.vcsm.repository.UserRepository userRepository;
+
     @GetMapping("/landing")
     public String landing() {
         return "landing";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 
     @GetMapping("/chatbot")
     public String chatbot() {
@@ -65,30 +65,10 @@ public class WebController {
         return "profile";
     }
 
-
     @GetMapping("/onboarding")
     public String onboarding() {
         return "onboarding";
     }
-
-
-
-    @GetMapping("/complaints")
-public String complaintsPage(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        Model model) {
-    
-    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-    Page<Complaint> complaintPage = complaintService.getPaginatedComplaints(pageable);
-    
-    model.addAttribute("complaints", complaintPage.getContent());
-    model.addAttribute("page", complaintPage);
-    model.addAttribute("stats", complaintService.getComplaintStats());
-    
-    return "complaints";
-}
-
 
     @GetMapping("/voice-analytics")
     public String voiceAnalytics() {
@@ -100,7 +80,10 @@ public String complaintsPage(
         return "audit-logs";
     }
 
-
+    @GetMapping("/ivr-builder")
+    public String ivrBuilder() {
+        return "ivr-builder";
+    }
 
     @GetMapping("/")
     public String dashboard(Model model) {
@@ -144,6 +127,11 @@ public String complaintsPage(
         model.addAttribute("recentCommands",
                 commands.stream().limit(5).toList());
 
+        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll().stream()
+                .filter(u -> u.getDissatisfactionScore() >= 75.0)
+                .toList();
+        model.addAttribute("highRiskUsers", highRiskUsers);
+
         return "dashboard";
     }
 
@@ -151,17 +139,6 @@ public String complaintsPage(
     public String complaintsPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-
-            Model model) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Complaint> complaintPage = complaintService.getPaginatedComplaints(pageable);
-        
-        model.addAttribute("complaints", complaintPage.getContent());
-        model.addAttribute("page", complaintPage);
-        model.addAttribute("stats", complaintService.getComplaintStats());
-        
-
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String category,
@@ -193,7 +170,6 @@ public String complaintsPage(
         model.addAttribute("page", complaintPage);
         model.addAttribute("stats", complaintService.getComplaintStats());
 
-
         return "complaints";
     }
 
@@ -219,16 +195,14 @@ public String complaintsPage(
     }
 
     @GetMapping("/live-dashboard")
-public String liveDashboard() {
-    return "live-dashboard";
-}
+    public String liveDashboard() {
+        return "live-dashboard";
+    }
 
-
-@GetMapping("/translation")
-public String translation() {
-    return "translation-ui";
-}
-
+    @GetMapping("/translation")
+    public String translation() {
+        return "translation-ui";
+    }
 
     @GetMapping("/analytics")
     public String analytics(Model model) {
@@ -256,43 +230,20 @@ public String translation() {
         return "analytics";
     }
 
-
-    
     @GetMapping("/blockchain-verify")
-public String blockchainVerify() {
-    return "blockchain-verify";
-}
-
-
-@GetMapping("/offline")
-public String offline() {
-    return "offline";
-}
-
-
-@GetMapping("/twilio-demo")
-public String twilioDemo() {
-    return "twilio-demo";
-}
-
-
-
-    @GetMapping("/voice-analytics")
-    public String voiceAnalytics() {
-        return "voice-analytics";
+    public String blockchainVerify() {
+        return "blockchain-verify";
     }
 
-    @GetMapping("/profile")
-    public String profile() {
-        return "profile";
-
+    @GetMapping("/offline")
+    public String offline() {
+        return "offline";
     }
-    @GetMapping("/audit-logs")
-public String auditLogs() {
-    return "audit-logs";
-}
 
-
+    @GetMapping("/twilio-demo")
+    public String twilioDemo() {
+        return "twilio-demo";
+    }
 
     @GetMapping("/interaction-history")
     public String interactionHistory(Model model) {
@@ -313,12 +264,6 @@ public String auditLogs() {
             model.addAttribute("interactionStats", new HashMap<>());
         }
         return "interaction-history";
-
     }
-
-
-
-    }
-
 
 }

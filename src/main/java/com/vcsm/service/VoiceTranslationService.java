@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,6 +18,8 @@ import java.util.Map;
 
 @Service
 public class VoiceTranslationService {
+
+    private static final Logger log = LoggerFactory.getLogger(VoiceTranslationService.class);
 
     @Autowired
     private LanguageDetector languageDetector;
@@ -30,6 +35,7 @@ public class VoiceTranslationService {
     /**
      * Translate text from source language to target language
      */
+    @CircuitBreaker(name = "translationService", fallbackMethod = "translateTextFallback")
     public String translateText(String text, String sourceLang, String targetLang) {
         if (text == null || text.isEmpty()) {
             return "";
@@ -87,8 +93,7 @@ public class VoiceTranslationService {
             return text;
             
         } catch (Exception e) {
-            // Fallback to mock translation
-            return getFallbackTranslation(text, sourceLang, targetLang);
+            throw new RuntimeException("Translation API call failed", e);
         }
     }
 
@@ -100,8 +105,13 @@ public class VoiceTranslationService {
         return translateText(text, sourceLang, targetLang);
     }
 
+    public String translateTextFallback(String text, String sourceLang, String targetLang, Throwable t) {
+        log.warn("Circuit breaker triggered for translation service: {}", t.getMessage());
+        return "Service temporarily unavailable, please try again.";
+    }
+
     /**
-     * Mock translation for Hindi/English (fallback when API key is missing)
+     * Mock translation for Hindi/English/Spanish (fallback when API key is missing)
      */
     private String getFallbackTranslation(String text, String sourceLang, String targetLang) {
         // If translation is Hindi -> English or vice versa
@@ -109,6 +119,10 @@ public class VoiceTranslationService {
             return getHindiToEnglishMock(text);
         } else if (sourceLang.equals("en") && targetLang.equals("hi")) {
             return getEnglishToHindiMock(text);
+        } else if (sourceLang.equals("es") && targetLang.equals("en")) {
+            return getSpanishToEnglishMock(text);
+        } else if (sourceLang.equals("en") && targetLang.equals("es")) {
+            return getEnglishToSpanishMock(text);
         }
         return text + " [translated to " + targetLang + "]";
     }
@@ -149,6 +163,44 @@ public class VoiceTranslationService {
             return "इवेंट पेज पर इवेंट उपलब्ध हैं";
         } else {
             return "मैं आपका प्रश्न समझ गया। हमारी टीम इस पर ध्यान देगी।";
+        }
+    }
+
+    private String getSpanishToEnglishMock(String text) {
+        String lower = text.toLowerCase();
+        if (lower.contains("problema") || lower.contains("queja")) {
+            return "Complaint filed successfully";
+        } else if (lower.contains("hola")) {
+            return "Hello! How can I help you?";
+        } else if (lower.contains("gracias")) {
+            return "You're welcome!";
+        } else if (lower.contains("ayuda")) {
+            return "I'm here to help you";
+        } else if (lower.contains("estado")) {
+            return "Your complaint status is: In Progress";
+        } else if (lower.contains("evento")) {
+            return "Events are available on the Events page";
+        } else {
+            return "I understand your query. Our team will look into it.";
+        }
+    }
+
+    private String getEnglishToSpanishMock(String text) {
+        String lower = text.toLowerCase();
+        if (lower.contains("complaint")) {
+            return "Queja registrada con éxito";
+        } else if (lower.contains("hello") || lower.contains("hi")) {
+            return "¡Hola! ¿Cómo puedo ayudarte?";
+        } else if (lower.contains("thank")) {
+            return "¡De nada!";
+        } else if (lower.contains("help")) {
+            return "Estoy aquí para ayudarte";
+        } else if (lower.contains("status")) {
+            return "El estado de tu queja es: En progreso";
+        } else if (lower.contains("event")) {
+            return "Los eventos están disponibles en la página de eventos";
+        } else {
+            return "Entiendo tu consulta. Nuestro equipo la revisará.";
         }
     }
 

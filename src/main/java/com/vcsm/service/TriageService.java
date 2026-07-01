@@ -1,6 +1,6 @@
 package com.vcsm.service;
 
-import com.vcsm.ml.ComplaintClassifier;
+import com.vcsm.ml.TicketClassifier;
 import com.vcsm.model.Complaint;
 import com.vcsm.model.TriageRequest;
 import com.vcsm.model.User;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class TriageService {
 
     @Autowired
-    private ComplaintClassifier classifier;
+    private TicketClassifier classifier;
 
     @Autowired
     private ComplaintRepository complaintRepository;
@@ -43,7 +43,7 @@ public class TriageService {
         TriageRequest request = new TriageRequest(complaint.getId(), complaint.getDescription());
 
         // 1. Classify category
-        ComplaintClassifier.ClassificationResult result = classifier.classify(complaint.getDescription());
+        TicketClassifier.ClassificationResult result = classifier.classify(complaint.getDescription());
         request.setCategory(result.getCategory());
         request.setConfidence(result.getConfidence());
 

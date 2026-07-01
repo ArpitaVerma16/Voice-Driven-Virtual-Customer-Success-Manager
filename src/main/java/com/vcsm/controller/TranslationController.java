@@ -21,7 +21,7 @@ public class TranslationController {
 
     @PostMapping("/translate")
     public ResponseEntity<Map<String, Object>> translate(
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         
         String text = request.get("text");
         String targetLang = request.get("targetLang");
@@ -58,7 +58,7 @@ public class TranslationController {
 
     @PostMapping("/detect")
     public ResponseEntity<Map<String, String>> detectLanguage(
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         
         String text = request.get("text");
         if (text == null || text.isEmpty()) {

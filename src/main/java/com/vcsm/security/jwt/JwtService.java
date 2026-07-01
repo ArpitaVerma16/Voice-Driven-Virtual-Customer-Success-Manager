@@ -86,4 +86,21 @@ public class JwtService {
             return false;
         }
     }
+
+    public String generateTicketToken(Long registrationId, Long userId, Long eventId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("registrationId", registrationId);
+        claims.put("userId", userId);
+        claims.put("eventId", eventId);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject("TICKET:" + registrationId)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public Claims parseTicketToken(String token) {
+        return extractAllClaims(token);
+    }
 }

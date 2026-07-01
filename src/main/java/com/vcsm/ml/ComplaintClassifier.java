@@ -93,8 +93,10 @@ public class ComplaintClassifier {
     private void trainModel() {
         try {
             List<DocumentSample> samples = new ArrayList<>();
+
             for (Map.Entry<String, List<String>> entry : trainingData.entrySet()) {
                 String category = entry.getKey();
+
                 for (String text : entry.getValue()) {
                     String[] tokens = tokenizer.tokenize(text);
                     samples.add(new DocumentSample(category, tokens));
@@ -102,16 +104,20 @@ public class ComplaintClassifier {
             }
 
             TrainingParameters params = TrainingParameters.defaultParams();
+
             model = DocumentCategorizerME.train(
-                new CollectionObjectStream<>(samples),
-                params
+                    "en",
+                    new CollectionObjectStream<>(samples),
+                    params,
+                    new DoccatFactory()
             );
+
             categorizer = new DocumentCategorizerME(model);
 
-            System.out.println("✅ Complaint classifier trained with " + samples.size() + " samples");
+            log.info("✅ Complaint classifier trained with " + samples.size() + " samples");
 
         } catch (IOException e) {
-            System.err.println("❌ Failed to train classification model: " + e.getMessage());
+            log.error("❌ Failed to train classification model: " + e.getMessage());
         }
     }
 
@@ -129,18 +135,20 @@ public class ComplaintClassifier {
     }
 
     public Map<String, Double> getAllScores(String text) {
-        if (categorizer == null || text == null || text.isEmpty()) {
-            return new HashMap<>();
+        Map<String, Double> scores = new LinkedHashMap<>();
+
+        if (categorizer == null || text == null || text.trim().isEmpty()) {
+            return scores;
         }
 
         String[] tokens = tokenizer.tokenize(text);
         double[] outcomes = categorizer.categorize(tokens);
-        String[] categories = categorizer.getCategories();
 
-        Map<String, Double> scores = new LinkedHashMap<>();
-        for (int i = 0; i < categories.length; i++) {
-            scores.put(categories[i], outcomes[i]);
+        for (int i = 0; i < outcomes.length; i++) {
+            String category = categorizer.getCategory(i);
+            scores.put(category, outcomes[i]);
         }
+
         return scores;
     }
 
@@ -153,8 +161,13 @@ public class ComplaintClassifier {
             this.confidence = confidence;
         }
 
-        public String getCategory() { return category; }
-        public double getConfidence() { return confidence; }
+        public String getCategory() {
+            return category;
+        }
+
+        public double getConfidence() {
+            return confidence;
+        }
     }
 
     private static class CollectionObjectStream<T> implements ObjectStream<T> {
@@ -175,6 +188,8 @@ public class ComplaintClassifier {
         }
 
         @Override
-        public void close() throws IOException {}
+        public void close() throws IOException {
+        }
     }
 }
+

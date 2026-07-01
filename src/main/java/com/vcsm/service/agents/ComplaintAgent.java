@@ -44,14 +44,27 @@ public class ComplaintAgent {
         return response;
     }
 
-    private String extractCategory(String query) {
-        String lower = query.toLowerCase();
-        if (lower.contains("noise")) return "NOISE";
-        if (lower.contains("maintenance") || lower.contains("repair")) return "MAINTENANCE";
-        if (lower.contains("security") || lower.contains("safety")) return "SECURITY";
-        if (lower.contains("cleanliness") || lower.contains("garbage")) return "CLEANLINESS";
-        if (lower.contains("parking")) return "PARKING";
-        if (lower.contains("utilities") || lower.contains("water") || lower.contains("electricity")) return "UTILITIES";
-        return "OTHER";
-    }
+    private Complaint.ComplaintCategory extractCategory(String query) {
+    String lower = query.toLowerCase();
+
+    if (lower.contains("noise"))
+        return Complaint.ComplaintCategory.NOISE;
+
+    if (lower.contains("maintenance") || lower.contains("repair"))
+        return Complaint.ComplaintCategory.MAINTENANCE;
+
+    if (lower.contains("security") || lower.contains("safety"))
+        return Complaint.ComplaintCategory.SECURITY;
+
+    if (lower.contains("cleanliness") || lower.contains("garbage"))
+        return Complaint.ComplaintCategory.CLEANLINESS;
+
+    if (lower.contains("parking"))
+        return Complaint.ComplaintCategory.PARKING;
+
+    if (lower.contains("utilities") || lower.contains("water") || lower.contains("electricity"))
+        return Complaint.ComplaintCategory.UTILITIES;
+
+    return Complaint.ComplaintCategory.OTHER;
+}
 }

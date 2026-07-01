@@ -51,7 +51,7 @@ public class UserProfileController {
     
     @PutMapping("/{id}/profile")
     @PreAuthorize("#id == authentication.principal.id or hasRole('ADMIN')")
-    public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+    public ResponseEntity<?> updateProfile(@PathVariable Long id, @Valid @RequestBody Map<String, String> updates) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();

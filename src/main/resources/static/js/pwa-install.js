@@ -43,3 +43,48 @@ window.addEventListener('appinstalled', function() {
         installBtn.style.display = 'none';
     }
 });
+
+// Offline connection loss and recovery monitoring
+window.addEventListener('offline', function() {
+    console.log('🔌 Network connection lost. Falling back to offline Wasm voice command processor.');
+    showOfflineBanner();
+});
+
+window.addEventListener('online', function() {
+    console.log('🔌 Network connection restored. Back to online mode.');
+    hideOfflineBanner();
+});
+
+function showOfflineBanner() {
+    let banner = document.getElementById('offline-wasm-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'offline-wasm-banner';
+        banner.style.position = 'fixed';
+        banner.style.top = '0';
+        banner.style.left = '0';
+        banner.style.width = '100%';
+        banner.style.background = 'linear-gradient(90deg, #dc2626, #b91c1c)';
+        banner.style.color = 'white';
+        banner.style.textAlign = 'center';
+        banner.style.padding = '8px 12px';
+        banner.style.fontWeight = 'bold';
+        banner.style.fontSize = '14px';
+        banner.style.zIndex = '99999';
+        banner.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+        banner.innerHTML = '<i class="fas fa-wifi-slash me-2"></i> Offline Mode: WebAssembly Speech Processing Fallback Active';
+        document.body.appendChild(banner);
+    }
+}
+
+function hideOfflineBanner() {
+    const banner = document.getElementById('offline-wasm-banner');
+    if (banner) {
+        banner.remove();
+    }
+}
+
+// Check initial status on startup
+if (!navigator.onLine) {
+    showOfflineBanner();
+}

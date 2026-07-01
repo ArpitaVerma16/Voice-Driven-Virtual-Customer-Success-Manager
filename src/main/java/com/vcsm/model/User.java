@@ -5,8 +5,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id=?")
+@Where(clause = "is_deleted = false")
 public class User {
     
     @Id
@@ -18,8 +23,6 @@ public class User {
     
     @Column(nullable = false)
     private String name;
-    
-    private String password;
     
     @Column(name = "preferred_language")
     private String preferredLanguage = "en";
@@ -49,6 +52,9 @@ public class User {
     
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "dissatisfaction_score")
+    private double dissatisfactionScore = 0.0;
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Complaint> complaints = new ArrayList<>();
@@ -56,13 +62,18 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private VoicePrint voicePrint;
     
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+    
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    
     // Constructors
     public User() {}
     
-    public User(String email, String name, String password) {
+    public User(String email, String name) {
         this.email = email;
         this.name = name;
-        this.password = password;
         this.createdAt = LocalDateTime.now();
         this.emailNotifications = true;
         this.smsNotifications = false;
@@ -72,7 +83,6 @@ public class User {
     public Long getId() { return id; }
     public String getEmail() { return email; }
     public String getName() { return name; }
-    public String getPassword() { return password; }
     public String getPreferredLanguage() { return preferredLanguage; }
     public boolean isVoiceEnrolled() { return isVoiceEnrolled; }
     public LocalDateTime getCreatedAt() { return createdAt; }
@@ -85,11 +95,13 @@ public class User {
     public List<Complaint> getComplaints() { return complaints; }
     public VoicePrint getVoicePrint() { return voicePrint; }
     
+    public boolean isDeleted() { return isDeleted; }
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    
     // ---- Setters ----
     public void setId(Long id) { this.id = id; }
     public void setEmail(String email) { this.email = email; }
     public void setName(String name) { this.name = name; }
-    public void setPassword(String password) { this.password = password; }
     public void setPreferredLanguage(String preferredLanguage) { this.preferredLanguage = preferredLanguage; }
     public void setVoiceEnrolled(boolean voiceEnrolled) { isVoiceEnrolled = voiceEnrolled; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -101,4 +113,9 @@ public class User {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setComplaints(List<Complaint> complaints) { this.complaints = complaints; }
     public void setVoicePrint(VoicePrint voicePrint) { this.voicePrint = voicePrint; }
+
+    public double getDissatisfactionScore() { return dissatisfactionScore; }
+    public void setDissatisfactionScore(double dissatisfactionScore) { this.dissatisfactionScore = dissatisfactionScore; }
+    public void setDeleted(boolean deleted) { isDeleted = deleted; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 }

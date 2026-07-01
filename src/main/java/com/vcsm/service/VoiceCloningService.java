@@ -24,6 +24,12 @@ public class VoiceCloningService {
     @Autowired
     private VoiceProfileRepository voiceProfileRepository;
 
+    @Autowired
+    private com.vcsm.repository.SentimentAnalysisRepository sentimentAnalysisRepository;
+
+    @Autowired
+    private VoiceToneAdapterService voiceToneAdapterService;
+
     @Value("${voice.cloning.upload.dir:uploads/voices}")
     private String uploadDir;
 
@@ -150,8 +156,24 @@ public class VoiceCloningService {
      * Synthesize speech using cloned voice
      */
     public byte[] synthesizeSpeech(User user, String text) {
+        return synthesizeSpeech(user, text, null, null);
+    }
+
+    public byte[] synthesizeSpeech(User user, String text, String sentiment, Double confidence) {
         VoiceProfile activeProfile = getActiveProfile(user);
         
+        // Retrieve sentiment if not provided
+        if (sentiment == null || confidence == null) {
+            List<com.vcsm.model.SentimentAnalysis> history = sentimentAnalysisRepository.findByUser(user);
+            if (history != null && !history.isEmpty()) {
+                com.vcsm.model.SentimentAnalysis latest = history.get(history.size() - 1);
+                if (sentiment == null) sentiment = latest.getSentiment();
+                if (confidence == null) confidence = latest.getConfidence();
+            }
+        }
+
+        com.vcsm.model.AdaptiveVoiceSettings settings = voiceToneAdapterService.getAdaptiveSettings(sentiment, confidence);
+
         if (activeProfile == null) {
             // Return default TTS
             return synthesizeDefaultSpeech(text);
@@ -159,7 +181,7 @@ public class VoiceCloningService {
 
         // If ElevenLabs voice ID is available, use it
         if (activeProfile.getElevenLabsVoiceId() != null && !activeProfile.getElevenLabsVoiceId().isEmpty()) {
-            return synthesizeWithElevenLabs(activeProfile.getElevenLabsVoiceId(), text);
+            return synthesizeWithElevenLabs(activeProfile.getElevenLabsVoiceId(), text, settings);
         }
 
         return synthesizeDefaultSpeech(text);
@@ -169,9 +191,15 @@ public class VoiceCloningService {
      * Synthesize speech with ElevenLabs
      */
     private byte[] synthesizeWithElevenLabs(String voiceId, String text) {
-        // Placeholder for ElevenLabs API call
-        // In production, this would call the ElevenLabs API
-        return new byte[0];
+        return synthesizeWithElevenLabs(voiceId, text, new com.vcsm.model.AdaptiveVoiceSettings(0.75, 0.75, 0.0, true, 1.00));
+    }
+
+    private byte[] synthesizeWithElevenLabs(String voiceId, String text, com.vcsm.model.AdaptiveVoiceSettings settings) {
+        System.out.printf("Synthesizing with ElevenLabs. VoiceId: %s, Text: '%s', Stability: %.2f, SimilarityBoost: %.2f, Style: %.2f, SpeakerBoost: %b, SpeedFactor: %.2f%n",
+            voiceId, text, settings.getStability(), settings.getSimilarityBoost(), settings.getStyle(), settings.isUseSpeakerBoost(), settings.getSpeedFactor());
+        
+        String mockResponse = String.format("Audio: '%s' [voice=%s, stability=%.2f, speed=%.2f]", text, voiceId, settings.getStability(), settings.getSpeedFactor());
+        return mockResponse.getBytes();
     }
 
     /**

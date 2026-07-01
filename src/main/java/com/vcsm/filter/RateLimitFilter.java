@@ -25,20 +25,20 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Only apply rate limiting to voice commands
-        if (!path.contains("/api/voice/command")) {
+        // Apply rate limiting to voice and auth endpoints
+        if (!path.startsWith("/api/voice/") && !path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Get user ID (from session, auth, or request param)
-        String userId = getUserId(request);
-        if (userId == null) {
-            userId = "anonymous";
+        // Get key (from auth, request param, header, or client IP)
+        String key = getUserId(request);
+        if (key == null) {
+            key = getClientIp(request);
         }
 
         // Check rate limit
-        boolean allowed = rateLimiterService.tryConsume(userId);
+        boolean allowed = rateLimiterService.tryConsume(key);
 
         if (!allowed) {
             response.setStatus(429);
@@ -56,7 +56,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         // Add rate limit headers
-        RateLimiterService.RateLimitStatus status = rateLimiterService.getStatus(userId);
+        RateLimiterService.RateLimitStatus status = rateLimiterService.getStatus(key);
         response.setHeader("X-RateLimit-Limit", String.valueOf(status.getLimit()));
         response.setHeader("X-RateLimit-Remaining", String.valueOf(status.getRemaining()));
 
@@ -66,7 +66,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private String getUserId(HttpServletRequest request) {
         // Try to get from authentication
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
             return auth.getName();
         }
 
@@ -83,5 +83,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
 }

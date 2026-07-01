@@ -25,12 +25,6 @@
 
     <dependencies>
 
-    <!-- ElevenLabs API Client -->
-<dependency>
-    <groupId>com.elevenlabs</groupId>
-    <artifactId>elevenlabs-java</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
 <!-- For audio processing -->
 <dependency>
@@ -46,7 +40,6 @@
     <version>4.9.5</version>
 </dependency>
 
-=
 <!-- Twilio SDK -->
 <dependency>
     <groupId>com.twilio.sdk</groupId>
@@ -56,14 +49,14 @@
 
 <!-- For XML processing (Twilio TwiML) -->
 <dependency>
-
     <groupId>javax.xml.bind</groupId>
     <artifactId>jaxb-api</artifactId>
     <version>2.3.1</version>
-
-<groupId>jakarta.xml.bind</groupId>
-<artifactId>jakarta.xml.bind-api</artifactId>
-<version>4.0.0</version>
+</dependency>
+<dependency>
+    <groupId>jakarta.xml.bind</groupId>
+    <artifactId>jakarta.xml.bind-api</artifactId>
+    <version>4.0.0</version>
 </dependency>
 
 <!-- OpenNLP for NLP -->
@@ -73,53 +66,15 @@
     <version>2.3.0</version>
 </dependency>
 
-<!-- Kafka for event processing -->
-<dependency>
-    <groupId>org.springframework.kafka</groupId>
-    <artifactId>spring-kafka</artifactId>
-</dependency>
-
-<!-- MLflow for model tracking -->
-<dependency>
-    <groupId>org.mlflow</groupId>
-    <artifactId>mlflow-client</artifactId>
-    <version>2.9.0</version>
-
-</dependency>
 
 
-<!-- QR Code Generation -->
-<dependency>
-    <groupId>com.google.zxing</groupId>
-    <artifactId>core</artifactId>
-    <version>3.5.3</version>
-</dependency>
-<dependency>
-    <groupId>com.google.zxing</groupId>
-    <artifactId>javase</artifactId>
-    <version>3.5.3</version>
-</dependency>
-
-<!-- Bouncy Castle for hashing -->
-<dependency>
-    <groupId>org.bouncycastle</groupId>
-    <artifactId>bcprov-jdk15on</artifactId>
-    <version>1.70</version>
-</dependency>
-<!-- Google Cloud Translation -->
-<dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-translate</artifactId>
-    <version>2.6.0</version>
-</dependency>
 
 
-<!-- For audio processing -->
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-lang3</artifactId>
-    <version>3.12.0</version>
-</dependency>
+
+
+
+
+
 
 
 <!-- JSON processing -->
@@ -182,11 +137,11 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- JSON processing -->
+        <!-- PostgreSQL Database Driver -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- OpenAPI/Swagger Documentation -->
@@ -224,10 +179,10 @@
 
         <!-- AWS S3 SDK for voice model uploads -->
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-            <version>2.25.60</version>
-        </dependency>
+           <groupId>software.amazon.awssdk</groupId>
+           <artifactId>s3</artifactId>
+           <version>2.25.53</version>
+      </dependency>
 
         <!-- WebSocket -->
         <dependency>
@@ -270,12 +225,7 @@
             <version>1.1.1</version>
         </dependency>
 
-        <!-- Google Authenticator for 2FA -->
-        <dependency>
-            <groupId>com.warrenstrange</groupId>
-            <artifactId>googleauth</artifactId>
-            <version>1.5.0</version>
-        </dependency>
+        
 
         <!-- QR Code Generation -->
         <dependency>
@@ -294,6 +244,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- Resilience4j Circuit Breaker -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        
+        <!-- Spring AOP for Resilience4j Annotations -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
     </dependencies>
 

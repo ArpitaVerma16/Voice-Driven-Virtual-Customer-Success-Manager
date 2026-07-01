@@ -23,7 +23,7 @@ public class SentimentController {
     private SentimentClassifier sentimentClassifier;
     
     @PostMapping("/analyze")
-    public ResponseEntity<Map<String, Object>> analyzeSentiment(@RequestBody VoiceVerificationRequest request) {
+    public ResponseEntity<Map<String, Object>> analyzeSentiment(@Valid @RequestBody VoiceVerificationRequest request) {
         SentimentAnalysis result = sentimentService.analyzeAndProcess(
             request.getUserId(), 
             request.getText() != null ? request.getText() : ""
@@ -55,13 +55,18 @@ public class SentimentController {
         return ResponseEntity.ok(sentimentService.getRecentAnalyses(50));
     }
     
+    @GetMapping("/trends")
+    public ResponseEntity<List<Map<String, Object>>> getSentimentTrends(@RequestParam(defaultValue = "7") int days) {
+        return ResponseEntity.ok(sentimentService.getSentimentTrends(days));
+    }
+    
     @GetMapping("/escalations/pending")
     public ResponseEntity<?> getPendingEscalations() {
         return ResponseEntity.ok(sentimentService.getPendingEscalations());
     }
     
     @PostMapping("/test")
-    public ResponseEntity<Map<String, Object>> testSentiment(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> testSentiment(@Valid @RequestBody Map<String, String> request) {
         String text = request.get("text");
         SentimentClassifier.SentimentResult result = sentimentClassifier.analyze(text);
         

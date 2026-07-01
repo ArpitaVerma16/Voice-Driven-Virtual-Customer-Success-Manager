@@ -2,12 +2,11 @@ package com.vcsm.service;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.repository.ComplaintRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.Hash;
+import org.web3j.protocol.Web3j;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -15,12 +14,17 @@ import java.util.*;
 @Service
 public class BlockchainService {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
+    private final Web3j web3j;
 
     // In-memory blockchain (simulated)
     private final List<Block> blockchain = new ArrayList<>();
     private static final String GENESIS_HASH = "0x0000000000000000000000000000000000000000";
+
+    public BlockchainService(ComplaintRepository complaintRepository, Web3j web3j) {
+        this.complaintRepository = complaintRepository;
+        this.web3j = web3j;
+    }
 
     /**
      * Initialize blockchain with genesis block
@@ -209,21 +213,17 @@ public class BlockchainService {
     }
 
     private String sha256(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
+        byte[] inputBytes = input.getBytes(StandardCharsets.UTF_8);
+        byte[] hash = Hash.sha3(inputBytes);
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
             }
-            return "0x" + hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            return "0x" + UUID.randomUUID().toString().replace("-", "");
+            hexString.append(hex);
         }
+        return "0x" + hexString.toString();
     }
 
     // ============================================================

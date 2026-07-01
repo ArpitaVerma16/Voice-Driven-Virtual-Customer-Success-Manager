@@ -34,7 +34,7 @@ public class ReminderScheduler {
      */
     @Scheduled(cron = "0 0 * * * *") // Every hour
     public void sendEventReminders() {
-        System.out.println("⏰ Checking for event reminders...");
+        log.info("⏰ Checking for event reminders...");
         
         LocalDateTime now = LocalDateTime.now();
         List<Event> upcomingEvents = eventRepository.findByEventDateAfter(now);

@@ -1,14 +1,34 @@
 # 🎙️ Voice-Driven Virtual Customer Success Manager (VCSM)
 
-## Project Overview 
+## 📖 Project Overview
 
 Voice-Driven Virtual Customer Success Manager (VCSM) is a Spring Boot web application that serves as a **Voice-enabled Virtual Community Manager** for resident support and community engagement.
 
 It enables users to:
+
 - File complaints and track status.
 - Interact using Voice Assistant.
 - View visuals of stats related to complaints and engagement.
 - View and register for events.
+
+---
+
+## 📑 Table of Contents
+
+- [🚀 Features](#-features)
+- [🎤 Example Voice Commands](#-example-voice-commands)
+- [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
+- [🏗️ Architecture](#%EF%B8%8F-architecture)
+- [▶️ Installation and Setup](#%EF%B8%8F-installation-and-setup)
+- [🔑 Omnidim.io Voice AI Setup](#-omnidimio-voice-ai-setup)
+- [📡 API](#-api)
+- [📘 API Request & Response Examples](#-api-request--response-examples)
+- [📁 Project Structure](#-project-structure)
+- [📸 Screenshots](#-screenshots)
+- [🚀 Deployment](#-deployment)
+- [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
+- [🤝 Contributing](#-contributing)
+- [🚀 Future Enhancements](#-future-enhancements)
 
 ---
 
@@ -68,13 +88,13 @@ The Voice Assistant supports natural language commands and automatically routes 
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Spring Boot 3.2, Spring Data JPA |
-| Frontend | Thymeleaf, Bootstrap 5, Chart.js |
-| Database | H2 (in-memory, dev) |
-| Voice AI | Omnidim.io API + Web Speech API |
-| Build | Maven |
+| Layer    | Technology                         |
+| -------- | ---------------------------------- |
+| Backend  | Spring Boot 3.2, Spring Data JPA   |
+| Frontend | Thymeleaf, Bootstrap 5, Chart.js   |
+| Database | H2 (in-memory, dev)                |
+| Voice AI | Omnidim.io API + Web Speech API    |
+| Build    | Maven                             |
 
 ---
 
@@ -93,8 +113,9 @@ Repository --> Database
 ## ▶️ Installation and Setup
 
 ### Prerequisites
-- Java 17+
-- Maven 3.8+
+
+- Java 17 or later
+- Maven 3.8 or later (optional when using the Maven Wrapper)
 
 ### Steps
 
@@ -108,6 +129,71 @@ cd voice-customer-success-manager
 # 3. Open in browser
 http://localhost:8080
 ```
+
+### Windows (PowerShell)
+
+If you are using Windows, open **PowerShell** in the project directory and run:
+
+```powershell
+# Run the application using the Maven Wrapper
+.\mvnw.cmd spring-boot:run
+```
+
+If Maven is installed globally, you can also use:
+
+```powershell
+mvn spring-boot:run
+```
+
+After the application starts, open:
+
+```
+http://localhost:8080
+```
+
+### Verify Java Installation
+
+Run the following command to verify that Java is installed correctly:
+
+```powershell
+java -version
+```
+
+The project requires **Java 17 or later**.
+
+### Verify Maven Installation (Optional)
+
+If you are not using the Maven Wrapper, verify Maven with:
+
+```powershell
+mvn -version
+```
+
+### Windows-specific Troubleshooting
+
+#### Java is not recognized
+
+If PowerShell displays:
+
+```text
+'java' is not recognized as an internal or external command
+```
+
+Ensure that:
+
+- Java 17 or later is installed.
+- The `JAVA_HOME` environment variable is configured.
+- The Java `bin` directory is included in your system `PATH`.
+
+#### mvnw.cmd cannot be found
+
+Run the command from the project's root directory where the `mvnw.cmd` file is located.
+
+#### Port 8080 is already in use
+
+Stop the process using port **8080** or configure a different server port in `application.properties`.
+
+
 
 ### H2 Database Console (for dev/debugging)
 ```
@@ -130,7 +216,7 @@ omnidim.api.key=YOUR_ACTUAL_API_KEY
 
 ---
 
-## 📡  API 
+## 📡 API 
 
 ### Complaints
 | Method | Endpoint | Description |
@@ -164,6 +250,129 @@ omnidim.api.key=YOUR_ACTUAL_API_KEY
 
 ---
 
+## 📘 API Request & Response Examples
+
+### 📋 Create Complaint
+
+**Request**
+
+```http
+POST /api/complaints
+Content-Type: application/json
+```
+
+```json
+{
+  "residentName": "John Doe",
+  "description": "Water leakage in Block A.",
+  "category": "MAINTENANCE",
+  "apartmentNumber": "A-204",
+  "contactEmail": "john@example.com"
+}
+```
+
+**Example Response**
+
+```json
+{
+  "id": 1,
+  "residentName": "John Doe",
+  "description": "Water leakage in Block A.",
+  "status": "OPEN",
+  "category": "MAINTENANCE",
+  "apartmentNumber": "A-204",
+  "contactEmail": "john@example.com",
+  "priority": "MEDIUM",
+  "autoAssigned": true
+}
+```
+
+---
+
+### 📅 Create Event
+
+**Request**
+
+```http
+POST /api/events
+Content-Type: application/json
+```
+
+```json
+{
+  "name": "Community Clean-up Drive",
+  "description": "Join the neighborhood clean-up event.",
+  "category": "SOCIAL",
+  "location": "Community Park",
+  "eventDate": "2026-07-10T09:00:00",
+  "maxCapacity": 100,
+  "organizer": "Community Association"
+}
+```
+
+**Example Response**
+
+```json
+{
+  "id": 5,
+  "name": "Community Clean-up Drive",
+  "category": "SOCIAL",
+  "location": "Community Park",
+  "eventDate": "2026-07-10T09:00:00",
+  "registrations": 0,
+  "active": true
+}
+```
+
+---
+
+### 🎤 Process Voice Command
+
+**Request**
+
+```http
+POST /api/voice/command
+Content-Type: application/json
+```
+
+```json
+{
+  "transcript": "Show upcoming events"
+}
+```
+
+**Example Response**
+
+```json
+{
+  "originalText": "Show upcoming events",
+  "detectedLanguage": "en",
+  "response": "Here are the upcoming events.",
+  "success": true
+}
+```
+
+---
+
+### 📊 Complaint Statistics
+
+**Request**
+
+```http
+GET /api/complaints/stats
+```
+
+**Example Response**
+
+```json
+{
+  "OPEN": 12,
+  "IN_PROGRESS": 5,
+  "RESOLVED": 18,
+  "CLOSED": 4
+}
+```
+
 ## 📁 Project Structure
 
 ```
@@ -184,16 +393,18 @@ Screenshots will be added once a stable or deployed version of the application i
 ---
 
 ## 🚀 Deployment
-- Live Demo: Not available currently
-The application is currently not deployed. It can be run locally using the setup instructions below.
+
+- **Live Demo:** Not available currently.
+
+The application is currently not deployed. It can be run locally using the setup instructions above.
 
 ---
 
 ## 🛠️ Troubleshooting
 
-- Ensure Java 17+ is installed
-- Run `mvn clean install` if build fails
-- H2 console: http://localhost:8080/h2-console
+- Ensure Java 17 or later is installed.
+- Run `mvn clean install` if the build fails.
+- Access the H2 console at `http://localhost:8080/h2-console`.
 
 ---
 
@@ -204,6 +415,12 @@ The application is currently not deployed. It can be run locally using the setup
 3. Commit changes
 4. Push branch
 5. Open PR
+
+### 👥 Contributors
+
+Thanks to all contributors ❤️
+
+[![Contributors](https://contrib.rocks/image?repo=ArpitaVerma16/Voice-Driven-Virtual-Customer-Success-Manager)](https://github.com/ArpitaVerma16/Voice-Driven-Virtual-Customer-Success-Manager/graphs/contributors)
 
 ---
 

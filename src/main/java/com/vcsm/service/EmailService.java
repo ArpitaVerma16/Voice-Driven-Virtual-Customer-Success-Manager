@@ -18,112 +18,133 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 public class EmailService {
-    
+
     @Autowired
     private JavaMailSender mailSender;
-    
+
     @Autowired
     private EmailLogRepository emailLogRepository;
 
     @Autowired
     private EmailQueueRepository emailQueueRepository;
-    
+
+    @Autowired
+    private com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
+
+    @Autowired
+    private com.vcsm.service.QRCodeService qrCodeService;
+
     @Value("${spring.mail.username}")
     private String fromEmail;
-    
+
     public void sendEventReminder(Event event, User user, String reminderType) {
         String subject = getSubject(reminderType, event.getName());
         String message = buildReminderMessage(event, user, reminderType);
-        
+
         EmailQueue queueItem = new EmailQueue(user, event, user.getEmail(), subject, message);
         emailQueueRepository.save(queueItem);
-        
-        System.out.println("📨 Queued email reminder to: " + user.getEmail() + " for event: " + event.getName());
+
+        log.info("📨 Queued email reminder to: " + user.getEmail() + " for event: " + event.getName());
     }
-    
-    /**
-     * Send notification when a slot becomes available
-     */
+
     public void sendEventSlotAvailable(Event event, User user) {
         String subject = "🎉 Slot Available for " + event.getName() + "!";
         String message = buildSlotAvailableMessage(event, user);
-        
+
         EmailQueue queueItem = new EmailQueue(user, event, user.getEmail(), subject, message);
         emailQueueRepository.save(queueItem);
-        
-        System.out.println("📨 Queued slot available email to: " + user.getEmail());
+
+        log.info("📨 Queued slot available email to: " + user.getEmail());
     }
 
-    /**
-     * Process an email from the queue, managing retries with exponential backoff
-     */
+    // ✅ NEW — used by ProactiveOutreachService.sendSimpleEmail(to, subject, body)
+    public void sendSimpleEmail(String toEmail, String subject, String message) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(message, true);
+            mailSender.send(mimeMessage);
+            log.info("✅ Sent simple email to: " + toEmail);
+        } catch (Exception e) {
+            log.error("❌ Failed to send simple email to " + toEmail + ": " + e.getMessage());
+        }
+    }
+
     public void processQueuedEmail(EmailQueue email) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            
+
             helper.setFrom(fromEmail);
             helper.setTo(email.getRecipientEmail());
             helper.setSubject(email.getSubject());
             helper.setText(email.getMessage(), true);
-            
+
+            // Inline QR Code generation for event registration confirmation
+            if (email.getSubject() != null && email.getSubject().startsWith("✅ Registration Confirmed") 
+                    && email.getUser() != null && email.getEvent() != null) {
+                com.vcsm.model.EventRegistration reg = eventRegistrationRepository
+                        .findByUserAndEvent(email.getUser(), email.getEvent()).orElse(null);
+                if (reg != null && reg.getTicketToken() != null) {
+                    try {
+                        byte[] qrBytes = qrCodeService.generateQRCodeImage(reg.getTicketToken(), 250, 250);
+                        helper.addInline("qrCode", new org.springframework.core.io.ByteArrayResource(qrBytes), "image/png");
+                    } catch (Exception e) {
+                        System.err.println("❌ Failed to generate QR Code for email " + email.getId() + ": " + e.getMessage());
+                    }
+                }
+            }
+
             mailSender.send(mimeMessage);
-            
-            // Log success in audit trail (EmailLog)
+
             EmailLog log = new EmailLog(email.getUser(), email.getEvent(), email.getRecipientEmail(), email.getSubject(), email.getMessage());
             log.setStatus("SENT");
             emailLogRepository.save(log);
-            
-            // Update queue item status
+
             email.setStatus("SENT");
             emailQueueRepository.save(email);
-            
-            System.out.println("✅ Sent queued email to: " + email.getRecipientEmail());
-            
+
+            log.info("✅ Sent queued email to: " + email.getRecipientEmail());
+
         } catch (Exception e) {
-            // Log failure in audit trail (EmailLog)
             EmailLog log = new EmailLog(email.getUser(), email.getEvent(), email.getRecipientEmail(), email.getSubject(), email.getMessage());
             log.setStatus("FAILED");
             log.setErrorMessage(e.getMessage());
             emailLogRepository.save(log);
-            
-            // Update queue item attempts and retry state
+
             int attempts = email.getAttempts() + 1;
             email.setAttempts(attempts);
             email.setErrorMessage(e.getMessage());
-            
+
             if (attempts >= 5) {
                 email.setStatus("FAILED");
-                System.err.println("❌ Permanently failed to send queued email to " + email.getRecipientEmail() + ": " + e.getMessage());
+                log.error("❌ Permanently failed to send queued email to " + email.getRecipientEmail() + ": " + e.getMessage());
             } else {
-                // Exponential backoff retry delay in minutes: 2^attempts (e.g. 2, 4, 8, 16 mins)
                 long backoffMinutes = (long) Math.pow(2, attempts);
                 email.setNextAttemptAt(LocalDateTime.now().plusMinutes(backoffMinutes));
-                System.out.println("⏳ Failed email to " + email.getRecipientEmail() + ". Scheduling retry in " + backoffMinutes + " mins. Attempt: " + attempts);
+                log.info("⏳ Failed email to " + email.getRecipientEmail() + ". Scheduling retry in " + backoffMinutes + " mins. Attempt: " + attempts);
             }
             emailQueueRepository.save(email);
         }
     }
-    
+
     private String getSubject(String reminderType, String eventName) {
         switch (reminderType) {
-            case "CONFIRMATION":
-                return "✅ Registration Confirmed: " + eventName;
-            case "DAY_BEFORE":
-                return "⏰ Reminder: " + eventName + " is tomorrow!";
-            case "HOUR_BEFORE":
-                return "🔔 " + eventName + " starts in 1 hour!";
-            case "FOLLOW_UP":
-                return "📝 How was " + eventName + "?";
-            default:
-                return "Event Reminder: " + eventName;
+            case "CONFIRMATION": return "✅ Registration Confirmed: " + eventName;
+            case "DAY_BEFORE":   return "⏰ Reminder: " + eventName + " is tomorrow!";
+            case "HOUR_BEFORE":  return "🔔 " + eventName + " starts in 1 hour!";
+            case "FOLLOW_UP":    return "📝 How was " + eventName + "?";
+            default:             return "Event Reminder: " + eventName;
         }
     }
-    
+
     private String buildReminderMessage(Event event, User user, String reminderType) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
         String formattedDate = event.getEventDate() != null ? event.getEventDate().format(formatter) : "TBD";
-        
+
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html><html><head><style>");
         html.append("body { font-family: Arial, sans-serif; color: #333; }");
@@ -145,21 +166,28 @@ public class EmailService {
             html.append("<p><strong>📝 Description:</strong> " + event.getDescription() + "</p>");
         }
         html.append("</div>");
-        html.append("<p style='text-align: center;'>");
-        html.append("<a href='http://localhost:8080/events' class='btn'>View Event Details</a>");
-        html.append("</p>");
+
+        if ("CONFIRMATION".equals(reminderType)) {
+            html.append("<div style='text-align: center; margin: 20px 0; padding: 15px; background: #fff; border-radius: 8px; border: 1px dashed #8b5cf6;'>");
+            html.append("<h4 style='margin: 0 0 10px 0; color: #6d28d9;'>Your Entry Pass QR Code</h4>");
+            html.append("<img src='cid:qrCode' alt='Ticket QR Code' style='width: 200px; height: 200px; border: 1px solid #eee; padding: 5px; background: #fff;' />");
+            html.append("<p style='margin: 10px 0 0 0; font-size: 11px; color: #666;'>Show this QR code at check-in for verification.</p>");
+            html.append("</div>");
+        }
+
+        html.append("<p style='text-align: center;'><a href='http://localhost:8080/events' class='btn'>View Event Details</a></p>");
         html.append("<p>Best regards,<br>VCSM Team</p>");
         html.append("</div>");
         html.append("<div class='footer'><small>This is an automated message. Please do not reply.</small></div>");
         html.append("</div></body></html>");
-        
+
         return html.toString();
     }
-    
+
     private String buildSlotAvailableMessage(Event event, User user) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
         String formattedDate = event.getEventDate() != null ? event.getEventDate().format(formatter) : "TBD";
-        
+
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html><html><head><style>");
         html.append("body { font-family: Arial, sans-serif; color: #333; }");
@@ -192,17 +220,18 @@ public class EmailService {
         html.append("</div>");
         html.append("<div class='footer'><small>This is an automated message. Please do not reply.</small></div>");
         html.append("</div></body></html>");
-        
+
         return html.toString();
     }
-    
+
     private String getReminderMessage(String reminderType) {
         switch (reminderType) {
             case "CONFIRMATION": return "You have successfully registered!";
-            case "DAY_BEFORE": return "This event is happening tomorrow!";
-            case "HOUR_BEFORE": return "This event starts in 1 hour!";
-            case "FOLLOW_UP": return "We hope you enjoyed the event!";
-            default: return "Event Reminder";
+            case "DAY_BEFORE":   return "This event is happening tomorrow!";
+            case "HOUR_BEFORE":  return "This event starts in 1 hour!";
+            case "FOLLOW_UP":    return "We hope you enjoyed the event!";
+            default:             return "Event Reminder";
         }
     }
 }
+

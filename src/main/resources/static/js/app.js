@@ -78,6 +78,19 @@ async function sendCommand() {
         responseText.textContent = data.response || 'Command processed successfully!';
         responseDiv.classList.remove('d-none');
         
+        // Handle offline local navigation matching
+        if (data.action) {
+            if (data.action === "nav_complaints") {
+                setTimeout(() => window.location.href = "/complaints", 1500);
+            } else if (data.action === "nav_events") {
+                setTimeout(() => window.location.href = "/events", 1500);
+            } else if (data.action === "nav_dashboard") {
+                setTimeout(() => window.location.href = "/", 1500);
+            } else if (data.action === "nav_profile") {
+                setTimeout(() => window.location.href = "/profile", 1500);
+            }
+        }
+
         // Store command ID for feedback
         if (data.id) {
             lastCommandId = data.id;

@@ -15,6 +15,7 @@ public class DefaultAdminSeeder implements CommandLineRunner {
 
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.vcsm.repository.UserRepository profileUserRepository;
 
     @Value("${security.admin.username:}")
     private String adminUsername;
@@ -25,6 +26,7 @@ public class DefaultAdminSeeder implements CommandLineRunner {
     public DefaultAdminSeeder(AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.profileUserRepository = profileUserRepository;
     }
 
     @Override
@@ -46,6 +48,13 @@ public class DefaultAdminSeeder implements CommandLineRunner {
         admin.setPasswordHash(passwordEncoder.encode(adminPassword));
         admin.setRoles(Set.of(UserRole.ROLE_ADMIN));
         userRepository.save(admin);
+
+        // Auto-create business User profile if it does not exist
+        String email = adminUsername.trim();
+        if (!profileUserRepository.existsByEmail(email)) {
+            User profile = new User(email, "Admin");
+            profileUserRepository.save(profile);
+        }
     }
 }
 
