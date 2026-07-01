@@ -2,6 +2,8 @@
 let recognition = null;
 let isRecording = false;
 let lastCommandId = null; // Store last command ID for feedback
+let recordingSeconds = 0;
+let recordingInterval = null;
 
 function startVoice() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -21,32 +23,94 @@ function startVoice() {
     recognition.interimResults = false;
 
     recognition.onstart = () => {
-        isRecording = true;
-        document.getElementById('micBtn').classList.add('btn-danger', 'recording');
-        document.getElementById('micBtn').classList.remove('btn-purple');
-        document.getElementById('micIcon').className = 'fas fa-stop';
-    };
+    isRecording = true;
+    recordingSeconds = 0;
+
+    document.getElementById('micBtn').classList.add('btn-danger', 'recording');
+    document.getElementById('micBtn').classList.remove('btn-purple');
+    document.getElementById('micIcon').className = 'fas fa-stop';
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'block';
+        time.textContent = '00:00';
+    }
+
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+         recordingInterval = null;
+    }
+
+    recordingInterval = setInterval(() => {
+        recordingSeconds++;
+
+        const minutes = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
+        const seconds = String(recordingSeconds % 60).padStart(2, '0');
+
+        if (time) {
+            time.textContent = `${minutes}:${seconds}`;
+        }
+    }, 1000);
+};
 
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('voiceInput').value = transcript;
-        sendCommand();
-    };
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('voiceInput').value = transcript;
+    sendCommand();
+};
 
     recognition.onend = () => {
-        isRecording = false;
-        document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
-        document.getElementById('micBtn').classList.add('btn-purple');
-        document.getElementById('micIcon').className = 'fas fa-microphone';
-    };
+    isRecording = false;
 
-    recognition.onerror = (e) => {
-        console.error('Voice error:', e);
-        isRecording = false;
-    };
+    document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
+    document.getElementById('micBtn').classList.add('btn-purple');
+    document.getElementById('micIcon').className = 'fas fa-microphone';
 
-    recognition.start();
-}
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+};
+
+   recognition.onerror = (e) => {
+    console.error('Voice error:', e);
+    isRecording = false;
+
+    document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
+    document.getElementById('micBtn').classList.add('btn-purple');
+    document.getElementById('micIcon').className = 'fas fa-microphone';
+
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+
+    if (typeof typingIndicator !== 'undefined') {
+        typingIndicator.hide();
+    }
+};
 
 function changePageSize(size) {
     const url = new URL(window.location.href);
@@ -396,8 +460,6 @@ async function registerEvent(id) {
 
 }
 
-}
-
 // ===== BULK OPERATIONS =====
 let selectedIds = [];
 
@@ -517,9 +579,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.complaint-checkbox').forEach(cb => {
         cb.addEventListener('change', updateSelectedCount);
     });
-
-
-});
 
 
 });
@@ -686,9 +745,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 
 
-});
-
-
-});
-
-
+})};
