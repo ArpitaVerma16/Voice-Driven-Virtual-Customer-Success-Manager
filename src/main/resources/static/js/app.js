@@ -130,7 +130,30 @@ async function sendCommand() {
 
     }
 }
+function copyResponse() {
+    const responseText = document.getElementById("responseText");
 
+    if (!responseText || !responseText.textContent.trim()) {
+        if (typeof toast !== "undefined") {
+            toast.warning("No response available to copy.", "Warning");
+        }
+        return;
+    }
+
+    navigator.clipboard.writeText(responseText.textContent)
+        .then(() => {
+            if (typeof toast !== "undefined") {
+                toast.success("Response copied to clipboard!", "Success");
+            } else {
+                alert("Response copied!");
+            }
+        })
+        .catch(() => {
+            if (typeof toast !== "undefined") {
+                toast.error("Failed to copy response.", "Error");
+            }
+        });
+}
 // Submit feedback for voice command
 function submitFeedback(type) {
     if (!lastCommandId) {
@@ -396,7 +419,7 @@ async function registerEvent(id) {
 
 }
 
-}
+
 
 // ===== BULK OPERATIONS =====
 let selectedIds = [];
@@ -522,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-});
+
 
 // ===== WEBSOCKET NOTIFICATIONS =====
 let stompClient = null;
@@ -689,6 +712,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-});
 
 
