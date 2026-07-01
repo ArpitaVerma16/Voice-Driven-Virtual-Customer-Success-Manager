@@ -59,6 +59,15 @@ async function sendCommand() {
     const input = document.getElementById('voiceInput');
     const transcript = input.value.trim();
     if (!transcript) return;
+    const sendBtn = document.getElementById('sendBtn');
+const sendBtnText = sendBtn?.querySelector('.btn-text');
+
+sendBtn.disabled = true;
+sendBtn.classList.add('disabled');
+
+if (sendBtnText) {
+    sendBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+}
 
     // Show typing indicator if available
     if (typeof typingIndicator !== 'undefined') {
@@ -115,22 +124,33 @@ async function sendCommand() {
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
         }
+        sendBtn.disabled = false;
+sendBtn.classList.remove('disabled');
+
+if (sendBtnText) {
+    sendBtnText.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+}
 
         input.value = '';
 
     } catch (err) {
-        console.error('Error sending command:', err);
-        if (typeof typingIndicator !== 'undefined') {
-            typingIndicator.hide();
-        }
-        if (typeof toast !== 'undefined') {
-            toast.error('Error processing command', 'Error');
-        }
+    console.error('Error sending command:', err);
 
+    if (typeof typingIndicator !== 'undefined') {
+        typingIndicator.hide();
+    }
 
+    sendBtn.disabled = false;
+    sendBtn.classList.remove('disabled');
+
+    if (sendBtnText) {
+        sendBtnText.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+    }
+
+    if (typeof toast !== 'undefined') {
+        toast.error('Error processing command', 'Error');
     }
 }
-
 // Submit feedback for voice command
 function submitFeedback(type) {
     if (!lastCommandId) {
@@ -396,7 +416,7 @@ async function registerEvent(id) {
 
 }
 
-}
+
 
 // ===== BULK OPERATIONS =====
 let selectedIds = [];
@@ -522,7 +542,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-});
 
 // ===== WEBSOCKET NOTIFICATIONS =====
 let stompClient = null;
@@ -686,9 +705,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 
 
-});
+})};
 
 
-});
 
 
