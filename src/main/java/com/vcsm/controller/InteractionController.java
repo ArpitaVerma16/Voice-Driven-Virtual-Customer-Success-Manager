@@ -25,7 +25,6 @@ import java.util.Map;
 @Tag(name = "Interactions", description = "Customer Interaction History APIs")
 @RestController
 @RequestMapping("/api/interactions")
-@CrossOrigin(origins = "*")
 public class InteractionController {
 
     @Autowired
@@ -170,3 +169,4 @@ public class InteractionController {
         return ResponseEntity.ok(stats);
     }
 }
+

@@ -35,10 +35,10 @@ public class OnboardingService {
                 tutorialSteps.add(stepMap);
             }
             
-            System.out.println("✅ Tutorial steps loaded: " + tutorialSteps.size() + " steps");
+            log.info("✅ Tutorial steps loaded: " + tutorialSteps.size() + " steps");
             
         } catch (Exception e) {
-            System.err.println("❌ Failed to load tutorial steps: " + e.getMessage());
+            log.error("❌ Failed to load tutorial steps: " + e.getMessage());
         }
     }
 

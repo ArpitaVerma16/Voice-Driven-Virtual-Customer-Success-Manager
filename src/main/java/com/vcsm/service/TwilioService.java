@@ -30,7 +30,7 @@ public class TwilioService {
     @PostConstruct
     public void init() {
         Twilio.init(accountSid, authToken);
-        System.out.println("✅ Twilio initialized with SID: " + accountSid);
+        log.info("✅ Twilio initialized with SID: " + accountSid);
     }
 
     /**
@@ -47,11 +47,11 @@ public class TwilioService {
             Call call = Call.creator(to, from, URI.create(callUrl))
                 .create();
             
-            System.out.println("📞 Call initiated: " + call.getSid());
+            log.info("📞 Call initiated: " + call.getSid());
             return call;
             
         } catch (Exception e) {
-            System.err.println("❌ Failed to make call: " + e.getMessage());
+            log.error("❌ Failed to make call: " + e.getMessage());
             return null;
         }
     }
@@ -67,11 +67,11 @@ public class TwilioService {
             Message sms = Message.creator(to, from, message)
                 .create();
             
-            System.out.println("📱 SMS sent: " + sms.getSid());
+            log.info("📱 SMS sent: " + sms.getSid());
             return sms;
             
         } catch (Exception e) {
-            System.err.println("❌ Failed to send SMS: " + e.getMessage());
+            log.error("❌ Failed to send SMS: " + e.getMessage());
             return null;
         }
     }

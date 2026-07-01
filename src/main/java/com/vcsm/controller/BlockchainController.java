@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/blockchain")
-@CrossOrigin(origins = "*")
 public class BlockchainController {
 
     @Autowired

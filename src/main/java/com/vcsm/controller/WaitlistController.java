@@ -19,7 +19,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/events/waitlist")
-@CrossOrigin(origins = "*")
 public class WaitlistController {
 
     @Autowired

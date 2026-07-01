@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agent")
-@CrossOrigin(origins = "*")
 public class MultiAgentController {
 
     @Autowired
@@ -22,7 +21,7 @@ public class MultiAgentController {
     private AgentRouter agentRouter;
 
     @PostMapping("/process")
-    public ResponseEntity<Map<String, Object>> process(@RequestBody AgentRequest request) {
+    public ResponseEntity<Map<String, Object>> process(@Valid @RequestBody AgentRequest request) {
         Map<String, Object> result = orchestrator.processRequest(request);
         return ResponseEntity.ok(result);
     }

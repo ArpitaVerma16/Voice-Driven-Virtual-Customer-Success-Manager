@@ -3,6 +3,9 @@ package com.vcsm.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -13,11 +16,14 @@ import java.util.*;
 @Service
 public class SpeechToTextService {
 
+    private static final Logger log = LoggerFactory.getLogger(SpeechToTextService.class);
+
     @Value("${google.speech.api.key:}")
     private String speechApiKey;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @CircuitBreaker(name = "speechToTextService", fallbackMethod = "transcribeFallback")
     public String transcribe(String base64Audio, String languageCode) {
         if (base64Audio == null || base64Audio.isEmpty()) {
             return "";
@@ -85,11 +91,18 @@ public class SpeechToTextService {
                         }
                     }
                 }
+            } else {
+                throw new RuntimeException("Speech API call failed with response code: " + responseCode);
             }
         } catch (Exception e) {
-            // Fall back to default mock digits
+            throw new RuntimeException("Speech API call failed", e);
         }
 
-        return "1 2 3 4";
+        throw new RuntimeException("Speech API call returned no transcript");
+    }
+
+    public String transcribeFallback(String base64Audio, String languageCode, Throwable t) {
+        log.warn("Circuit breaker triggered for speech-to-text service: {}", t.getMessage());
+        return "Service temporarily unavailable, please try again.";
     }
 }

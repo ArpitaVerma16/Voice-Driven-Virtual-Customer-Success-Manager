@@ -12,26 +12,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
-import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PredictionService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private SentimentAnalysisRepository sentimentAnalysisRepository;
-
-    @Autowired
-    private ComplaintRepository complaintRepository;
-
-    @Autowired
-    @org.springframework.context.annotation.Lazy
-    private ProactiveOutreachService proactiveOutreachService;
+    private static final Logger log = LoggerFactory.getLogger(PredictionService.class);
 
     @Value("${ml.service.url:http://localhost:8000}")
     private String mlServiceUrl;
@@ -39,90 +30,109 @@ public class PredictionService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @CircuitBreaker(name = "mlService", fallbackMethod = "predictComplaintsFallback")
     public Map<String, Object> predictComplaints(int days) {
+        String url = mlServiceUrl + "/api/predict/complaints";
+        Map<String, Integer> request = Map.of("days", days);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(request, headers);
+        
+        ResponseEntity<String> response = restTemplate.exchange(
+            url,
+            HttpMethod.POST,
+            entity,
+            String.class
+        );
+        
         try {
-            String url = mlServiceUrl + "/api/predict/complaints";
-            Map<String, Integer> request = Map.of("days", days);
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            
-            HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(request, headers);
-            
-            ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                String.class
-            );
-            
             return objectMapper.readValue(response.getBody(), Map.class);
-            
         } catch (Exception e) {
-            // Fallback: return mock prediction if ML service is down
-            return getFallbackPrediction(days);
+            throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
 
+    public Map<String, Object> predictComplaintsFallback(int days, Throwable t) {
+        log.warn("ML service unavailable for complaint prediction, using fallback: {}", t.getMessage());
+        return getFallbackPrediction(days);
+    }
+
+    @CircuitBreaker(name = "mlService", fallbackMethod = "predictEventAttendanceFallback")
     public Map<String, Object> predictEventAttendance(Long eventId, List<Map<String, Object>> historicalData) {
+        String url = mlServiceUrl + "/api/predict/event/" + eventId;
+        Map<String, Object> request = Map.of("historicalData", historicalData);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+        
+        ResponseEntity<String> response = restTemplate.exchange(
+            url,
+            HttpMethod.POST,
+            entity,
+            String.class
+        );
+        
         try {
-            String url = mlServiceUrl + "/api/predict/event/" + eventId;
-            Map<String, Object> request = Map.of("historicalData", historicalData);
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
-            
-            ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                String.class
-            );
-            
             return objectMapper.readValue(response.getBody(), Map.class);
-            
         } catch (Exception e) {
-            return getFallbackEventPrediction(eventId);
+            throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
 
+    public Map<String, Object> predictEventAttendanceFallback(Long eventId, List<Map<String, Object>> historicalData, Throwable t) {
+        log.warn("ML service unavailable for event attendance prediction, using fallback: {}", t.getMessage());
+        return getFallbackEventPrediction(eventId);
+    }
+
+    @CircuitBreaker(name = "mlService", fallbackMethod = "predictSentimentFallback")
     public Map<String, Object> predictSentiment(List<Map<String, Object>> historicalSentiment) {
+        String url = mlServiceUrl + "/api/predict/sentiment";
+        Map<String, Object> request = Map.of("historicalSentiment", historicalSentiment);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+        
+        ResponseEntity<String> response = restTemplate.exchange(
+            url,
+            HttpMethod.POST,
+            entity,
+            String.class
+        );
+        
         try {
-            String url = mlServiceUrl + "/api/predict/sentiment";
-            Map<String, Object> request = Map.of("historicalSentiment", historicalSentiment);
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
-            
-            ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                String.class
-            );
-            
             return objectMapper.readValue(response.getBody(), Map.class);
-            
         } catch (Exception e) {
-            return getFallbackSentimentPrediction();
+            throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
 
+    public Map<String, Object> predictSentimentFallback(List<Map<String, Object>> historicalSentiment, Throwable t) {
+        log.warn("ML service unavailable for sentiment prediction, using fallback: {}", t.getMessage());
+        return getFallbackSentimentPrediction();
+    }
+
+    @CircuitBreaker(name = "mlService", fallbackMethod = "getPeakTimesFallback")
     public Map<String, Object> getPeakTimes() {
+        String url = mlServiceUrl + "/api/predict/peak-times";
+        
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        
         try {
-            String url = mlServiceUrl + "/api/predict/peak-times";
-            
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            
             return objectMapper.readValue(response.getBody(), Map.class);
-            
         } catch (Exception e) {
-            return getFallbackPeakTimes();
+            throw new RuntimeException("Failed to parse ML service response", e);
         }
+    }
+
+    public Map<String, Object> getPeakTimesFallback(Throwable t) {
+        log.warn("ML service unavailable for peak times prediction, using fallback: {}", t.getMessage());
+        return getFallbackPeakTimes();
     }
 
     // ============================================================

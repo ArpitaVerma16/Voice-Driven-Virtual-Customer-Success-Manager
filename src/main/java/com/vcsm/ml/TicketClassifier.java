@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
+    private static final Logger log = LoggerFactory.getLogger(TicketClassifier.class);
+
 public class TicketClassifier {
 
     private static final Logger log = LoggerFactory.getLogger(TicketClassifier.class);
@@ -182,3 +184,4 @@ public class TicketClassifier {
         public void close() throws IOException {}
     }
 }
+

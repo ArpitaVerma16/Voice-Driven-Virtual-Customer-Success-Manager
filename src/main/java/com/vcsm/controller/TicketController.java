@@ -11,20 +11,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = "*")
 public class TicketController {
 
     @Autowired
     private SmartRouter smartRouter;
 
     @PostMapping("/classify")
-    public ResponseEntity<SmartRouter.RoutingResult> classifyTicket(@RequestBody Complaint complaint) {
+    public ResponseEntity<SmartRouter.RoutingResult> classifyTicket(@Valid @RequestBody Complaint complaint) {
         SmartRouter.RoutingResult result = smartRouter.classifyAndRoute(complaint);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/auto-assign")
-    public ResponseEntity<SmartRouter.RoutingResult> autoAssign(@RequestBody Complaint complaint) {
+    public ResponseEntity<SmartRouter.RoutingResult> autoAssign(@Valid @RequestBody Complaint complaint) {
         SmartRouter.RoutingResult result = smartRouter.classifyAndRoute(complaint);
         return ResponseEntity.ok(result);
     }

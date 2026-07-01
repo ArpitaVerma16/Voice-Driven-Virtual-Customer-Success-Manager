@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/live")
-@CrossOrigin(origins = "*")
 public class LiveDashboardController {
 
     @Autowired

@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/healing")
-@CrossOrigin(origins = "*")
 public class SelfHealingController {
 
     @Autowired

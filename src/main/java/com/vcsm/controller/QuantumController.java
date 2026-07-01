@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quantum")
-@CrossOrigin(origins = "*")
 public class QuantumController {
 
     @Autowired

@@ -44,6 +44,17 @@ public class ComplaintService {
     @Autowired
     private BlockchainService blockchainService;
 
+    @Autowired
+    private EmailService emailService;
+
+
+    private void safelyExecute(Runnable operation, String description) {
+        try {
+            operation.run();
+        } catch (Exception e) {
+            log.error("Failed: " + description, e);
+        }
+    }
 
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -91,8 +102,7 @@ public class ComplaintService {
 
         log.info("📝 Filing complaint for user: " + username + " with priority: " + priority);
 
-        // Log user activity
-        try {
+        safelyExecute(() -> {
             User user = getCurrentUser();
             if (user != null) {
                 String description = "Filed complaint: " + saved.getDescription();
@@ -101,9 +111,7 @@ public class ComplaintService {
                 }
                 userActivityService.logActivity(user, "COMPLAINT", description, saved.getId());
             }
-        } catch (Exception e) {
-            log.warning("Failed to log user activity: " + e.getMessage());
-        }
+        }, "log user activity for complaint filing");
 
         // Send notification to admin
         try {
@@ -118,16 +126,10 @@ public class ComplaintService {
                     )
                 );
             }
-        } catch (Exception e) {
-            log.warning("Failed to send notification: " + e.getMessage());
-        }
+        }, "send notification for complaint filing");
 
-        // Add to blockchain
-        try {
-            blockchainService.addBlock(saved, "COMPLAINT_CREATED");
-        } catch (Exception e) {
-            log.warning("Failed to add block to blockchain: " + e.getMessage());
-        }
+        safelyExecute(() -> blockchainService.addBlock(saved, "COMPLAINT_CREATED"), "add blockchain entry for complaint creation");
+
 
         return saved;
     }
@@ -210,7 +212,28 @@ public class ComplaintService {
         if (notes != null && !notes.isBlank()) complaint.setResolutionNotes(notes);
         
         Complaint updated = complaintRepository.save(complaint);
+        try {
+            User user = getComplaintUser(id);
 
+            if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+                String subject = "Complaint Status Updated - #" + id;
+
+                String emailBody =
+                        "<p>Hello " + user.getName() + ",</p>" +
+                        "<p>Your complaint status has been updated.</p>" +
+                        "<p><strong>Complaint ID:</strong> " + id + "</p>" +
+                        "<p><strong>Previous Status:</strong> " + oldStatus + "</p>" +
+                        "<p><strong>New Status:</strong> " + newStatus + "</p>" +
+                        "<p><strong>Resolution Notes:</strong> " +
+                        (notes != null && !notes.isBlank() ? notes : "No resolution notes provided.") +
+                        "</p>" +
+                        "<p>Regards,<br>VCSM Team</p>";
+
+                emailService.sendSimpleEmail(user.getEmail(), subject, emailBody);
+            }
+        } catch (Exception e) {
+            log.warning("Failed to send complaint status update email: " + e.getMessage());
+        }
         // Log user activity
         try {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
@@ -233,12 +256,9 @@ public class ComplaintService {
                     newStatus.toString()
                 );
             }
-        } catch (Exception e) {
-            log.warning("Failed to log user activity: " + e.getMessage());
-        }
+        }, "log user activity and audit for status update");
 
-        // Send notification to complaint owner
-        try {
+        safelyExecute(() -> {
             User user = getComplaintUser(id);
             if (user != null) {
                 String message = "Your complaint #" + id + " status changed from " + oldStatus + " to " + newStatus;
@@ -260,16 +280,10 @@ public class ComplaintService {
                     "INFO"
                 )
             );
-        } catch (Exception e) {
-            log.warning("Failed to send notification: " + e.getMessage());
-        }
+        }, "send notifications for status update");
 
-        // Add to blockchain
-        try {
-            blockchainService.addBlock(updated, "STATUS_UPDATED");
-        } catch (Exception e) {
-            log.warning("Failed to add block to blockchain: " + e.getMessage());
-        }
+        safelyExecute(() -> blockchainService.addBlock(updated, "STATUS_UPDATED"), "add blockchain entry for status update");
+
 
         return updated;
     }
@@ -313,17 +327,9 @@ public class ComplaintService {
                     newPriority
                 );
             }
+        }, "log user activity and audit for priority update");
 
-        } catch (Exception e) {
-            log.warning("Failed to log user activity: " + e.getMessage());
-        }
-
-        // Add to blockchain
-        try {
-            blockchainService.addBlock(updated, "PRIORITY_UPDATED");
-        } catch (Exception e) {
-            log.warning("Failed to add block to blockchain: " + e.getMessage());
-        }
+        safelyExecute(() -> blockchainService.addBlock(updated, "PRIORITY_UPDATED"), "add blockchain entry for priority update");
 
         return updated;
     }
@@ -364,9 +370,7 @@ public class ComplaintService {
                     id
                 );
             }
-        } catch (Exception e) {
-            log.warning("Failed to log user activity: " + e.getMessage());
-        }
+        }, "log user activity and audit for complaint deletion");
 
         // Send notification before deletion
         try {
@@ -381,9 +385,7 @@ public class ComplaintService {
                     )
                 );
             }
-        } catch (Exception e) {
-            log.warning("Failed to send notification: " + e.getMessage());
-        }
+        }, "send notification for complaint deletion");
         
         complaintRepository.deleteById(id);
     }

@@ -4,8 +4,13 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
 @Table(name = "customer_sessions")
+@SQLDelete(sql = "UPDATE customer_sessions SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id=?")
+@Where(clause = "is_deleted = false")
 public class CustomerSession {
 
     @Id
@@ -41,6 +46,12 @@ public class CustomerSession {
 
     @Column
     private boolean isArchived = false;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public CustomerSession() {
         this.startedAt = LocalDateTime.now();
@@ -83,6 +94,12 @@ public class CustomerSession {
 
     public boolean isArchived() { return isArchived; }
     public void setArchived(boolean archived) { isArchived = archived; }
+    
+    public boolean isDeleted() { return isDeleted; }
+    public void setDeleted(boolean deleted) { isDeleted = deleted; }
+
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 
     public long getDurationSeconds() {
         if (endedAt == null) return -1;

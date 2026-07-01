@@ -11,16 +11,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-import com.vcsm.model.VenueReservation;
 
 @Service
 public class OmnidimService {
 
-    private static final Logger log = Logger.getLogger(OmnidimService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(OmnidimService.class);
 
     @Value("${omnidim.api.key:YOUR_OMNIDIM_API_KEY}")
     private String apiKey;
@@ -112,7 +111,7 @@ public class OmnidimService {
                 voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
             }
         } catch (Exception e) {
-            log.warning("Failed to log voice analytics: " + e.getMessage());
+            log.warn("Failed to log voice analytics: {}", e.getMessage(), e);
         }
 
         Map<String, Object> result = new java.util.HashMap<>();

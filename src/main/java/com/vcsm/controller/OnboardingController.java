@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/onboarding")
-@CrossOrigin(origins = "*")
 public class OnboardingController {
 
     @Autowired

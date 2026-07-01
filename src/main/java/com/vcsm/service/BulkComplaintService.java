@@ -147,7 +147,7 @@ public class BulkComplaintService {
                 }
             } catch (Exception e) {
                 failed.add(id);
-                log.warning("Failed to update complaint " + id + ": " + e.getMessage());
+                log.warn("Failed to update complaint {}: {}", id, e.getMessage(), e);
             }
         }
 

@@ -11,14 +11,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/genai")
-@CrossOrigin(origins = "*")
 public class GenAIController {
 
     @Autowired
     private GenAIResolver genAIResolver;
 
     @PostMapping("/resolve")
-    public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@RequestBody Complaint complaint) {
+    public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@Valid @RequestBody Complaint complaint) {
         GenAIResolver.ResolutionResult result = genAIResolver.resolveComplaint(complaint);
         return ResponseEntity.ok(result);
     }

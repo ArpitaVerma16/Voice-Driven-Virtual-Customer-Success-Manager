@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/predict")
-@CrossOrigin(origins = "*")
 public class PredictionController {
 
     @Autowired
@@ -25,31 +24,18 @@ public class PredictionController {
     @PostMapping("/event/{eventId}")
     public ResponseEntity<Map<String, Object>> predictEvent(
             @PathVariable Long eventId,
-            @RequestBody(required = false) List<Map<String, Object>> historicalData) {
+            @Valid @RequestBody(required = false) List<Map<String, Object>> historicalData) {
         return ResponseEntity.ok(predictionService.predictEventAttendance(eventId, historicalData));
     }
 
     @PostMapping("/sentiment")
     public ResponseEntity<Map<String, Object>> predictSentiment(
-            @RequestBody(required = false) List<Map<String, Object>> historicalSentiment) {
+            @Valid @RequestBody(required = false) List<Map<String, Object>> historicalSentiment) {
         return ResponseEntity.ok(predictionService.predictSentiment(historicalSentiment));
     }
 
     @GetMapping("/peak-times")
     public ResponseEntity<Map<String, Object>> getPeakTimes() {
         return ResponseEntity.ok(predictionService.getPeakTimes());
-    }
-
-    @PostMapping("/dissatisfaction/run")
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> runDissatisfactionAnalysis() {
-        predictionService.runDissatisfactionAnalysis();
-        return ResponseEntity.ok(Map.of("success", true, "message", "Weekly dissatisfaction analysis run completed."));
-    }
-
-    @GetMapping("/dissatisfaction/high-risk")
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<com.vcsm.model.User>> getHighRiskUsers() {
-        return ResponseEntity.ok(predictionService.getHighRiskUsers());
     }
 }

@@ -26,7 +26,6 @@ import java.util.Map;
 @Tag(name = "Complaints", description = "Complaint management APIs")
 @RestController
 @RequestMapping("/api/complaints")
-@CrossOrigin(origins = "*")
 public class ComplaintController {
 
     @Autowired

@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Base64;
 import java.util.Optional;
 
 @Service
 public class VoiceBiometricsService {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(VoiceBiometricsService.class);
+
     private static final double VERIFICATION_THRESHOLD = 0.75;
     private static final int SAMPLE_RATE = 16000;
     
@@ -82,6 +86,7 @@ public class VoiceBiometricsService {
                 "Voice enrollment successful! You can now use voice commands.", userId, user.getName());
             
         } catch (Exception e) {
+            log.error("Voice enrollment failed for user {}: {}", userId, e.getMessage(), e);
             return new VoiceVerificationResponse(false, 0, 
                 "Enrollment failed: " + e.getMessage());
         }
@@ -148,6 +153,7 @@ public class VoiceBiometricsService {
             return new VoiceVerificationResponse(verified, similarity, message, userId, user.getName());
             
         } catch (Exception e) {
+            log.error("Voice verification failed for user {}: {}", userId, e.getMessage(), e);
             return new VoiceVerificationResponse(false, 0, 
                 "Verification failed: " + e.getMessage());
         }

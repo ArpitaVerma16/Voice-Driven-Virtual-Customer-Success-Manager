@@ -5,8 +5,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id=?")
+@Where(clause = "is_deleted = false")
 public class User {
     
     @Id
@@ -57,6 +62,12 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private VoicePrint voicePrint;
     
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+    
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    
     // Constructors
     public User() {}
     
@@ -84,6 +95,9 @@ public class User {
     public List<Complaint> getComplaints() { return complaints; }
     public VoicePrint getVoicePrint() { return voicePrint; }
     
+    public boolean isDeleted() { return isDeleted; }
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    
     // ---- Setters ----
     public void setId(Long id) { this.id = id; }
     public void setEmail(String email) { this.email = email; }
@@ -102,4 +116,6 @@ public class User {
 
     public double getDissatisfactionScore() { return dissatisfactionScore; }
     public void setDissatisfactionScore(double dissatisfactionScore) { this.dissatisfactionScore = dissatisfactionScore; }
+    public void setDeleted(boolean deleted) { isDeleted = deleted; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 }

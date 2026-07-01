@@ -13,14 +13,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/triage")
-@CrossOrigin(origins = "*")
 public class TriageController {
 
     @Autowired
     private TriageService triageService;
 
     @PostMapping("/classify")
-    public ResponseEntity<TriageRequest> classifyComplaint(@RequestBody Complaint complaint) {
+    public ResponseEntity<TriageRequest> classifyComplaint(@Valid @RequestBody Complaint complaint) {
         TriageRequest result = triageService.triageComplaint(complaint);
         return ResponseEntity.ok(result);
     }

@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/decision")
-@CrossOrigin(origins = "*")
 public class DecisionController {
 
     @Autowired
@@ -27,7 +26,7 @@ public class DecisionController {
     private ReinforcementLearningService rlService;
 
     @PostMapping("/make")
-    public ResponseEntity<Decision> makeDecision(@RequestBody Complaint complaint) {
+    public ResponseEntity<Decision> makeDecision(@Valid @RequestBody Complaint complaint) {
         Decision decision = decisionEngine.makeDecision(complaint);
         return ResponseEntity.ok(decision);
     }

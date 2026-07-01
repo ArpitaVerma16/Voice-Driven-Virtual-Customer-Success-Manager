@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/voice/biometrics")
-@CrossOrigin(origins = "*")
 public class VoiceBiometricsController {
 
     @Autowired
@@ -31,19 +30,9 @@ public class VoiceBiometricsController {
 
     @PostMapping("/enroll")
     public ResponseEntity<VoiceVerificationResponse> enrollVoice(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody VoiceVerificationRequest request) {
-
-        // Security fix:
-        // Never trust a client-supplied user ID.
-        // Always use the authenticated user's identity from the security context.
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new VoiceVerificationResponse(false, 0, "Authentication required"));
-        }
-
-        Long userId = userDetails.getId();
-
+            @PathVariable Long userId,
+            @Valid @RequestBody VoiceVerificationRequest request) {
+        
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -63,8 +52,8 @@ public class VoiceBiometricsController {
 
     @PostMapping("/verify")
     public ResponseEntity<VoiceVerificationResponse> verifyVoice(
-            @RequestBody VoiceVerificationRequest request) {
-
+            @Valid @RequestBody VoiceVerificationRequest request) {
+        
         if (request.getUserId() == null) {
             return ResponseEntity.badRequest()
                     .body(new VoiceVerificationResponse(false, 0, "UserId is required"));

@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/complaints/bulk")
-@CrossOrigin(origins = "*")
 public class BulkComplaintController {
 
     @Autowired
@@ -18,7 +17,7 @@ public class BulkComplaintController {
 
     @PostMapping("/resolve")
     public ResponseEntity<Map<String, Object>> bulkResolve(
-            @RequestBody Map<String, Object> request) {
+            @Valid @RequestBody Map<String, Object> request) {
         
         List<Long> complaintIds = (List<Long>) request.get("complaintIds");
         String resolutionNotes = (String) request.get("resolutionNotes");
@@ -36,7 +35,7 @@ public class BulkComplaintController {
 
     @PostMapping("/status")
     public ResponseEntity<Map<String, Object>> bulkUpdateStatus(
-            @RequestBody Map<String, Object> request) {
+            @Valid @RequestBody Map<String, Object> request) {
         
         List<Long> complaintIds = (List<Long>) request.get("complaintIds");
         String newStatus = (String) request.get("status");

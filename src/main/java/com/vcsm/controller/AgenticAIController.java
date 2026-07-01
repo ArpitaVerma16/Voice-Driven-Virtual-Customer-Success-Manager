@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agentic")
-@CrossOrigin(origins = "*")
 public class AgenticAIController {
 
     @Autowired

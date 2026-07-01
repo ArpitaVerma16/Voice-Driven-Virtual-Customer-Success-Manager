@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AppUserRepository userRepository;
@@ -73,10 +72,4 @@ public class AuthController {
         return errorResponse(ex.getMessage());
     }
 
-    private Map<String, Object> errorResponse(String message) {
-        return Map.of(
-                "error", message,
-                "success", false
-        );
-    }
-}
+
