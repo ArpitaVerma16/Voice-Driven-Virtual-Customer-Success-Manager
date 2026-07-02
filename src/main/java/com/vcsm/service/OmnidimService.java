@@ -97,9 +97,7 @@ public class OmnidimService {
             if (email != null) {
                 user = userRepository.findByEmail(email).orElse(null);
             }
-            if (user == null) {
-                user = userRepository.findById(1L).orElse(null); // Fallback to 1L
-            }
+
 
             if (user != null) {
                 boolean success = !intent.equals("UNKNOWN");
@@ -145,9 +143,7 @@ public class OmnidimService {
         if (email != null) {
             user = userRepository.findByEmail(email).orElse(null);
         }
-        if (user == null) {
-            user = userRepository.findById(1L).orElse(null); // Fallback to 1L
-        }
+
 
         if (user == null) {
             return org.springframework.http.ResponseEntity.ok("User not found. Please log in first.");
@@ -205,9 +201,7 @@ public class OmnidimService {
         if (email != null) {
             user = userRepository.findByEmail(email).orElse(null);
         }
-        if (user == null) {
-            user = userRepository.findById(1L).orElse(null); // Fallback to 1L
-        }
+
 
         Complaint complaint = new Complaint();
         if (user != null) {
@@ -239,7 +233,14 @@ public class OmnidimService {
     }
 
     private String handleAnalytics() {
-        Map<String, Long> s = complaintService.getComplaintStats();
+        Map<String, Long> s;
+        try {
+            s = complaintService.getComplaintStats();
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            // Community-wide statistics are admin-only; do not leak them
+            // through the public voice endpoint.
+            return "Community analytics are only available to administrators.";
+        }
         return "Summary: " + s.get("total") + " complaints (" + s.get("open") + " open, "
                 + s.get("resolved") + " resolved). " + eventService.getActiveEvents().size() + " active events.";
     }
@@ -262,9 +263,7 @@ public class OmnidimService {
         if (email != null) {
             user = userRepository.findByEmail(email).orElse(null);
         }
-        if (user == null) {
-            user = userRepository.findById(1L).orElse(null); // Fallback to 1L
-        }
+
         if (user == null) {
             return org.springframework.http.ResponseEntity.ok("Unable to book event: user session not found.");
         }
