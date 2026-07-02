@@ -7,6 +7,7 @@ import com.vcsm.model.Event;
 import com.vcsm.repository.VoiceCommandRepository;
 import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import com.vcsm.model.VenueReservation;
 
+@Profile("dev")
 @Service
 public class OmnidimService {
 

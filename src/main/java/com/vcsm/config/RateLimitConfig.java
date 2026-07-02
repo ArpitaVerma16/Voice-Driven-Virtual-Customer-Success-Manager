@@ -3,7 +3,7 @@ package com.vcsm.config;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.annotation.Configuration;
 
 import java.time.Duration;
 

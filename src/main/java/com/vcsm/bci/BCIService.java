@@ -1,10 +1,12 @@
 package com.vcsm.bci;
 
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Profile;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Profile("dev")
 @Service
 public class BCIService {
 

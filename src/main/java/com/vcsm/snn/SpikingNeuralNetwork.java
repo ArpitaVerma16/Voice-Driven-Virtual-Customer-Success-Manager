@@ -3,11 +3,13 @@ package com.vcsm.snn;
 import com.vcsm.snn.LIFNeuronModel.LIFNeuron;
 import com.vcsm.snn.LIFNeuronModel.LayerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Profile("dev")
 @Service
 public class SpikingNeuralNetwork {
 
