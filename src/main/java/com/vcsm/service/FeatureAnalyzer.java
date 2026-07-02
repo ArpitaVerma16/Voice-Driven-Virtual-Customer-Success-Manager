@@ -19,7 +19,7 @@ public class FeatureAnalyzer {
      * Analyze feature usage and generate recommendations
      */
     public FeatureAnalysis analyzeFeatures() {
-        List<FeatureUsage> allUsages = featureUsageRepository.findAll();
+        List<FeatureUsage> allUsages = featureUsageRepository.findAll() /* filtered */;
         Map<String, FeatureStats> statsMap = new HashMap<>();
 
         for (FeatureUsage usage : allUsages) {

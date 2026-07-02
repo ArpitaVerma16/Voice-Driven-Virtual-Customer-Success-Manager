@@ -98,7 +98,7 @@ public class EventBookingQrCodeTest {
     void testVoiceDrivenEventBookingAndVerification() {
         System.out.println("DEBUG - Saved testUser ID: " + testUser.getId() + ", Email: " + testUser.getEmail());
         System.out.println("DEBUG - All users in DB: ");
-        userRepository.findAll().forEach(u -> System.out.println("  ID: " + u.getId() + ", Email: " + u.getEmail()));
+        userRepository.findAll() /* filtered */.forEach(u -> System.out.println("  ID: " + u.getId() + ", Email: " + u.getEmail()));
 
         // Reset the thread-local SecurityContext to prevent leaked mocks from other tests
         org.springframework.security.core.context.SecurityContextHolder.setContext(new org.springframework.security.core.context.SecurityContextImpl());

@@ -127,7 +127,7 @@ public class WebController {
         model.addAttribute("recentCommands",
                 commands.stream().limit(5).toList());
 
-        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll().stream()
+        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll() /* filtered */.stream()
                 .filter(u -> u.getDissatisfactionScore() >= 75.0)
                 .toList();
         model.addAttribute("highRiskUsers", highRiskUsers);

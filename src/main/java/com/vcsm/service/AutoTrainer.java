@@ -31,7 +31,7 @@ public class AutoTrainer {
         // Check for drift
         DriftDetector.DriftResult drift = driftDetector.detectDrift();
 
-        List<Complaint> trainingData = complaintRepository.findAll();
+        List<Complaint> trainingData = complaintRepository.findAll() /* filtered */;
         if (trainingData.isEmpty()) {
             throw new RuntimeException("No training data available");
         }

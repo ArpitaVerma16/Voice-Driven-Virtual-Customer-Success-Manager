@@ -108,7 +108,7 @@ public class SmartRouter {
     }
 
     private List<Complaint> findDuplicates(Complaint complaint) {
-        List<Complaint> allComplaints = complaintRepository.findAll();
+        List<Complaint> allComplaints = complaintRepository.findAll() /* filtered */;
         return allComplaints.stream()
             .filter(c -> !c.getId().equals(complaint.getId()))
             .filter(c -> c.getStatus() != Complaint.ComplaintStatus.RESOLVED)

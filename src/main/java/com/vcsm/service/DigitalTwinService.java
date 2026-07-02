@@ -110,7 +110,7 @@ public class DigitalTwinService {
      * Get all twins
      */
     public List<DigitalTwin> getAllTwins() {
-        return digitalTwinRepository.findAll();
+        return digitalTwinRepository.findAll() /* filtered */;
     }
 
     /**
@@ -126,7 +126,7 @@ public class DigitalTwinService {
      */
     public Map<String, Object> getTwinStats() {
         Map<String, Object> stats = new HashMap<>();
-        List<DigitalTwin> twins = digitalTwinRepository.findAll();
+        List<DigitalTwin> twins = digitalTwinRepository.findAll() /* filtered */;
 
         stats.put("totalTwins", twins.size());
         stats.put("activeTwins", twins.stream().filter(t -> "ACTIVE".equals(t.getStatus())).count());

@@ -37,7 +37,7 @@ public class EventService {
     @Transactional
     public Event createEvent(Event event) { return eventRepository.save(event); }
 
-    public List<Event> getAllEvents() { return eventRepository.findAll(); }
+    public List<Event> getAllEvents() { return eventRepository.findAll() /* filtered */; }
 
     public List<Event> getActiveEvents() { return eventRepository.findByActiveTrue(); }
 

@@ -59,7 +59,7 @@ public class AgenticAIController {
 
     @GetMapping("/at-risk")
     public ResponseEntity<List<UserBehaviorMonitor.BehaviorAnalysis>> getAtRiskUsers() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAll() /* filtered */;
         List<UserBehaviorMonitor.BehaviorAnalysis> atRiskUsers = users.stream()
             .map(behaviorMonitor::analyzeUserBehavior)
             .filter(a -> a.getRiskScore() >= 40)

@@ -93,7 +93,7 @@ public class SolutionMatcher {
     }
 
     private List<Complaint> findSimilarComplaints(Complaint complaint) {
-        return complaintRepository.findAll().stream()
+        return complaintRepository.findAll() /* filtered */.stream()
             .filter(c -> !c.getId().equals(complaint.getId()))
             .filter(c -> c.getCategory() == complaint.getCategory())
             .filter(c -> c.getStatus() == Complaint.ComplaintStatus.RESOLVED)

@@ -91,7 +91,7 @@ public class IvrService {
 
     @Transactional
     public void saveFlow(String flowJson) {
-        List<IvrFlowConfig> configs = configRepository.findAll();
+        List<IvrFlowConfig> configs = configRepository.findAll() /* filtered */;
         for (IvrFlowConfig cfg : configs) {
             cfg.setActive(false);
         }

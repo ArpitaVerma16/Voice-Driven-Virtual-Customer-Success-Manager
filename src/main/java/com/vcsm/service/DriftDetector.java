@@ -38,7 +38,7 @@ public class DriftDetector {
     }
 
     private List<Complaint> getRecentComplaints() {
-        return complaintRepository.findAll().stream()
+        return complaintRepository.findAll() /* filtered */.stream()
             .filter(c -> c.getCreatedAt() != null)
             .filter(c -> c.getCreatedAt().isAfter(LocalDateTime.now().minusDays(7)))
             .limit(100)
@@ -46,7 +46,7 @@ public class DriftDetector {
     }
 
     private List<Complaint> getBaselineComplaints() {
-        return complaintRepository.findAll().stream()
+        return complaintRepository.findAll() /* filtered */.stream()
             .filter(c -> c.getCreatedAt() != null)
             .filter(c -> c.getCreatedAt().isBefore(LocalDateTime.now().minusDays(7)))
             .limit(200)

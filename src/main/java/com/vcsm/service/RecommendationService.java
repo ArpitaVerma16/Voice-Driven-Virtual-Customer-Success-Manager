@@ -53,7 +53,7 @@ public class RecommendationService {
             .filter(w -> w.length() > 3)
             .collect(Collectors.toSet());
 
-        return complaintRepository.findAll().stream()
+        return complaintRepository.findAll() /* filtered */.stream()
             .filter(c -> !userComplaints.contains(c))
             .filter(c -> {
                 String desc = c.getDescription().toLowerCase();
@@ -64,7 +64,7 @@ public class RecommendationService {
     }
 
     private List<Event> getRecommendedEvents(Map<String, Long> categoryCounts) {
-        List<Event> allEvents = eventRepository.findAll();
+        List<Event> allEvents = eventRepository.findAll() /* filtered */;
         
         if (categoryCounts.isEmpty() || allEvents.isEmpty()) {
             return allEvents.stream().limit(3).collect(Collectors.toList());

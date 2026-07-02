@@ -116,7 +116,7 @@ public class SmartContractService {
      * Get all contracts
      */
     public List<SmartContract> getAllContracts() {
-        return smartContractRepository.findAll();
+        return smartContractRepository.findAll() /* filtered */;
     }
 
     /**

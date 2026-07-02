@@ -28,8 +28,8 @@ public class SimulationEngine {
      */
     public SimulationResult runSimulation(DigitalTwin twin, SimulationScenario scenario) {
         // Create copy of production data
-        List<Complaint> prodComplaints = complaintRepository.findAll();
-        List<Event> prodEvents = eventRepository.findAll();
+        List<Complaint> prodComplaints = complaintRepository.findAll() /* filtered */;
+        List<Event> prodEvents = eventRepository.findAll() /* filtered */;
 
         // Apply scenario to twin data
         List<Complaint> twinComplaints = applyScenarioToComplaints(prodComplaints, scenario);

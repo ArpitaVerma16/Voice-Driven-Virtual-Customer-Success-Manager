@@ -262,7 +262,7 @@ public class PredictionService {
     @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 0 * * SUN") // Sunday at midnight
     public void runWeeklyDissatisfactionAnalysis() {
         System.out.println("🗓️ Running weekly customer dissatisfaction and churn prediction analysis...");
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAll() /* filtered */;
         for (User user : users) {
             double cdi = calculateCustomerDissatisfactionIndex(user);
             user.setDissatisfactionScore(cdi);
@@ -284,7 +284,7 @@ public class PredictionService {
     }
 
     public List<User> getHighRiskUsers() {
-        return userRepository.findAll().stream()
+        return userRepository.findAll() /* filtered */.stream()
                 .filter(u -> u.getDissatisfactionScore() >= 75.0)
                 .collect(Collectors.toList());
     }

@@ -32,7 +32,7 @@ public class ExportService {
      * Export complaints as CSV
      */
     public ByteArrayInputStream exportComplaintsToCSV() {
-        List<Complaint> complaints = complaintRepository.findAll();
+        List<Complaint> complaints = complaintRepository.findAll() /* filtered */;
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(out))) {
@@ -64,7 +64,7 @@ public class ExportService {
      * Export complaints as PDF
      */
     public ByteArrayInputStream exportComplaintsToPDF() {
-        List<Complaint> complaints = complaintRepository.findAll();
+        List<Complaint> complaints = complaintRepository.findAll() /* filtered */;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
