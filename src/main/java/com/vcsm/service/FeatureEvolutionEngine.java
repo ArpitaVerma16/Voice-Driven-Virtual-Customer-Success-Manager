@@ -19,7 +19,7 @@ public class FeatureEvolutionEngine {
     @Autowired
     private ABTestingService abTestingService;
 
-    private final Map<String, Double> featureScores = new HashMap<>();
+    private final Map<String, Double> featureScores = new ConcurrentHashMap<>();
 
     /**
      * Run evolution cycle

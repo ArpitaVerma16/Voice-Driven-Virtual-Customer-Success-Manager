@@ -20,7 +20,7 @@ public class DigitalTwinService {
     @Autowired
     private SimulationEngine simulationEngine;
 
-    private final Map<Long, DigitalTwin> activeTwins = new HashMap<>();
+    private final Map<Long, DigitalTwin> activeTwins = new ConcurrentHashMap<>();
 
     /**
      * Create a new digital twin

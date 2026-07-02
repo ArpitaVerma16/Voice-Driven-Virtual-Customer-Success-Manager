@@ -17,9 +17,9 @@ public class HindiCommandMapper {
 
     private static final Logger log = LoggerFactory.getLogger(HindiCommandMapper.class);
     
-    private Map<String, String> commandMap = new HashMap<>();
-    private Map<String, String> responseMap = new HashMap<>();
-    private Map<String, String[]> keywordMap = new HashMap<>();
+    private Map<String, String> commandMap = new ConcurrentHashMap<>();
+    private Map<String, String> responseMap = new ConcurrentHashMap<>();
+    private Map<String, String[]> keywordMap = new ConcurrentHashMap<>();
     
     @PostConstruct
     public void init() {
