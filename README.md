@@ -82,7 +82,33 @@ The Voice Assistant supports natural language commands and automatically routes 
 | "Show complaint summary"        | Displays complaint summary   |
 | "Show total complaints"         | Retrieves complaint counts   |
 
-> The assistant uses keyword-based intent detection and may support additional natural language variations of these commands.
+### 🗣️ Voice Profile & Biometrics
+
+| Example Command                                   | Action                                    |
+| ------------------------------------------------- | ----------------------------------------- |
+| "Enroll my voice"                                 | Registers voice print for future auth     |
+| "Verify my identity"                              | Performs voice biometric verification     |
+| "Change my language to Hindi"                     | Switches voice interface language         |
+| "Switch to English"                               | Switches back to English                  |
+
+### 👤 Account & Profile
+
+| Example Command              | Action                        |
+| ---------------------------- | ----------------------------- |
+| "Show my profile"            | Opens user profile page       |
+| "Update my apartment number" | Prompts to update apartment   |
+| "Log out"                    | Logs out of the application   |
+
+### 🆘 Help & Navigation
+
+| Example Command            | Action                         |
+| -------------------------- | ------------------------------ |
+| "Help"                     | Shows available voice commands |
+| "Go to dashboard"          | Navigates to dashboard         |
+| "Show navigation"          | Displays navigation menu       |
+| "What can I say?"          | Lists all supported commands   |
+
+> The assistant uses keyword-based intent detection and may support additional natural language variations of these commands. Say "Help" at any time to see available commands.
 
 ---
 
