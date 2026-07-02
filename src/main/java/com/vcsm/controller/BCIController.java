@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bci")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class BCIController {
 

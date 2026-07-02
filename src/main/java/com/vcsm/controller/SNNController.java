@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/snn")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class SNNController {
 
