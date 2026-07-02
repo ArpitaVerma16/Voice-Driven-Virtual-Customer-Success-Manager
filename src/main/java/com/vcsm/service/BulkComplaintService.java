@@ -11,12 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class BulkComplaintService {
 
-    private static final Logger log = Logger.getLogger(BulkComplaintService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(BulkComplaintService.class);
 
     @Autowired
     private ComplaintRepository complaintRepository;
@@ -94,7 +95,7 @@ public class BulkComplaintService {
                 }
             } catch (Exception e) {
                 failed.add(id);
-                log.warning("Failed to resolve complaint " + id + ": " + e.getMessage());
+                log.warn("Failed to resolve complaint {}: {}", id, e.getMessage(), e);
             }
         }
 

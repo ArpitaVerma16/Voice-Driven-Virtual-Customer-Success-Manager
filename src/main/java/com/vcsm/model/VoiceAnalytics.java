@@ -1,6 +1,7 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,6 +20,7 @@ public class VoiceAnalytics {
     private String intent;
     private boolean success;
 
+    @Min(0)
     private long responseTime; // in milliseconds
 
     

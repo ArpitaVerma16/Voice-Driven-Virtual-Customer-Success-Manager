@@ -169,4 +169,3 @@ public class InteractionController {
         return ResponseEntity.ok(stats);
     }
 }
-

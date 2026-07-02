@@ -8,6 +8,8 @@ import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.EventRepository;
 import com.vcsm.repository.UserRepository;
 import com.vcsm.service.TwilioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping("/api/twilio")
 public class TwilioController {
+
+    private static final Logger log = LoggerFactory.getLogger(TwilioController.class);
 
     @Autowired
     private TwilioService twilioService;

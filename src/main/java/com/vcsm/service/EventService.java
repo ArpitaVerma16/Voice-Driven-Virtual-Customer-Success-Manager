@@ -1,5 +1,6 @@
 package com.vcsm.service;
 
+import com.vcsm.exception.EventCapacityExceededException;
 import com.vcsm.model.Event;
 import com.vcsm.model.User;
 import com.vcsm.model.EventRegistration;
@@ -33,13 +34,7 @@ public class EventService {
     @Autowired
     private EmailLogRepository emailLogRepository;
 
-    @Autowired
-    private com.vcsm.security.jwt.JwtService jwtService;
-
-    @Autowired
-    @org.springframework.context.annotation.Lazy
-    private ReminderScheduler reminderScheduler;
-
+    @Transactional
     public Event createEvent(Event event) { return eventRepository.save(event); }
 
     public List<Event> getAllEvents() { return eventRepository.findAll(); }
@@ -56,6 +51,7 @@ public class EventService {
 
     public Optional<Event> getEventById(Long id) { return eventRepository.findById(id); }
 
+    @Transactional
     public Event updateEvent(Long id, Event updated) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));
@@ -68,6 +64,7 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    @Transactional
     public Event registerForEvent(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
@@ -90,10 +87,10 @@ public class EventService {
 
         // Capacity validation
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException(
-                "Event Full! Maximum capacity of "
-                        + event.getMaxCapacity()
-                        + " participants reached."
+            throw new EventCapacityExceededException(
+                "Event has reached its maximum capacity of "
+                    + event.getMaxCapacity()
+                    + " participants."
             );
         }
 

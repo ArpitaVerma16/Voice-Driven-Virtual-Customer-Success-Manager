@@ -8,6 +8,7 @@ import com.vcsm.security.model.UserRole;
 import com.vcsm.security.repo.AppUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 

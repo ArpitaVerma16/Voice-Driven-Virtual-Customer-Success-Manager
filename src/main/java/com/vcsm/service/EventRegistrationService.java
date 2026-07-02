@@ -7,6 +7,7 @@ import com.vcsm.repository.EventRepository;
 import com.vcsm.repository.EventRegistrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class EventRegistrationService {
     /**
      * Register a user for an event
      */
+    @Transactional
     public Event registerUserForEvent(Event event, User user) {
         // Check if event exists
         if (event == null) {
@@ -67,6 +69,7 @@ public class EventRegistrationService {
     /**
      * Cancel registration for an event
      */
+    @Transactional
     public Event cancelRegistration(Event event, User user) {
         if (event == null) {
             throw new RuntimeException("Event not found");

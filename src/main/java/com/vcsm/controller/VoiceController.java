@@ -146,8 +146,12 @@ public class VoiceController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<VoiceCommand>> history() {
-        return ResponseEntity.ok(omnidimService.getRecentCommands());
+    public ResponseEntity<List<VoiceCommand>> history(
+            @RequestParam(required = false) Boolean success) {
+
+        return ResponseEntity.ok(
+                omnidimService.getRecentCommands(success)
+        );
     }
 
     @GetMapping("/flow-config")
@@ -165,4 +169,3 @@ public class VoiceController {
         return ResponseEntity.ok(Map.of("message", "IVR Flow Configuration updated successfully", "success", true));
     }
 }
-

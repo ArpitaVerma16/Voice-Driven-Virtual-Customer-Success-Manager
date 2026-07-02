@@ -253,6 +253,13 @@ public class OmnidimService {
         return voiceCommandRepository.findTop10ByOrderByCreatedAtDesc();
     }
 
+    public List<VoiceCommand> getRecentCommands(Boolean success) {
+
+        if (success == null) {
+            return voiceCommandRepository.findTop10ByOrderByCreatedAtDesc();
+        }
+
+        return voiceCommandRepository.findByProcessedOrderByCreatedAtDesc(success);
     private String handleEventBooking(String t) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth != null ? auth.getName() : null;

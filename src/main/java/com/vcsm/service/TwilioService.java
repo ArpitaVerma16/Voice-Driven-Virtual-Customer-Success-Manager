@@ -8,12 +8,16 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class TwilioService {
+
+    private static final Logger log = LoggerFactory.getLogger(TwilioService.class);
 
     @Value("${twilio.account.sid}")
     private String accountSid;
@@ -52,6 +56,7 @@ public class TwilioService {
             
         } catch (Exception e) {
             log.error("❌ Failed to make call: " + e.getMessage());
+            log.error("Failed to make call to {}: {}", toPhoneNumber, e.getMessage(), e);
             return null;
         }
     }
@@ -72,6 +77,7 @@ public class TwilioService {
             
         } catch (Exception e) {
             log.error("❌ Failed to send SMS: " + e.getMessage());
+            log.error("Failed to send SMS to {}: {}", toPhoneNumber, e.getMessage(), e);
             return null;
         }
     }

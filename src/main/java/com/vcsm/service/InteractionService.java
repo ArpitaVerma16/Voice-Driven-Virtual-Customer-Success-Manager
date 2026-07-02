@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,6 +38,7 @@ public class InteractionService {
     /**
      * Create a new interaction
      */
+    @Transactional
     public Interaction createInteraction(Interaction interaction) {
         String username = getCurrentUsername();
         if (username == null) throw new RuntimeException("Unauthorized");
@@ -218,6 +220,7 @@ public class InteractionService {
     /**
      * Update an interaction
      */
+    @Transactional
     public Interaction updateInteraction(Long id, Interaction updatedInteraction) {
         Optional<Interaction> existing = interactionRepository.findById(id);
         if (existing.isEmpty()) {
@@ -259,6 +262,7 @@ public class InteractionService {
     /**
      * Delete an interaction
      */
+    @Transactional
     public void deleteInteraction(Long id) {
         Optional<Interaction> interaction = interactionRepository.findById(id);
         if (interaction.isEmpty()) {

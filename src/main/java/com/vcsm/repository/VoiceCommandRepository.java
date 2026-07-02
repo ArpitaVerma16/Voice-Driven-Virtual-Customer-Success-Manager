@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public interface VoiceCommandRepository extends JpaRepository<VoiceCommand, Long> {
     List<VoiceCommand> findByIntent(String intent);
     List<VoiceCommand> findTop10ByOrderByCreatedAtDesc();
+    List<VoiceCommand> findByProcessedOrderByCreatedAtDesc(boolean processed);
 
     @Query("SELECT v.intent, COUNT(v) as intentCount FROM VoiceCommand v WHERE v.createdAt >= :startDate GROUP BY v.intent ORDER BY intentCount DESC")
     List<Object[]> findTopIntents(@Param("startDate") LocalDateTime startDate);
