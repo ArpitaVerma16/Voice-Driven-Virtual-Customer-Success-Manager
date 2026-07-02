@@ -30,3 +30,4 @@ public class IntentScore {
         return "IntentScore{" + "intent=" + intent + ", score=" + String.format("%.3f", score) + ", matches=" + keywordMatches + '}';
     }
 }
+

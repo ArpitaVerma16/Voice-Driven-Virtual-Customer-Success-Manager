@@ -36,3 +36,4 @@ public class IntentResult {
         return String.format("%s (%.1f%% confidence)", classifiedIntent.getDescription(), confidence * 100);
     }
 }
+

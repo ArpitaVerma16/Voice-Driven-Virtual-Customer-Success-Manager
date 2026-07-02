@@ -3,10 +3,15 @@ package com.vcsm.dto;
 import java.util.List;
 
 public class IvrNode {
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("prompt")
     private String prompt;
+    @JsonProperty("pattern")
     private String pattern;
+    @JsonProperty("action")
     private String action;
+    @JsonProperty("options")
     private List<IvrNode> options;
 
     public IvrNode() {}
@@ -26,3 +31,4 @@ public class IvrNode {
     public List<IvrNode> getOptions() { return options; }
     public void setOptions(List<IvrNode> options) { this.options = options; }
 }
+
