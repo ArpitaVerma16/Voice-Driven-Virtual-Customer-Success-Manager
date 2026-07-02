@@ -17,7 +17,7 @@ public class IntentClassificationController {
     private IntentClassificationService intentClassificationService;
 
     @PostMapping("/classify")
-    public ResponseEntity<Map<String, Object>> classify(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> classify(@Valid @RequestBody Map<String, String> request) {
         String transcript = request.get("transcript");
 
         if (transcript == null || transcript.trim().isEmpty()) {

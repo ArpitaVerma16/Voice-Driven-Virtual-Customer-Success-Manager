@@ -28,12 +28,12 @@ public class ArchitectureController {
     }
 
     @PostMapping("/predict")
-    public ResponseEntity<PerformancePredictor.PredictedPerformance> predict(@RequestBody NeuralArchitecture architecture) {
+    public ResponseEntity<PerformancePredictor.PredictedPerformance> predict(@Valid @RequestBody NeuralArchitecture architecture) {
         return ResponseEntity.ok(performancePredictor.predict(architecture));
     }
 
     @PostMapping("/compare")
-    public ResponseEntity<PerformancePredictor.ComparisonResult> compare(@RequestBody CompareRequest request) {
+    public ResponseEntity<PerformancePredictor.ComparisonResult> compare(@Valid @RequestBody CompareRequest request) {
         return ResponseEntity.ok(performancePredictor.compare(request.getArch1(), request.getArch2()));
     }
 

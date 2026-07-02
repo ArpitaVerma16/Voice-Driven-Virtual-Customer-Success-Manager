@@ -19,7 +19,7 @@ public class MultiModalController {
     @PostMapping("/analyze")
     public ResponseEntity<ContextualEmotionAI.EmotionAnalysis> analyzeEmotion(
             @RequestParam String userId,
-            @RequestBody MultiModalRequest request) {
+            @Valid @RequestBody MultiModalRequest request) {
         return ResponseEntity.ok(contextualEmotionAI.analyzeEmotion(
             userId,
             request.getText(),

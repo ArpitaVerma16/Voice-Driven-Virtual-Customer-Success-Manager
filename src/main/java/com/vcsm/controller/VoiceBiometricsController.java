@@ -33,6 +33,19 @@ public class VoiceBiometricsController {
             @PathVariable Long userId,
             @Valid @RequestBody VoiceVerificationRequest request) {
         
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody VoiceVerificationRequest request) {
+
+        // Security fix:
+        // Never trust a client-supplied user ID.
+        // Always use the authenticated user's identity from the security context.
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new VoiceVerificationResponse(false, 0, "Authentication required"));
+        }
+
+        Long userId = userDetails.getId();
+
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -54,6 +67,8 @@ public class VoiceBiometricsController {
     public ResponseEntity<VoiceVerificationResponse> verifyVoice(
             @Valid @RequestBody VoiceVerificationRequest request) {
         
+            @Valid @RequestBody VoiceVerificationRequest request) {
+
         if (request.getUserId() == null) {
             return ResponseEntity.badRequest()
                     .body(new VoiceVerificationResponse(false, 0, "UserId is required"));

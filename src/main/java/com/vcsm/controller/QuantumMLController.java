@@ -23,27 +23,27 @@ public class QuantumMLController {
     }
 
     @PostMapping("/feature-map")
-    public ResponseEntity<double[]> featureMap(@RequestBody double[] data) {
+    public ResponseEntity<double[]> featureMap(@Valid @RequestBody double[] data) {
         return ResponseEntity.ok(quantumMLService.quantumFeatureMap(data));
     }
 
     @PostMapping("/kernel")
-    public ResponseEntity<Double> kernel(@RequestBody KernelRequest request) {
+    public ResponseEntity<Double> kernel(@Valid @RequestBody KernelRequest request) {
         return ResponseEntity.ok(quantumMLService.quantumKernel(request.getX1(), request.getX2()));
     }
 
     @PostMapping("/infer")
-    public ResponseEntity<QuantumMLService.QuantumInferenceResult> infer(@RequestBody double[] input) {
+    public ResponseEntity<QuantumMLService.QuantumInferenceResult> infer(@Valid @RequestBody double[] input) {
         return ResponseEntity.ok(quantumMLService.quantumInference(input));
     }
 
     @PostMapping("/train")
-    public ResponseEntity<QuantumMLService.QuantumModel> train(@RequestBody TrainingRequest request) {
+    public ResponseEntity<QuantumMLService.QuantumModel> train(@Valid @RequestBody TrainingRequest request) {
         return ResponseEntity.ok(quantumMLService.trainModel(request.getData(), request.getLabels()));
     }
 
     @PostMapping("/hybrid-predict")
-    public ResponseEntity<Double> hybridPredict(@RequestBody double[] input) {
+    public ResponseEntity<Double> hybridPredict(@Valid @RequestBody double[] input) {
         return ResponseEntity.ok(quantumMLService.hybridPredict(input));
     }
 

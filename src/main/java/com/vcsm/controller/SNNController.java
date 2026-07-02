@@ -25,12 +25,12 @@ public class SNNController {
     }
 
     @PostMapping("/forward")
-    public ResponseEntity<SpikingNeuralNetwork.SNNResponse> forward(@RequestBody double[] input) {
+    public ResponseEntity<SpikingNeuralNetwork.SNNResponse> forward(@Valid @RequestBody double[] input) {
         return ResponseEntity.ok(spikingNeuralNetwork.forward(input));
     }
 
     @PostMapping("/train")
-    public ResponseEntity<Map<String, String>> train(@RequestBody TrainingRequest request) {
+    public ResponseEntity<Map<String, String>> train(@Valid @RequestBody TrainingRequest request) {
         spikingNeuralNetwork.train(request.getData(), request.getEpochs());
         return ResponseEntity.ok(Map.of("status", "success", "message", "Training completed"));
     }

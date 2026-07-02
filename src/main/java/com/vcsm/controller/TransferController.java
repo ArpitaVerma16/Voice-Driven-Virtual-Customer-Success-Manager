@@ -29,7 +29,7 @@ public class TransferController {
     public ResponseEntity<FederatedTransferService.FederatedNode> registerNode(
             @RequestParam String nodeId,
             @RequestParam String domain,
-            @RequestBody double[] domainFeatures) {
+            @Valid @RequestBody double[] domainFeatures) {
         return ResponseEntity.ok(federatedTransferService.registerNode(nodeId, domain, domainFeatures));
     }
 
@@ -79,7 +79,7 @@ public class TransferController {
     @PostMapping("/knowledge/create")
     public ResponseEntity<KnowledgeTransfer.KnowledgeBase> createKnowledgeBase(
             @RequestParam String domain,
-            @RequestBody KnowledgeRequest request) {
+            @Valid @RequestBody KnowledgeRequest request) {
         return ResponseEntity.ok(knowledgeTransfer.createKnowledgeBase(
             domain, request.getData(), request.getLabels()
         ));

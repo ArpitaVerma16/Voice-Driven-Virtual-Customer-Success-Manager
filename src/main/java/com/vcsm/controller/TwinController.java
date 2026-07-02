@@ -27,7 +27,7 @@ public class TwinController {
     @PostMapping("/sync")
     public ResponseEntity<Map<String, String>> syncData(
             @RequestParam String twinId,
-            @RequestBody SyncRequest request) {
+            @Valid @RequestBody SyncRequest request) {
         predictiveDigitalTwin.syncData(twinId, request.getMetrics(), request.getState());
         return ResponseEntity.ok(Map.of("status", "success", "message", "Data synced"));
     }

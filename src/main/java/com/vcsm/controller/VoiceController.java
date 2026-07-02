@@ -49,6 +49,8 @@ public class VoiceController {
     @PostMapping("/command")
     public ResponseEntity<Map<String, Object>> command(@Valid @RequestBody VoiceCommandRequest request) {
         String transcript = request.getTranscript();
+    public ResponseEntity<?> command(@Valid @RequestBody Map<String, String> body) {
+        String transcript = body.get("transcript");
         
         if (transcript == null || transcript.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Transcript required", "success", false));
@@ -160,7 +162,7 @@ public class VoiceController {
     }
 
     @PostMapping("/flow-config")
-    public ResponseEntity<Map<String, Object>> saveFlowConfig(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, Object>> saveFlowConfig(@Valid @RequestBody Map<String, String> body) {
         String flowJson = body.get("flowJson");
         if (flowJson == null || flowJson.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "flowJson is required", "success", false));

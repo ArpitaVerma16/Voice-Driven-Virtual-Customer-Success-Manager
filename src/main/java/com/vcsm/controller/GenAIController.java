@@ -23,7 +23,7 @@ public class GenAIController {
     }
 
     @PostMapping("/summarize")
-    public ResponseEntity<GenAIResolver.CallSummaryResult> summarizeCallSession(@RequestBody Map<String, String> request) {
+    public ResponseEntity<GenAIResolver.CallSummaryResult> summarizeCallSession(@Valid @RequestBody Map<String, String> request) {
         String transcript = request.get("transcript");
         String residentEmail = request.get("residentEmail");
         
