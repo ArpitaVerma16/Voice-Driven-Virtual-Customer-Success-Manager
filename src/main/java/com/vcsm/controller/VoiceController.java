@@ -46,7 +46,7 @@ public class VoiceController {
     private com.vcsm.service.EventRegistrationService eventRegistrationService;
 
     @PostMapping("/command")
-    public ResponseEntity<?> command(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> command(@Valid @RequestBody Map<String, String> body) {
         String transcript = body.get("transcript");
         
         if (transcript == null || transcript.isBlank()) {
@@ -155,7 +155,7 @@ public class VoiceController {
     }
 
     @PostMapping("/flow-config")
-    public ResponseEntity<Map<String, Object>> saveFlowConfig(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, Object>> saveFlowConfig(@Valid @RequestBody Map<String, String> body) {
         String flowJson = body.get("flowJson");
         if (flowJson == null || flowJson.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "flowJson is required", "success", false));
@@ -164,3 +164,4 @@ public class VoiceController {
         return ResponseEntity.ok(Map.of("message", "IVR Flow Configuration updated successfully", "success", true));
     }
 }
+

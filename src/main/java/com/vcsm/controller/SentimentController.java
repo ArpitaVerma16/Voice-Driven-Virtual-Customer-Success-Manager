@@ -24,7 +24,7 @@ public class SentimentController {
     private SentimentClassifier sentimentClassifier;
     
     @PostMapping("/analyze")
-    public ResponseEntity<Map<String, Object>> analyzeSentiment(@RequestBody VoiceVerificationRequest request) {
+    public ResponseEntity<Map<String, Object>> analyzeSentiment(@Valid @RequestBody VoiceVerificationRequest request) {
         SentimentAnalysis result = sentimentService.analyzeAndProcess(
             request.getUserId(), 
             request.getText() != null ? request.getText() : ""
@@ -67,7 +67,7 @@ public class SentimentController {
     }
     
     @PostMapping("/test")
-    public ResponseEntity<Map<String, Object>> testSentiment(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> testSentiment(@Valid @RequestBody Map<String, String> request) {
         String text = request.get("text");
         SentimentClassifier.SentimentResult result = sentimentClassifier.analyze(text);
         

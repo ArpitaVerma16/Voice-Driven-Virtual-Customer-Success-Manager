@@ -31,7 +31,7 @@ public class SecurityController {
     @PostMapping("/detect-deepfake")
     public ResponseEntity<DeepfakeDetector.DeepfakeAnalysis> detectDeepfake(
             @RequestParam String userId,
-            @RequestBody byte[] audioData) {
+            @Valid @RequestBody byte[] audioData) {
         
         DeepfakeDetector.DeepfakeAnalysis analysis = deepfakeDetector.analyze(audioData, userId);
         

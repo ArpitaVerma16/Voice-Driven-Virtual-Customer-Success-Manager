@@ -25,13 +25,13 @@ public class PredictionController {
     @PostMapping("/event/{eventId}")
     public ResponseEntity<Map<String, Object>> predictEvent(
             @PathVariable Long eventId,
-            @RequestBody(required = false) List<Map<String, Object>> historicalData) {
+            @Valid @RequestBody(required = false) List<Map<String, Object>> historicalData) {
         return ResponseEntity.ok(predictionService.predictEventAttendance(eventId, historicalData));
     }
 
     @PostMapping("/sentiment")
     public ResponseEntity<Map<String, Object>> predictSentiment(
-            @RequestBody(required = false) List<Map<String, Object>> historicalSentiment) {
+            @Valid @RequestBody(required = false) List<Map<String, Object>> historicalSentiment) {
         return ResponseEntity.ok(predictionService.predictSentiment(historicalSentiment));
     }
 

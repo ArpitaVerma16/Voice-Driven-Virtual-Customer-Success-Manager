@@ -20,7 +20,7 @@ public class TriageController {
     private TriageService triageService;
 
     @PostMapping("/classify")
-    public ResponseEntity<TriageRequest> classifyComplaint(@RequestBody Complaint complaint) {
+    public ResponseEntity<TriageRequest> classifyComplaint(@Valid @RequestBody Complaint complaint) {
         TriageRequest result = triageService.triageComplaint(complaint);
         return ResponseEntity.ok(result);
     }

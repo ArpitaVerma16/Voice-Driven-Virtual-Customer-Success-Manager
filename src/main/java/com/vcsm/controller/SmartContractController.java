@@ -19,7 +19,7 @@ public class SmartContractController {
     private SmartContractService smartContractService;
 
     @PostMapping
-    public ResponseEntity<SmartContract> createContract(@RequestBody SmartContract contract) {
+    public ResponseEntity<SmartContract> createContract(@Valid @RequestBody SmartContract contract) {
         return ResponseEntity.ok(smartContractService.createContract(contract));
     }
 

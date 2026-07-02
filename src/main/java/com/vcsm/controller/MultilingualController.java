@@ -36,7 +36,7 @@ public class MultilingualController {
     }
 
     @PostMapping("/detect")
-    public ResponseEntity<Map<String, Object>> detectLanguage(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> detectLanguage(@Valid @RequestBody Map<String, String> request) {
         String audioTranscript = request.get("transcript");
 
         if (audioTranscript == null || audioTranscript.isEmpty()) {
@@ -57,7 +57,7 @@ public class MultilingualController {
     }
 
     @PostMapping("/response")
-    public ResponseEntity<Map<String, Object>> getResponse(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> getResponse(@Valid @RequestBody Map<String, String> request) {
         String languageCode = request.get("language");
         String responseKey = request.get("responseKey");
 
@@ -88,3 +88,4 @@ public class MultilingualController {
         ));
     }
 }
+

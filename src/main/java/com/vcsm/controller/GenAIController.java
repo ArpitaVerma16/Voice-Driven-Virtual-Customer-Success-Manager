@@ -18,13 +18,13 @@ public class GenAIController {
     private GenAIResolver genAIResolver;
 
     @PostMapping("/resolve")
-    public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@RequestBody Complaint complaint) {
+    public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@Valid @RequestBody Complaint complaint) {
         GenAIResolver.ResolutionResult result = genAIResolver.resolveComplaint(complaint);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/summarize")
-    public ResponseEntity<GenAIResolver.CallSummaryResult> summarizeCallSession(@RequestBody Map<String, String> request) {
+    public ResponseEntity<GenAIResolver.CallSummaryResult> summarizeCallSession(@Valid @RequestBody Map<String, String> request) {
         String transcript = request.get("transcript");
         String residentEmail = request.get("residentEmail");
         

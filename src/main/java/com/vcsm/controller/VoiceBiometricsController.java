@@ -32,7 +32,7 @@ public class VoiceBiometricsController {
     @PostMapping("/enroll")
     public ResponseEntity<VoiceVerificationResponse> enrollVoice(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody VoiceVerificationRequest request) {
+            @Valid @RequestBody VoiceVerificationRequest request) {
 
         // Security fix:
         // Never trust a client-supplied user ID.
@@ -63,7 +63,7 @@ public class VoiceBiometricsController {
 
     @PostMapping("/verify")
     public ResponseEntity<VoiceVerificationResponse> verifyVoice(
-            @RequestBody VoiceVerificationRequest request) {
+            @Valid @RequestBody VoiceVerificationRequest request) {
 
         if (request.getUserId() == null) {
             return ResponseEntity.badRequest()

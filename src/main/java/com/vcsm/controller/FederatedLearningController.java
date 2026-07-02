@@ -26,7 +26,7 @@ public class FederatedLearningController {
     public ResponseEntity<FederatedLearningService.ClientParticipation> participate(
             @RequestParam String roundId,
             @RequestParam String clientId,
-            @RequestBody FederatedData data) {
+            @Valid @RequestBody FederatedData data) {
         return ResponseEntity.ok(federatedLearningService.participate(
             roundId, clientId, data.getFeatures(), data.getLabels()
         ));

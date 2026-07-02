@@ -28,7 +28,7 @@ public class IotAlertController {
     private TwilioService twilioService;
 
     @PostMapping("/alert")
-    public ResponseEntity<Map<String, Object>> handleIotAlert(@RequestBody IotAlertPayload payload) {
+    public ResponseEntity<Map<String, Object>> handleIotAlert(@Valid @RequestBody IotAlertPayload payload) {
         if (payload.getSensorId() == null || payload.getSensorType() == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Sensor ID and type are required"));
         }
@@ -143,3 +143,4 @@ public class IotAlertController {
         public void setResidentPhoneNumber(String residentPhoneNumber) { this.residentPhoneNumber = residentPhoneNumber; }
     }
 }
+

@@ -20,7 +20,7 @@ public class DigitalTwinController {
     private DigitalTwinService digitalTwinService;
 
     @PostMapping
-    public ResponseEntity<DigitalTwin> createTwin(@RequestBody DigitalTwin twin) {
+    public ResponseEntity<DigitalTwin> createTwin(@Valid @RequestBody DigitalTwin twin) {
         return ResponseEntity.ok(digitalTwinService.createTwin(twin));
     }
 

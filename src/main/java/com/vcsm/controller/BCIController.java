@@ -64,7 +64,7 @@ public class BCIController {
     @PostMapping("/signal")
     public ResponseEntity<?> processSignal(
             @RequestParam String sessionId,
-            @RequestBody double[] signalData,
+            @Valid @RequestBody double[] signalData,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
