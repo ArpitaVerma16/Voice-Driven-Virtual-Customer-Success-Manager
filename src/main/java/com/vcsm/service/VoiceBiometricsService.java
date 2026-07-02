@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.User;
 import com.vcsm.model.VoicePrint;
@@ -15,7 +17,7 @@ import java.util.Optional;
 @Service
 public class VoiceBiometricsService {
     
-    private static final double VERIFICATION_THRESHOLD = 0.75;
+    private static final double VERIFICATION_THRESHOLD = AppConstants.VOICE_VERIFICATION_THRESHOLD;
     private static final int SAMPLE_RATE = 16000;
     
     @Autowired

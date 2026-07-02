@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.EmailQueue;
 import com.vcsm.model.Event;
@@ -74,7 +76,7 @@ public class ReminderScheduler {
     /**
      * Polls the email queue and processes pending emails that are due
      */
-    @Scheduled(fixedDelay = 10000) // Every 10 seconds
+    @Scheduled(fixedDelay = AppConstants.SCHEDULER_POLL_MS) // Every 10 seconds
     public void processEmailQueue() {
         LocalDateTime now = LocalDateTime.now();
         List<EmailQueue> pendingEmails = emailQueueRepository.findByStatusAndNextAttemptAtBefore("PENDING", now);

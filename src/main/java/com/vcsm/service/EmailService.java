@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.EmailLog;
 import com.vcsm.model.EmailQueue;
@@ -234,3 +236,4 @@ public class EmailService {
         }
     }
 }
+
