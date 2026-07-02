@@ -86,10 +86,7 @@ public class TriageService {
         return Math.min(100, severity);
     }
 
-    private boolean containsAny(String text, String... keywords) {
-        for (String keyword : keywords) {
-            if (text.contains(keyword)) return true;
-        }
+    // Replaced by ComplaintRoutingUtils.containsAny()
         return false;
     }
 
