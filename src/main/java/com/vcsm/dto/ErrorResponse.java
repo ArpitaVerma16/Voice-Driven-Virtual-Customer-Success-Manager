@@ -4,11 +4,17 @@ import java.time.LocalDateTime;
 
 public class ErrorResponse {
 
+    @JsonProperty("status")
     private int status;
+    @JsonProperty("error")
     private String error;
+    @JsonProperty("message")
     private String message;
+    @JsonProperty("userMessage")
     private String userMessage;
+    @JsonProperty("path")
     private String path;
+    @JsonProperty("timestamp")
     private LocalDateTime timestamp;
 
     public ErrorResponse() {
@@ -89,3 +95,4 @@ public class ErrorResponse {
         this.timestamp = timestamp;
     }
 }
+
