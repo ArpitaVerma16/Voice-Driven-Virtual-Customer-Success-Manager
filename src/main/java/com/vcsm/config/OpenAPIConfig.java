@@ -37,7 +37,7 @@ public class OpenAPIConfig {
                     .name("MIT License")
                     .url("https://opensource.org/licenses/MIT")))
             .servers(List.of(
-                new Server().url("http://localhost:8080").description("Local Development Server"),
+                new Server().url(System.getenv().getOrDefault("API_URL", "https://api.production.com")).description("Local Development Server"),
                 new Server().url("https://vcsm.onrender.com").description("Production Server")
             ));
     }
