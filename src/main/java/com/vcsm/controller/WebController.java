@@ -97,10 +97,12 @@ public class WebController {
             stats.put("resolved", 0L);
         }
 
-        List<?> complaints = complaintService.getAllComplaints();
+        // Recent complaints via a LIMIT 5 query instead of loading the whole
+        // complaints table; page load time no longer scales with table size.
+        List<?> recentComplaints = complaintService.getRecentComplaints(5);
 
-        if (complaints == null) {
-            complaints = new ArrayList<>();
+        if (recentComplaints == null) {
+            recentComplaints = new ArrayList<>();
         }
 
         List<?> commands = omnidimService.getRecentCommands();
@@ -111,25 +113,21 @@ public class WebController {
 
         model.addAttribute("complaintStats", stats);
 
-        model.addAttribute("activeEvents",
-                eventService.getActiveEvents() != null
-                        ? eventService.getActiveEvents().size()
-                        : 0);
+        // Dashboard cards only need counts: COUNT(*) in the database instead
+        // of materializing every event row (twice, previously).
+        model.addAttribute("activeEvents", eventService.countActiveEvents());
 
-        model.addAttribute("upcomingEvents",
-                eventService.getUpcomingEvents() != null
-                        ? eventService.getUpcomingEvents().size()
-                        : 0);
+        model.addAttribute("upcomingEvents", eventService.countUpcomingEvents());
 
-        model.addAttribute("recentComplaints",
-                complaints.stream().limit(5).toList());
+        model.addAttribute("recentComplaints", recentComplaints);
 
         model.addAttribute("recentCommands",
                 commands.stream().limit(5).toList());
 
-        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll().stream()
-                .filter(u -> u.getDissatisfactionScore() >= 75.0)
-                .toList();
+        // High-risk residents filtered in the database rather than streaming
+        // the entire users table into memory.
+        List<com.vcsm.model.User> highRiskUsers =
+                userRepository.findByDissatisfactionScoreGreaterThanEqual(75.0);
         model.addAttribute("highRiskUsers", highRiskUsers);
 
         return "dashboard";

@@ -160,6 +160,18 @@ public class ComplaintService {
     }
 
 
+    /**
+     * The newest complaints, fetched with a LIMIT query instead of loading
+     * the entire complaints table. Permission-aware like getAllComplaints:
+     * admins see all complaints, residents see their own.
+     */
+    public List<Complaint> getRecentComplaints(int limit) {
+        var pageable = org.springframework.data.domain.PageRequest.of(
+                0, limit, org.springframework.data.domain.Sort.by(
+                        org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        return getPaginatedComplaints(pageable).getContent();
+    }
+
     // Pagination method
 
     public Page<Complaint> getPaginatedComplaints(Pageable pageable) {
