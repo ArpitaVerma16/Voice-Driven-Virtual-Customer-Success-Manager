@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class IvrService {
 
     @Autowired
@@ -80,7 +81,7 @@ public class IvrService {
         try {
             return objectMapper.readValue(config.getFlowJson(), IvrNode.class);
         } catch (Exception e) {
-            System.err.println("Error parsing IVR flow JSON: " + e.getMessage());
+            log.error("Error parsing IVR flow JSON: " + e.getMessage());
             try {
                 return objectMapper.readValue(DEFAULT_FLOW, IvrNode.class);
             } catch (Exception ex) {

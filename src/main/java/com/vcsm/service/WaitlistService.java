@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class WaitlistService {
 
     private static final Logger log = LoggerFactory.getLogger(WaitlistService.class);
@@ -103,7 +104,7 @@ public class WaitlistService {
             log.info("✅ Notification sent to user: " + user.getEmail());
         } catch (Exception e) {
             log.error("❌ Failed to send notification: " + e.getMessage());
-            System.out.println("✅ Notification sent to user: " + user.getEmail());
+            log.info("✅ Notification sent to user: " + user.getEmail());
         } catch (Exception e) {
             log.error("Failed to send waitlist notification to user {}: {}", user.getEmail(), e.getMessage(), e);
         }

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
@@ -100,7 +101,7 @@ public class EmailService {
                         byte[] qrBytes = qrCodeService.generateQRCodeImage(reg.getTicketToken(), 250, 250);
                         helper.addInline("qrCode", new org.springframework.core.io.ByteArrayResource(qrBytes), "image/png");
                     } catch (Exception e) {
-                        System.err.println("❌ Failed to generate QR Code for email " + email.getId() + ": " + e.getMessage());
+                        log.error("❌ Failed to generate QR Code for email " + email.getId() + ": " + e.getMessage());
                     }
                 }
             }

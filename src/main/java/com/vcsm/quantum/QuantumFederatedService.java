@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class QuantumFederatedService {
 
     @Autowired
@@ -152,7 +153,7 @@ public class QuantumFederatedService {
      */
     @Scheduled(fixedDelay = 900000) // 15 minutes
     public void autoStartRound() {
-        System.out.println("🔬 Auto-starting quantum federated round...");
+        log.info("🔬 Auto-starting quantum federated round...");
         startRound();
     }
 

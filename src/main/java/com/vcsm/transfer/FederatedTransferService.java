@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class FederatedTransferService {
 
     @Autowired
@@ -127,7 +128,7 @@ public class FederatedTransferService {
      */
     @Scheduled(fixedDelay = 300000) // 5 minutes
     public void autoTransfer() {
-        System.out.println("🔄 Auto-triggering federated transfer learning...");
+        log.info("🔄 Auto-triggering federated transfer learning...");
         List<FederatedNode> nodeList = getAllNodes();
         if (nodeList.size() >= 2) {
             // Transfer from first node to second

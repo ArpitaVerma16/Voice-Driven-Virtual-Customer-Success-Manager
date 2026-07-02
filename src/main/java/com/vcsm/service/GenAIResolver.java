@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class GenAIResolver {
 
     @Autowired
@@ -87,7 +88,7 @@ public class GenAIResolver {
                     Complaint saved = complaintService.fileComplaint(complaint);
                     ticketId = saved.getId();
                 } catch (Exception e) {
-                    System.err.println("Failed to auto-file complaint: " + e.getMessage());
+                    log.error("Failed to auto-file complaint: " + e.getMessage());
                 }
             }
         }
