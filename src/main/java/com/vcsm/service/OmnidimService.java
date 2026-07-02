@@ -100,7 +100,7 @@ public class OmnidimService {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth != null ? auth.getName() : null;
-            user = null;
+            User user = null;
             if (email != null) {
                 user = userRepository.findByEmail(email).orElse(null);
             }
@@ -262,6 +262,7 @@ public class OmnidimService {
         }
 
         return voiceCommandRepository.findByProcessedOrderByCreatedAtDesc(success);
+    }
     private String handleEventBooking(String t) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth != null ? auth.getName() : null;

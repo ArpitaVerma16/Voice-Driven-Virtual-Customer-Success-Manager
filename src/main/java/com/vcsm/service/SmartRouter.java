@@ -89,10 +89,7 @@ public class SmartRouter {
         return Math.min(100, urgency);
     }
 
-    private boolean containsAny(String text, String... keywords) {
-        for (String keyword : keywords) {
-            if (text.contains(keyword)) return true;
-        }
+    // Replaced by ComplaintRoutingUtils.containsAny()
         return false;
     }
 
@@ -107,19 +104,7 @@ public class SmartRouter {
         return userRepository.findByEmail("admin@example.com").orElse(null);
     }
 
-    private List<Complaint> findDuplicates(Complaint complaint) {
-        List<Complaint> allComplaints = complaintRepository.findAll();
-        return allComplaints.stream()
-            .filter(c -> !c.getId().equals(complaint.getId()))
-            .filter(c -> c.getStatus() != Complaint.ComplaintStatus.RESOLVED)
-            .filter(c -> {
-                String desc1 = c.getDescription().toLowerCase();
-                String desc2 = complaint.getDescription().toLowerCase();
-                String[] words = desc2.split(" ");
-                long matches = 0;
-                for (String w : words) {
-                    if (desc1.contains(w) && w.length() > 3) matches++;
-                }
+    // Replaced by ComplaintRoutingUtils.findSimilarComplaints()
                 return matches >= 2;
             })
             .limit(5)
@@ -128,13 +113,13 @@ public class SmartRouter {
 
     private String generateRecommendation(String category, int urgency) {
         if (urgency >= 80) {
-            return "⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.";
+            return org.springframework.http.ResponseEntity.ok("⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.");
         } else if (urgency >= 60) {
-            return "🔴 HIGH: Priority action needed within 4 hours.";
+            return org.springframework.http.ResponseEntity.ok("🔴 HIGH: Priority action needed within 4 hours.");
         } else if (urgency >= 40) {
-            return "🟡 MEDIUM: Normal priority. Handle within 24 hours.";
+            return org.springframework.http.ResponseEntity.ok("🟡 MEDIUM: Normal priority. Handle within 24 hours.");
         } else {
-            return "🟢 LOW: Standard priority. Handle within 48 hours.";
+            return org.springframework.http.ResponseEntity.ok("🟢 LOW: Standard priority. Handle within 48 hours.");
         }
     }
 

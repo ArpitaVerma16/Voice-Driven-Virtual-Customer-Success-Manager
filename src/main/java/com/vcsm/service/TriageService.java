@@ -86,18 +86,15 @@ public class TriageService {
         return Math.min(100, severity);
     }
 
-    private boolean containsAny(String text, String... keywords) {
-        for (String keyword : keywords) {
-            if (text.contains(keyword)) return true;
-        }
+    // Replaced by ComplaintRoutingUtils.containsAny()
         return false;
     }
 
     private String getSeverityLabel(int severity) {
-        if (severity >= 80) return "CRITICAL";
-        if (severity >= 60) return "HIGH";
-        if (severity >= 40) return "MEDIUM";
-        return "LOW";
+        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("CRITICAL");
+        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("HIGH");
+        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("MEDIUM");
+        return org.springframework.http.ResponseEntity.ok("LOW");
     }
 
     private User findBestAdmin(String category) {
@@ -107,10 +104,10 @@ public class TriageService {
     }
 
     private String calculateETA(int severity) {
-        if (severity >= 80) return "1 hour";
-        if (severity >= 60) return "4 hours";
-        if (severity >= 40) return "24 hours";
-        return "48 hours";
+        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("1 hour");
+        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("4 hours");
+        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("24 hours");
+        return org.springframework.http.ResponseEntity.ok("48 hours");
     }
 
     private List<Complaint> findSimilarComplaints(Complaint complaint) {

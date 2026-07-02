@@ -24,6 +24,7 @@ import java.util.Map;
 
 @Profile("!dev")
 @RestControllerAdvice
+@lombok.extern.slf4j.Slf4j
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
@@ -199,7 +200,7 @@ public class GlobalExceptionHandler {
 
         // Log the error for debugging
         log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-        ex.printStackTrace();
+        log.error("An unexpected error occurred", ex);
 
         log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(), ex);
         

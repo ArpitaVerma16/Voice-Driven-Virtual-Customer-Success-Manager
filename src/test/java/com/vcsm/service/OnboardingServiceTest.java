@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class VoiceCloningServiceTest {
+class OnboardingServiceTest {
 
     @InjectMocks
-    private VoiceCloningService voiceCloningService;
+    private OnboardingService onboardingService;
 
     @BeforeEach
     void setUp() {
@@ -20,6 +20,6 @@ class VoiceCloningServiceTest {
 
     @Test
     void contextLoads() {
-        assertNotNull(voiceCloningService);
+        assertNotNull(onboardingService);
     }
 }

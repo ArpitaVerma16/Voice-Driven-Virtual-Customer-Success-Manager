@@ -85,20 +85,20 @@ public class CommandTemplateService {
 
     public String getSuggestion(String context) {
         if (context == null || context.isEmpty()) {
-            return "Try saying: 'I have a noise complaint' or 'Show upcoming events'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'I have a noise complaint' or 'Show upcoming events'");
         }
         
         // Simple suggestion based on context
         String lower = context.toLowerCase();
         if (lower.contains("complaint") || lower.contains("noise") || lower.contains("issue")) {
-            return "Try saying: 'I have a noise complaint' or 'Report a maintenance issue'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'I have a noise complaint' or 'Report a maintenance issue'");
         } else if (lower.contains("event") || lower.contains("calendar")) {
-            return "Try saying: 'Show upcoming events' or 'Register for an event'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'Show upcoming events' or 'Register for an event'");
         } else if (lower.contains("status") || lower.contains("track")) {
-            return "Try saying: 'Check my complaint status' or 'How many complaints are open?'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'Check my complaint status' or 'How many complaints are open?'");
         } else if (lower.contains("help") || lower.contains("what")) {
-            return "Try saying: 'What can I say?' or 'I need help'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'What can I say?' or 'I need help'");
         }
-        return "Try saying: 'I have a noise complaint', 'Show upcoming events', or 'Check my complaint status'";
+        return org.springframework.http.ResponseEntity.ok("Try saying: 'I have a noise complaint', 'Show upcoming events', or 'Check my complaint status'");
     }
 }

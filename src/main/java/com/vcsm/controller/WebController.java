@@ -42,47 +42,47 @@ public class WebController {
 
     @GetMapping("/landing")
     public String landing() {
-        return "landing";
+        return org.springframework.http.ResponseEntity.ok("landing");
     }
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return org.springframework.http.ResponseEntity.ok("login");
     }
 
     @GetMapping("/chatbot")
     public String chatbot() {
-        return "chatbot-ui";
+        return org.springframework.http.ResponseEntity.ok("chatbot-ui");
     }
 
     @GetMapping("/voice-templates")
     public String voiceTemplates() {
-        return "voice-templates";
+        return org.springframework.http.ResponseEntity.ok("voice-templates");
     }
 
     @GetMapping("/profile")
     public String profile() {
-        return "profile";
+        return org.springframework.http.ResponseEntity.ok("profile");
     }
 
     @GetMapping("/onboarding")
     public String onboarding() {
-        return "onboarding";
+        return org.springframework.http.ResponseEntity.ok("onboarding");
     }
 
     @GetMapping("/voice-analytics")
     public String voiceAnalytics() {
-        return "voice-analytics";
+        return org.springframework.http.ResponseEntity.ok("voice-analytics");
     }
 
     @GetMapping("/audit-logs")
     public String auditLogs() {
-        return "audit-logs";
+        return org.springframework.http.ResponseEntity.ok("audit-logs");
     }
 
     @GetMapping("/ivr-builder")
     public String ivrBuilder() {
-        return "ivr-builder";
+        return org.springframework.http.ResponseEntity.ok("ivr-builder");
     }
 
     @GetMapping("/")
@@ -132,7 +132,7 @@ public class WebController {
                 .toList();
         model.addAttribute("highRiskUsers", highRiskUsers);
 
-        return "dashboard";
+        return org.springframework.http.ResponseEntity.ok("dashboard");
     }
 
     @GetMapping("/complaints")
@@ -170,7 +170,7 @@ public class WebController {
         model.addAttribute("page", complaintPage);
         model.addAttribute("stats", complaintService.getComplaintStats());
 
-        return "complaints";
+        return org.springframework.http.ResponseEntity.ok("complaints");
     }
 
     @GetMapping("/events")
@@ -186,22 +186,22 @@ public class WebController {
                         ? eventService.getUpcomingEvents().size()
                         : 0);
 
-        return "events";
+        return org.springframework.http.ResponseEntity.ok("events");
     }
 
     @GetMapping("/voice-cloning")
     public String voiceCloning() {
-       return "voice-cloning-ui";
+       return org.springframework.http.ResponseEntity.ok("voice-cloning-ui");
     }
 
     @GetMapping("/live-dashboard")
     public String liveDashboard() {
-        return "live-dashboard";
+        return org.springframework.http.ResponseEntity.ok("live-dashboard");
     }
 
     @GetMapping("/translation")
     public String translation() {
-        return "translation-ui";
+        return org.springframework.http.ResponseEntity.ok("translation-ui");
     }
 
     @GetMapping("/analytics")
@@ -227,22 +227,22 @@ public class WebController {
                         ? eventService.getActiveEvents().size()
                         : 0);
 
-        return "analytics";
+        return org.springframework.http.ResponseEntity.ok("analytics");
     }
 
     @GetMapping("/blockchain-verify")
     public String blockchainVerify() {
-        return "blockchain-verify";
+        return org.springframework.http.ResponseEntity.ok("blockchain-verify");
     }
 
     @GetMapping("/offline")
     public String offline() {
-        return "offline";
+        return org.springframework.http.ResponseEntity.ok("offline");
     }
 
     @GetMapping("/twilio-demo")
     public String twilioDemo() {
-        return "twilio-demo";
+        return org.springframework.http.ResponseEntity.ok("twilio-demo");
     }
 
     @GetMapping("/interaction-history")
@@ -263,7 +263,7 @@ public class WebController {
         } catch (RuntimeException e) {
             model.addAttribute("interactionStats", new HashMap<>());
         }
-        return "interaction-history";
+        return org.springframework.http.ResponseEntity.ok("interaction-history");
     }
 
 }

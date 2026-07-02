@@ -59,7 +59,7 @@ public class ChatbotService {
 
     public String getResponse(String userMessage) {
         if (userMessage == null || userMessage.isEmpty()) {
-            return "Please ask me something! I'm here to help.";
+            return org.springframework.http.ResponseEntity.ok("Please ask me something! I'm here to help.");
         }
 
         String lowerMessage = userMessage.toLowerCase().trim();
