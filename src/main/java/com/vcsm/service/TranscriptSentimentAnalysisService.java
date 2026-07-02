@@ -44,8 +44,8 @@ public class TranscriptSentimentAnalysisService {
     }
 
     private String determineSentiment(double score) {
-        if (score < -0.5) return "NEGATIVE";
-        if (score > 0.5) return "POSITIVE";
-        return "NEUTRAL";
+        if (score < -0.5) return org.springframework.http.ResponseEntity.ok("NEGATIVE");
+        if (score > 0.5) return org.springframework.http.ResponseEntity.ok("POSITIVE");
+        return org.springframework.http.ResponseEntity.ok("NEUTRAL");
     }
 }

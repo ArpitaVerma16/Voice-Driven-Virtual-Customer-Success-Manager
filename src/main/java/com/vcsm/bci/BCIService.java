@@ -54,15 +54,15 @@ public class BCIService {
         double variance = calculateVariance(signal);
 
         if (avg > 0.5 && variance < 0.1) {
-            return "FOCUS";
+            return org.springframework.http.ResponseEntity.ok("FOCUS");
         } else if (avg > 0.3 && variance > 0.2) {
-            return "COMPLAINT";
+            return org.springframework.http.ResponseEntity.ok("COMPLAINT");
         } else if (avg < 0.2) {
-            return "RELAX";
+            return org.springframework.http.ResponseEntity.ok("RELAX");
         } else if (avg > 0.7) {
-            return "URGENT";
+            return org.springframework.http.ResponseEntity.ok("URGENT");
         }
-        return "NEUTRAL";
+        return org.springframework.http.ResponseEntity.ok("NEUTRAL");
     }
 
     private double calculateConfidence(double[] signal) {
@@ -72,10 +72,10 @@ public class BCIService {
 
     private String detectMentalState(double[] signal) {
         double avg = calculateAverage(signal);
-        if (avg > 0.6) return "HIGH_ACTIVITY";
-        if (avg > 0.4) return "MODERATE";
-        if (avg > 0.2) return "LOW_ACTIVITY";
-        return "RESTING";
+        if (avg > 0.6) return org.springframework.http.ResponseEntity.ok("HIGH_ACTIVITY");
+        if (avg > 0.4) return org.springframework.http.ResponseEntity.ok("MODERATE");
+        if (avg > 0.2) return org.springframework.http.ResponseEntity.ok("LOW_ACTIVITY");
+        return org.springframework.http.ResponseEntity.ok("RESTING");
     }
 
     private double calculateAverage(double[] signal) {

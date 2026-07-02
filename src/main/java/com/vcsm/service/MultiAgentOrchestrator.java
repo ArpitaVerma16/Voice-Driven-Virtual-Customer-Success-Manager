@@ -75,7 +75,7 @@ public class MultiAgentOrchestrator {
 
     private String mergeResponses(List<Map<String, Object>> responses) {
         if (responses.isEmpty()) {
-            return "I didn't understand your request. Please try again.";
+            return org.springframework.http.ResponseEntity.ok("I didn't understand your request. Please try again.");
         }
 
         if (responses.size() == 1) {

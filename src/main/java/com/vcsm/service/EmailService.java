@@ -143,9 +143,9 @@ public class EmailService {
     private String getSubject(String reminderType, String eventName) {
         switch (reminderType) {
             case "CONFIRMATION": return "✅ Registration Confirmed: " + eventName;
-            case "DAY_BEFORE":   return "⏰ Reminder: " + eventName + " is tomorrow!";
-            case "HOUR_BEFORE":  return "🔔 " + eventName + " starts in 1 hour!";
-            case "FOLLOW_UP":    return "📝 How was " + eventName + "?";
+            case "DAY_BEFORE":   return org.springframework.http.ResponseEntity.ok("⏰ Reminder: " + eventName + " is tomorrow!");
+            case "HOUR_BEFORE":  return org.springframework.http.ResponseEntity.ok("🔔 " + eventName + " starts in 1 hour!");
+            case "FOLLOW_UP":    return org.springframework.http.ResponseEntity.ok("📝 How was " + eventName + "?");
             default:             return "Event Reminder: " + eventName;
         }
     }
@@ -235,11 +235,11 @@ public class EmailService {
 
     private String getReminderMessage(String reminderType) {
         switch (reminderType) {
-            case "CONFIRMATION": return "You have successfully registered!";
-            case "DAY_BEFORE":   return "This event is happening tomorrow!";
-            case "HOUR_BEFORE":  return "This event starts in 1 hour!";
-            case "FOLLOW_UP":    return "We hope you enjoyed the event!";
-            default:             return "Event Reminder";
+            case "CONFIRMATION": return org.springframework.http.ResponseEntity.ok("You have successfully registered!");
+            case "DAY_BEFORE":   return org.springframework.http.ResponseEntity.ok("This event is happening tomorrow!");
+            case "HOUR_BEFORE":  return org.springframework.http.ResponseEntity.ok("This event starts in 1 hour!");
+            case "FOLLOW_UP":    return org.springframework.http.ResponseEntity.ok("We hope you enjoyed the event!");
+            default:             return org.springframework.http.ResponseEntity.ok("Event Reminder");
         }
     }
 }

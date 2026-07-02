@@ -113,13 +113,13 @@ public class SmartRouter {
 
     private String generateRecommendation(String category, int urgency) {
         if (urgency >= 80) {
-            return "⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.";
+            return org.springframework.http.ResponseEntity.ok("⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.");
         } else if (urgency >= 60) {
-            return "🔴 HIGH: Priority action needed within 4 hours.";
+            return org.springframework.http.ResponseEntity.ok("🔴 HIGH: Priority action needed within 4 hours.");
         } else if (urgency >= 40) {
-            return "🟡 MEDIUM: Normal priority. Handle within 24 hours.";
+            return org.springframework.http.ResponseEntity.ok("🟡 MEDIUM: Normal priority. Handle within 24 hours.");
         } else {
-            return "🟢 LOW: Standard priority. Handle within 48 hours.";
+            return org.springframework.http.ResponseEntity.ok("🟢 LOW: Standard priority. Handle within 48 hours.");
         }
     }
 
