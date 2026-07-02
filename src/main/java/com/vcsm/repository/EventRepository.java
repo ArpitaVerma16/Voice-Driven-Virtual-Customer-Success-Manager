@@ -14,4 +14,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByCategoryAndActiveTrue(Event.EventCategory category);
 
     List<Event> findByEventDateAfter(LocalDateTime dateTime);
+
+    // Count queries for dashboard cards: the dashboard only needs the
+    // numbers, so counting in the database avoids loading every event row.
+    long countByActiveTrue();
+
+    long countByEventDateAfterAndActiveTrue(LocalDateTime dateTime);
 }

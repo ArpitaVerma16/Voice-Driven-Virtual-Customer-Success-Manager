@@ -37,6 +37,14 @@ public class EventService {
 
     public List<Event> getActiveEvents() { return eventRepository.findByActiveTrue(); }
 
+    /** Count of active events without materializing the rows. */
+    public long countActiveEvents() { return eventRepository.countByActiveTrue(); }
+
+    /** Count of upcoming active events without materializing the rows. */
+    public long countUpcomingEvents() {
+        return eventRepository.countByEventDateAfterAndActiveTrue(LocalDateTime.now());
+    }
+
     public List<Event> getUpcomingEvents() {
         return eventRepository.findByEventDateAfterAndActiveTrue(LocalDateTime.now());
     }
