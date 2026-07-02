@@ -20,33 +20,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ComplaintService {
 
     private static final Logger log = LoggerFactory.getLogger(ComplaintService.class);
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private AuditLogService auditLogService;
+    private final AuditLogService auditLogService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private PriorityClassifierService priorityClassifierService;
+    private final PriorityClassifierService priorityClassifierService;
 
-    @Autowired
-    private UserActivityService userActivityService;
+    private final UserActivityService userActivityService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private BlockchainService blockchainService;
+    private final BlockchainService blockchainService;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
 
     private void safelyExecute(Runnable operation, String description) {

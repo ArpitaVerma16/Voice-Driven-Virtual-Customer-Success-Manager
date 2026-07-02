@@ -15,13 +15,12 @@ import java.util.stream.Collectors;
 
 @Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class SimulationEngine {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     /**
      * Run simulation on digital twin

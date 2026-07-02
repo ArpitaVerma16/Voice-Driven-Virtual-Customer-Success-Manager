@@ -16,22 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SentimentAnalysisService {
     
-    @Autowired
-    private SentimentClassifier sentimentClassifier;
+    private final SentimentClassifier sentimentClassifier;
     
-    @Autowired
-    private SentimentAnalysisRepository sentimentRepository;
+    private final SentimentAnalysisRepository sentimentRepository;
     
-    @Autowired
-    private EscalatedCaseRepository escalatedRepository;
+    private final EscalatedCaseRepository escalatedRepository;
     
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     @Transactional
     public SentimentAnalysis analyzeAndProcess(Long userId, String transcribedText) {

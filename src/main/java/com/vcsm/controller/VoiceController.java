@@ -26,25 +26,20 @@ import com.vcsm.dto.VoiceCommandRequest;
 
 @RestController
 @RequestMapping("/api/voice")
+@lombok.RequiredArgsConstructor
 public class VoiceController {
 
-    @Autowired
-    private OmnidimService omnidimService;
+    private final OmnidimService omnidimService;
     
-    @Autowired
-    private SentimentAnalysisService sentimentService;
+    private final SentimentAnalysisService sentimentService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private LanguageDetectionService languageDetectionService;
+    private final LanguageDetectionService languageDetectionService;
 
-    @Autowired
-    private HindiCommandMapper hindiCommandMapper;
+    private final HindiCommandMapper hindiCommandMapper;
 
-    @Autowired
-    private com.vcsm.service.EventRegistrationService eventRegistrationService;
+    private final com.vcsm.service.EventRegistrationService eventRegistrationService;
 
     @PostMapping("/command")
     public ResponseEntity<Map<String, Object>> command(@Valid @RequestBody VoiceCommandRequest request) {

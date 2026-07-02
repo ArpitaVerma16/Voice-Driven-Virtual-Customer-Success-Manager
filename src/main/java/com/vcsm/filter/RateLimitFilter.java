@@ -12,10 +12,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private RateLimiterService rateLimiterService;
+    private final RateLimiterService rateLimiterService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

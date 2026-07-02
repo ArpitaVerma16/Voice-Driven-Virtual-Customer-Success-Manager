@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 
 @Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class DriftDetector {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     private Map<String, List<Double>> featureDistributions = new HashMap<>();
 

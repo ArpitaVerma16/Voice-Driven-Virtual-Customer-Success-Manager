@@ -14,16 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceFeedbackService {
     
-    @Autowired
-    private VoiceFeedbackRepository voiceFeedbackRepository;
+    private final VoiceFeedbackRepository voiceFeedbackRepository;
     
-    @Autowired
-    private VoiceCommandRepository voiceCommandRepository;
+    private final VoiceCommandRepository voiceCommandRepository;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     public VoiceFeedback submitFeedback(Long commandId, Long userId, String feedback, String comment) {
         VoiceCommand command = voiceCommandRepository.findById(commandId)

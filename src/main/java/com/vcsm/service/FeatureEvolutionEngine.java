@@ -11,15 +11,14 @@ import java.util.*;
 
 @Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class FeatureEvolutionEngine {
 
     private static final Logger log = LoggerFactory.getLogger(FeatureEvolutionEngine.class);
 
-    @Autowired
-    private FeatureAnalyzer featureAnalyzer;
+    private final FeatureAnalyzer featureAnalyzer;
 
-    @Autowired
-    private ABTestingService abTestingService;
+    private final ABTestingService abTestingService;
 
     private final Map<String, Double> featureScores = new ConcurrentHashMap<>();
 

@@ -13,16 +13,14 @@ import java.util.*;
 
 @Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class AutoTrainer {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private ModelVersionRepository modelVersionRepository;
+    private final ModelVersionRepository modelVersionRepository;
 
-    @Autowired
-    private DriftDetector driftDetector;
+    private final DriftDetector driftDetector;
 
     /**
      * Train new model version

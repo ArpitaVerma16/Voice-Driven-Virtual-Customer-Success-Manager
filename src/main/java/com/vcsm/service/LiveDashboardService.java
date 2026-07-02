@@ -13,13 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class LiveDashboardService {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     // Active user tracking
     private final Map<String, Long> activeUsers = new ConcurrentHashMap<>();

@@ -11,13 +11,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/languages")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class MultilingualController {
 
-    @Autowired
-    private LanguageDetectionEnhancedService languageDetectionService;
+    private final LanguageDetectionEnhancedService languageDetectionService;
 
-    @Autowired
-    private MultilingualResponseService multilingualResponseService;
+    private final MultilingualResponseService multilingualResponseService;
 
     @GetMapping("/supported")
     public ResponseEntity<Map<String, Object>> getSupportedLanguages() {

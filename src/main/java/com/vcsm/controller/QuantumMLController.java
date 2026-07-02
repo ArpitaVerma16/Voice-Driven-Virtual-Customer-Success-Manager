@@ -12,10 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/quantum-ml")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class QuantumMLController {
 
-    @Autowired
-    private QuantumMLService quantumMLService;
+    private final QuantumMLService quantumMLService;
 
     @PostMapping("/init")
     public ResponseEntity<QuantumMLService.QuantumModel> initializeModel() {

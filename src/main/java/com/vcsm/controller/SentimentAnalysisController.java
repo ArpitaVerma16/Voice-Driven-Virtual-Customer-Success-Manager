@@ -12,13 +12,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/sentiment")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SentimentAnalysisController {
 
-    @Autowired
-    private SentimentAnalysisServiceImpl sentimentService;
+    private final SentimentAnalysisServiceImpl sentimentService;
 
-    @Autowired
-    private WebhookNotificationService webhookNotificationService;
+    private final WebhookNotificationService webhookNotificationService;
 
     @PostMapping("/analyze")
     public ResponseEntity<Map<String, Object>> analyzeTranscript(@RequestBody Map<String, String> request) {

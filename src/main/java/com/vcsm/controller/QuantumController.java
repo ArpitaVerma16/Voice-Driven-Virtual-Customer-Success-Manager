@@ -12,10 +12,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quantum")
+@lombok.RequiredArgsConstructor
 public class QuantumController {
 
-    @Autowired
-    private SchedulingOptimizer schedulingOptimizer;
+    private final SchedulingOptimizer schedulingOptimizer;
 
     @PostMapping("/route")
     public ResponseEntity<Map<String, Object>> optimizeRouting() {

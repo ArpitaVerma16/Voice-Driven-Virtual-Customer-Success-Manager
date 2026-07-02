@@ -20,13 +20,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/voice/biometrics")
+@lombok.RequiredArgsConstructor
 public class VoiceBiometricsController {
 
-    @Autowired
-    private VoiceBiometricsService voiceBiometricsService;
+    private final VoiceBiometricsService voiceBiometricsService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @PostMapping("/enroll")
     public ResponseEntity<VoiceVerificationResponse> enrollVoice(

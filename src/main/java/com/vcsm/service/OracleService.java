@@ -11,13 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class OracleService {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     /**
      * Fetch data from external sources (oracle)

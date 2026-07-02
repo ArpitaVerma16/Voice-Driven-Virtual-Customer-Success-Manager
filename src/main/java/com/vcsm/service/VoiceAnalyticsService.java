@@ -12,10 +12,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceAnalyticsService {
     
-    @Autowired
-    private VoiceAnalyticsRepository voiceAnalyticsRepository;
+    private final VoiceAnalyticsRepository voiceAnalyticsRepository;
     
     public void logCommand(User user, String commandText, String intent, boolean success, long responseTime) {
         VoiceAnalytics analytics = new VoiceAnalytics(user, commandText, intent, success, responseTime);

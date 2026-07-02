@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class AnalyticsAgent {
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
     public Map<String, Object> process(String query, Long userId) {
         Map<String, Object> response = new HashMap<>();

@@ -26,10 +26,10 @@ import java.util.Map;
 @Tag(name = "Complaints", description = "Complaint management APIs")
 @RestController
 @RequestMapping("/api/complaints")
+@lombok.RequiredArgsConstructor
 public class ComplaintController {
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
     @Operation(summary = "File a new complaint", description = "Creates a new complaint")
     @ApiResponses(value = {

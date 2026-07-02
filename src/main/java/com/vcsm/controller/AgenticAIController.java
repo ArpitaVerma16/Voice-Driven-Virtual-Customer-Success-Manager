@@ -14,16 +14,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agentic")
+@lombok.RequiredArgsConstructor
 public class AgenticAIController {
 
-    @Autowired
-    private UserBehaviorMonitor behaviorMonitor;
+    private final UserBehaviorMonitor behaviorMonitor;
 
-    @Autowired
-    private ProactiveOutreachService outreachService;
+    private final ProactiveOutreachService outreachService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/analyze/{userId}")
     public ResponseEntity<UserBehaviorMonitor.BehaviorAnalysis> analyzeUser(@PathVariable Long userId) {

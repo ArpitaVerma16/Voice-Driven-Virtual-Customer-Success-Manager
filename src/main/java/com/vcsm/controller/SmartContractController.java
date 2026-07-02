@@ -13,10 +13,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/contracts")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SmartContractController {
 
-    @Autowired
-    private SmartContractService smartContractService;
+    private final SmartContractService smartContractService;
 
     @PostMapping
     public ResponseEntity<SmartContract> createContract(@Valid @RequestBody SmartContract contract) {

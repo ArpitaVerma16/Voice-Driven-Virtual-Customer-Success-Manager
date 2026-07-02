@@ -10,10 +10,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chatbot")
+@lombok.RequiredArgsConstructor
 public class ChatbotController {
 
-    @Autowired
-    private ChatbotService chatbotService;
+    private final ChatbotService chatbotService;
 
     @PostMapping("/ask")
     public ResponseEntity<Map<String, Object>> ask(@Valid @RequestBody Map<String, String> request) {

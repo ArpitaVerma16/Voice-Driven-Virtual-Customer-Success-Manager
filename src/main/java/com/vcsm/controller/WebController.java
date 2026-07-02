@@ -23,22 +23,18 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@lombok.RequiredArgsConstructor
 public class WebController {
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
-    @Autowired
-    private OmnidimService omnidimService;
+    private final OmnidimService omnidimService;
 
-    @Autowired
-    private InteractionService interactionService;
+    private final InteractionService interactionService;
 
-    @Autowired
-    private com.vcsm.repository.UserRepository userRepository;
+    private final com.vcsm.repository.UserRepository userRepository;
 
     @GetMapping("/landing")
     public String landing() {

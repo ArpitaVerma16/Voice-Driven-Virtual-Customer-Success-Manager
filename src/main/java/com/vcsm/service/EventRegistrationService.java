@@ -13,19 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class EventRegistrationService {
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private EventRegistrationRepository eventRegistrationRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private ReminderScheduler reminderScheduler;
+    private final ReminderScheduler reminderScheduler;
 
-    @Autowired
-    private com.vcsm.security.jwt.JwtService jwtService;
+    private final com.vcsm.security.jwt.JwtService jwtService;
 
     /**
      * Register a user for an event

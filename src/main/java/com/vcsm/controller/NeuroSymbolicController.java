@@ -13,13 +13,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/neuro")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class NeuroSymbolicController {
 
-    @Autowired
-    private NeuroSymbolicEngine neuroSymbolicEngine;
+    private final NeuroSymbolicEngine neuroSymbolicEngine;
 
-    @Autowired
-    private RuleExtractor ruleExtractor;
+    private final RuleExtractor ruleExtractor;
 
     @PostMapping("/reason")
     public ResponseEntity<NeuroSymbolicEngine.NeuroSymbolicResult> reason(

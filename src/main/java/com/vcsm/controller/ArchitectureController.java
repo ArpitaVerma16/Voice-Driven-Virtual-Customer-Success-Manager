@@ -14,13 +14,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/enas")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class ArchitectureController {
 
-    @Autowired
-    private EvolutionaryEngine evolutionaryEngine;
+    private final EvolutionaryEngine evolutionaryEngine;
 
-    @Autowired
-    private PerformancePredictor performancePredictor;
+    private final PerformancePredictor performancePredictor;
 
     @PostMapping("/evolve")
     public ResponseEntity<EvolutionaryEngine.EvolutionResult> evolve() {

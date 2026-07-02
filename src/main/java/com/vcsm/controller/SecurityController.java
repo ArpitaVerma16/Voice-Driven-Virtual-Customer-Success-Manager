@@ -13,19 +13,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/security")
+@lombok.RequiredArgsConstructor
 public class SecurityController {
 
-    @Autowired
-    private DeepfakeDetector deepfakeDetector;
+    private final DeepfakeDetector deepfakeDetector;
 
-    @Autowired
-    private VoiceLivenessService livenessService;
+    private final VoiceLivenessService livenessService;
 
-    @Autowired
-    private FraudAlertService fraudAlertService;
+    private final FraudAlertService fraudAlertService;
 
-    @Autowired
-    private VoiceOtpService voiceOtpService;
+    private final VoiceOtpService voiceOtpService;
 
     @PostMapping("/detect-deepfake")
     public ResponseEntity<DeepfakeDetector.DeepfakeAnalysis> detectDeepfake(

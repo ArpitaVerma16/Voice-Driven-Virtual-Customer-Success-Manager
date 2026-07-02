@@ -14,19 +14,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/causal")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class CausalController {
 
-    @Autowired
-    private CausalEngine causalEngine;
+    private final CausalEngine causalEngine;
 
-    @Autowired
-    private RootCauseAnalyzer rootCauseAnalyzer;
+    private final RootCauseAnalyzer rootCauseAnalyzer;
 
-    @Autowired
-    private CounterfactualSimulator counterfactualSimulator;
+    private final CounterfactualSimulator counterfactualSimulator;
 
-    @Autowired
-    private CausalGraphBuilder causalGraphBuilder;
+    private final CausalGraphBuilder causalGraphBuilder;
 
     @GetMapping("/analyze")
     public ResponseEntity<CausalEngine.CausalAnalysis> analyze(@RequestParam String issue) {

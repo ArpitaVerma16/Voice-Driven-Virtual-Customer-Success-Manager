@@ -11,13 +11,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class SpikingNeuralNetwork {
 
-    @Autowired
-    private LIFNeuronModel lifNeuronModel;
+    private final LIFNeuronModel lifNeuronModel;
 
-    @Autowired
-    private STDPLearning stdpLearning;
+    private final STDPLearning stdpLearning;
 
     private List<LIFNeuron> inputLayer;
     private List<LIFNeuron> hiddenLayer;

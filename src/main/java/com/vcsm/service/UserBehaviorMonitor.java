@@ -14,13 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class UserBehaviorMonitor {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     // In-memory user behavior tracking
     private final Map<Long, UserBehavior> userBehaviorMap = new ConcurrentHashMap<>();

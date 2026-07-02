@@ -9,15 +9,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SelfHealingEngine {
 
     private static final Logger log = LoggerFactory.getLogger(SelfHealingEngine.class);
 
-    @Autowired
-    private AnomalyDetector anomalyDetector;
+    private final AnomalyDetector anomalyDetector;
 
-    @Autowired
-    private AutoRecoveryService autoRecoveryService;
+    private final AutoRecoveryService autoRecoveryService;
 
     private final List<HealingReport> healingReports = new ArrayList<>();
     private int healingCount = 0;

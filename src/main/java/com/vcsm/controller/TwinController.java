@@ -12,10 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/twin")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class TwinController {
 
-    @Autowired
-    private PredictiveDigitalTwin predictiveDigitalTwin;
+    private final PredictiveDigitalTwin predictiveDigitalTwin;
 
     @PostMapping("/create")
     public ResponseEntity<PredictiveDigitalTwin.TwinInstance> createTwin(

@@ -9,22 +9,18 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class GenAIResolver {
 
-    @Autowired
-    private SolutionMatcher solutionMatcher;
+    private final SolutionMatcher solutionMatcher;
 
-    @Autowired
-    private ResponseGenerator responseGenerator;
+    private final ResponseGenerator responseGenerator;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     /**
      * Resolve complaint using GenAI

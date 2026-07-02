@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class OmnidimService {
 
     private static final Logger log = LoggerFactory.getLogger(OmnidimService.class);
@@ -26,29 +27,21 @@ public class OmnidimService {
     @Value("${omnidim.api.key:YOUR_OMNIDIM_API_KEY}")
     private String apiKey;
 
-    @Autowired
-    private VoiceCommandRepository voiceCommandRepository;
+    private final VoiceCommandRepository voiceCommandRepository;
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
-    @Autowired
-    private EventRegistrationService eventRegistrationService;
+    private final EventRegistrationService eventRegistrationService;
 
-    @Autowired
-    private VoiceModelRegistryService voiceModelRegistryService;
+    private final VoiceModelRegistryService voiceModelRegistryService;
 
-    @Autowired
-    private VoiceAnalyticsService voiceAnalyticsService;
+    private final VoiceAnalyticsService voiceAnalyticsService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private SchedulingOptimizer schedulingOptimizer;
+    private final SchedulingOptimizer schedulingOptimizer;
 
     private final Map<Long, PendingBookingState> pendingBookings = new java.util.concurrent.ConcurrentHashMap<>();
 

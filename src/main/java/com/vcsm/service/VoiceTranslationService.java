@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceTranslationService {
 
     private static final Logger log = LoggerFactory.getLogger(VoiceTranslationService.class);
 
-    @Autowired
-    private LanguageDetector languageDetector;
+    private final LanguageDetector languageDetector;
 
     @Value("${google.translate.api.key:}")
     private String apiKey;

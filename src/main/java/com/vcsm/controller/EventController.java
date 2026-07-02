@@ -12,16 +12,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/events")
+@lombok.RequiredArgsConstructor
 public class EventController {
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
-    @Autowired
-    private com.vcsm.security.jwt.JwtService jwtService;
+    private final com.vcsm.security.jwt.JwtService jwtService;
 
-    @Autowired
-    private com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
+    private final com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
 
     @PostMapping
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")

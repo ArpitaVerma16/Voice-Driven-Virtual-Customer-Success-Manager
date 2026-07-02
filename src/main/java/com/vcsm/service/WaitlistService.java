@@ -17,21 +17,18 @@ import java.util.Optional;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class WaitlistService {
 
     private static final Logger log = LoggerFactory.getLogger(WaitlistService.class);
     
-    @Autowired
-    private EventWaitlistRepository waitlistRepository;
+    private final EventWaitlistRepository waitlistRepository;
     
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
     
-    @Autowired
-    private EventRegistrationService eventRegistrationService;
+    private final EventRegistrationService eventRegistrationService;
     
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
     
     /**
      * Add user to waitlist

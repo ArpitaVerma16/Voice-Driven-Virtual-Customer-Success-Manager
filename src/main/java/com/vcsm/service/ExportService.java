@@ -19,12 +19,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ExportService {
 
     private static final Logger log = LoggerFactory.getLogger(ExportService.class);
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
 

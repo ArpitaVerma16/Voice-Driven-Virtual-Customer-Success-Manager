@@ -25,10 +25,10 @@ import java.util.Map;
 @Tag(name = "Interactions", description = "Customer Interaction History APIs")
 @RestController
 @RequestMapping("/api/interactions")
+@lombok.RequiredArgsConstructor
 public class InteractionController {
 
-    @Autowired
-    private InteractionService interactionService;
+    private final InteractionService interactionService;
 
     @Operation(summary = "Create a new interaction", description = "Creates a new customer interaction record")
     @ApiResponses(value = {

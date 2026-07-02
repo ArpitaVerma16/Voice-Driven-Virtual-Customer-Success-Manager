@@ -21,24 +21,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private EmailLogRepository emailLogRepository;
+    private final EmailLogRepository emailLogRepository;
 
-    @Autowired
-    private EmailQueueRepository emailQueueRepository;
+    private final EmailQueueRepository emailQueueRepository;
 
-    @Autowired
-    private com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
+    private final com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private com.vcsm.service.QRCodeService qrCodeService;
+    private final com.vcsm.service.QRCodeService qrCodeService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;

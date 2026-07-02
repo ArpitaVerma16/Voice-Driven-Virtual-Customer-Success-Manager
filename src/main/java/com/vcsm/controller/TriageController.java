@@ -13,10 +13,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/triage")
+@lombok.RequiredArgsConstructor
 public class TriageController {
 
-    @Autowired
-    private TriageService triageService;
+    private final TriageService triageService;
 
     @PostMapping("/classify")
     public ResponseEntity<TriageRequest> classifyComplaint(@Valid @RequestBody Complaint complaint) {

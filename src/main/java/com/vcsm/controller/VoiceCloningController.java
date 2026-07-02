@@ -17,13 +17,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voice/cloning")
+@lombok.RequiredArgsConstructor
 public class VoiceCloningController {
 
-    @Autowired
-    private VoiceCloningService voiceCloningService;
+    private final VoiceCloningService voiceCloningService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private User getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();

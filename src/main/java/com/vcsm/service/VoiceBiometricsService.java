@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceBiometricsService {
 
     private static final Logger log = LoggerFactory.getLogger(VoiceBiometricsService.class);
@@ -22,17 +23,13 @@ public class VoiceBiometricsService {
     private static final double VERIFICATION_THRESHOLD = 0.75;
     private static final int SAMPLE_RATE = 16000;
     
-    @Autowired
-    private VoicePrintRepository voicePrintRepository;
+    private final VoicePrintRepository voicePrintRepository;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
-    @Autowired
-    private VoiceFeatureService featureService;
+    private final VoiceFeatureService featureService;
 
-    @Autowired
-    private LanguageDetectionService languageDetectionService;
+    private final LanguageDetectionService languageDetectionService;
     
     @Transactional
     public VoiceVerificationResponse enrollVoice(Long userId, String base64Audio, double durationSeconds) {

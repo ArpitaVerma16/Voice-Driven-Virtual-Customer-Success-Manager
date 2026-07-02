@@ -11,10 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/genai")
+@lombok.RequiredArgsConstructor
 public class GenAIController {
 
-    @Autowired
-    private GenAIResolver genAIResolver;
+    private final GenAIResolver genAIResolver;
 
     @PostMapping("/resolve")
     public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@Valid @RequestBody Complaint complaint) {

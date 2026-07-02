@@ -14,13 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SessionManagementService {
 
-    @Autowired
-    private CustomerSessionRepository sessionRepository;
+    private final CustomerSessionRepository sessionRepository;
 
-    @Autowired
-    private SessionTurnRepository turnRepository;
+    private final SessionTurnRepository turnRepository;
 
     private static final int SESSION_ARCHIVAL_DAYS = 90;
     private static final int MAX_RECENT_SESSIONS = 50;

@@ -14,20 +14,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ReminderScheduler {
     
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
     
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
     
     @Autowired
     @org.springframework.context.annotation.Lazy
     private EventRegistrationService eventRegistrationService;
 
-    @Autowired
-    private EmailQueueRepository emailQueueRepository;
+    private final EmailQueueRepository emailQueueRepository;
     
     /**
      * Runs every hour to check for events

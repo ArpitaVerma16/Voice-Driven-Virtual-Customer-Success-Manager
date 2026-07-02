@@ -14,16 +14,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/language")
+@lombok.RequiredArgsConstructor
 public class LanguageController {
     
-    @Autowired
-    private LanguageDetectionService languageDetectionService;
+    private final LanguageDetectionService languageDetectionService;
     
-    @Autowired
-    private HindiCommandMapper hindiCommandMapper;
+    private final HindiCommandMapper hindiCommandMapper;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     @PostMapping("/detect")
     public ResponseEntity<Map<String, Object>> detectLanguage(@Valid @RequestBody Map<String, String> request) {
