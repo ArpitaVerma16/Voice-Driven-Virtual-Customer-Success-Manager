@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class CommandTemplateService {
 
         } catch (Exception e) {
             log.error("❌ Failed to load command templates: " + e.getMessage());
+            log.error("Failed to load command templates: {}", e.getMessage(), e);
         }
     }
 

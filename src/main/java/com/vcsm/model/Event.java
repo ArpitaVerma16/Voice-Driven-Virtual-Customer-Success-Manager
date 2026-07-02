@@ -1,9 +1,7 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +17,19 @@ public class Event {
     @NotBlank(message = "Event name is required")
     private String name;
 
+    @Size(max = 2000)
     @Column(length = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)
     private EventCategory category;
 
+    @Size(max = 500)
     private String location;
-
-    @Future(message = "Event date must be in the future")
+    @NotNull
     private LocalDateTime eventDate;
-
-    @Min(value = 1, message = "Maximum capacity must be at least 1")
+    @Min(1)
+    @Max(10000)
     private int maxCapacity;
     private int registrations = 0;
     private boolean active = true;

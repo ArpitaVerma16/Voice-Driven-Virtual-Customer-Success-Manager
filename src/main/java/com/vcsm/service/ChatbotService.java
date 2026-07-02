@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.*;
 
@@ -51,6 +53,7 @@ public class ChatbotService {
 
         } catch (Exception e) {
             log.error("❌ Failed to load FAQs: " + e.getMessage());
+            log.error("Failed to load FAQs: {}", e.getMessage(), e);
         }
     }
 

@@ -3,6 +3,7 @@ package com.vcsm.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,20 +22,25 @@ public class Complaint {
 
     @NotBlank(message = "Description is required")
     @Column(nullable = false, length = 1000)
+    @Size(max = 500)
+    @Column(length = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull
     private ComplaintStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull
     private ComplaintCategory category;
 
     @Column(length = 20)
     private String apartmentNumber;
 
     @Column(length = 100)
+    @Email
     private String contactEmail;
 
     private LocalDateTime createdAt;

@@ -1,7 +1,7 @@
 package com.vcsm.security.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +24,14 @@ public class AppUser implements UserDetails {
     private String username;
 
     @NotBlank
+    @Size(min = 8)
     @Column(nullable = false)
     private String passwordHash;
+
+    @NotBlank
+    @Email
+    @Column(nullable = false, length = 100)
+    private String email;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "app_user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -44,6 +50,14 @@ public class AppUser implements UserDetails {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Set<UserRole> getRoles() {

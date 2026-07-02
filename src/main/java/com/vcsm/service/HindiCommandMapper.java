@@ -6,12 +6,16 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class HindiCommandMapper {
+
+    private static final Logger log = LoggerFactory.getLogger(HindiCommandMapper.class);
     
     private Map<String, String> commandMap = new HashMap<>();
     private Map<String, String> responseMap = new HashMap<>();
@@ -48,6 +52,7 @@ public class HindiCommandMapper {
             
         } catch (Exception e) {
             log.error("❌ Failed to load Hindi commands: " + e.getMessage());
+            log.error("Failed to load Hindi commands: {}", e.getMessage(), e);
         }
     }
     

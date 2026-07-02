@@ -1,6 +1,7 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +16,7 @@ public class VoiceProfile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
+    @NotBlank
     @Column(nullable = false)
     private String name;
     

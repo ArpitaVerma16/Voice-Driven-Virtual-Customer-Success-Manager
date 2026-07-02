@@ -2,9 +2,12 @@ package com.vcsm.model;
 
 import java.util.List;
 import java.util.Map;
+import jakarta.validation.constraints.*;
 
 public class AgentRequest {
+    @NotBlank
     private String userQuery;
+    @NotNull
     private Long userId;
     private List<String> intents;
     private Map<String, Object> context;

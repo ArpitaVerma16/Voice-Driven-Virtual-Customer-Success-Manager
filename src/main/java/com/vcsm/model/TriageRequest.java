@@ -1,9 +1,12 @@
 package com.vcsm.model;
 
 import java.time.LocalDateTime;
+import jakarta.validation.constraints.*;
 
 public class TriageRequest {
+    @NotNull
     private Long complaintId;
+    @NotBlank
     private String description;
     private String category;
     private String severity;

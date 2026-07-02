@@ -5,12 +5,16 @@ import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class ProactiveOutreachService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProactiveOutreachService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -97,6 +101,7 @@ public class ProactiveOutreachService {
             return true;
         } catch (Exception e) {
             log.error("Failed to send email: " + e.getMessage());
+            log.error("Failed to send email to {}: {}", user.getEmail(), e.getMessage(), e);
             return false;
         }
     }
@@ -123,4 +128,3 @@ public class ProactiveOutreachService {
         public String getDetails() { return details; }
     }
 }
-

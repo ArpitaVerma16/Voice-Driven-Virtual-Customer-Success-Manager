@@ -1,6 +1,7 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,12 +16,15 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private User user;
     
+    @NotBlank
     @Column(nullable = false)
     private String title;
     
+    @NotBlank
     @Column(length = 500)
     private String message;
     
+    @Pattern(regexp = "INFO|WARNING|ERROR|SUCCESS")
     private String type; // INFO, SUCCESS, WARNING, ERROR
     
     private String link; // URL to navigate

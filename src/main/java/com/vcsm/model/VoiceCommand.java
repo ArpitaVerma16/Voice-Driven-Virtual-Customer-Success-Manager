@@ -1,6 +1,7 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,10 @@ public class VoiceCommand {
     private Long id;
 
     @Column(length = 2000)
+    @NotBlank
     private String transcript;
 
+    @NotBlank
     private String intent;
 
     @Column(length = 2000)
