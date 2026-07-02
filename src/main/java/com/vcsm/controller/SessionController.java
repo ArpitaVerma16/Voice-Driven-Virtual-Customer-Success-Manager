@@ -11,10 +11,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/sessions")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SessionController {
 
-    @Autowired
-    private SessionManagementService sessionManagementService;
+    private final SessionManagementService sessionManagementService;
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody Map<String, String> request) {

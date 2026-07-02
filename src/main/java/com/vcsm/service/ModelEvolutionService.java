@@ -9,16 +9,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ModelEvolutionService {
 
-    @Autowired
-    private ModelVersionRepository modelVersionRepository;
+    private final ModelVersionRepository modelVersionRepository;
 
-    @Autowired
-    private AutoTrainer autoTrainer;
+    private final AutoTrainer autoTrainer;
 
-    @Autowired
-    private DriftDetector driftDetector;
+    private final DriftDetector driftDetector;
 
     /**
      * Run evolution cycle automatically

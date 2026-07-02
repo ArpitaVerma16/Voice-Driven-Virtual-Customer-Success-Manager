@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class RootCauseAnalyzer {
 
-    @Autowired
-    private CausalGraphBuilder causalGraphBuilder;
+    private final CausalGraphBuilder causalGraphBuilder;
 
     /**
      * Find root causes for a given issue

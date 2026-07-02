@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutionException;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class RateLimitingService {
 
     @Autowired
@@ -21,8 +22,7 @@ public class RateLimitingService {
     @Qualifier("authenticatedVoiceApiRateLimiter")
     private LoadingCache<String, RateLimiter> authenticatedLimiters;
 
-    @Autowired
-    private VoiceRateLimitConfig config;
+    private final VoiceRateLimitConfig config;
 
     public boolean isAllowed(String clientIp) throws ExecutionException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

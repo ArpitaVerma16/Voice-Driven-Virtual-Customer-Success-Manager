@@ -12,13 +12,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SchedulingOptimizer {
 
-    @Autowired
-    private QuantumOptimizer quantumOptimizer;
+    private final QuantumOptimizer quantumOptimizer;
 
-    @Autowired
-    private VenueReservationRepository venueReservationRepository;
+    private final VenueReservationRepository venueReservationRepository;
 
     /**
      * Optimize complaint routing

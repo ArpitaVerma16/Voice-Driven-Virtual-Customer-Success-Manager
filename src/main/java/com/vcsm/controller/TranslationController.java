@@ -11,13 +11,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/translation")
+@lombok.RequiredArgsConstructor
 public class TranslationController {
 
-    @Autowired
-    private VoiceTranslationService translationService;
+    private final VoiceTranslationService translationService;
 
-    @Autowired
-    private LanguageDetector languageDetector;
+    private final LanguageDetector languageDetector;
 
     @PostMapping("/translate")
     public ResponseEntity<Map<String, Object>> translate(

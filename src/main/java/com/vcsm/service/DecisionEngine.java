@@ -13,19 +13,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class DecisionEngine {
 
-    @Autowired
-    private DecisionRepository decisionRepository;
+    private final DecisionRepository decisionRepository;
 
-    @Autowired
-    private ExplainabilityService explainabilityService;
+    private final ExplainabilityService explainabilityService;
 
-    @Autowired
-    private ReinforcementLearningService rlService;
+    private final ReinforcementLearningService rlService;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     /**
      * Make autonomous decision for a complaint

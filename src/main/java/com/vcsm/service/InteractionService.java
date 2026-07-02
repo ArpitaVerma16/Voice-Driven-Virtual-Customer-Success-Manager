@@ -16,10 +16,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class InteractionService {
 
-    @Autowired
-    private InteractionRepository interactionRepository;
+    private final InteractionRepository interactionRepository;
 
     // Get current user from security context
     private String getCurrentUsername() {

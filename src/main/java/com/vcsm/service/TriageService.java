@@ -13,16 +13,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class TriageService {
 
-    @Autowired
-    private TicketClassifier classifier;
+    private final TicketClassifier classifier;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private static final Map<String, Integer> CATEGORY_URGENCY = new ConcurrentHashMap<>();
 

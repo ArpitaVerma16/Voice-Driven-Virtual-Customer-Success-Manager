@@ -11,16 +11,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/personalize")
+@lombok.RequiredArgsConstructor
 public class PersonalizationController {
 
-    @Autowired
-    private UserProfileBuilder userProfileBuilder;
+    private final UserProfileBuilder userProfileBuilder;
 
-    @Autowired
-    private RecommendationService recommendationService;
+    private final RecommendationService recommendationService;
 
-    @Autowired
-    private PersonalizationEngine personalizationEngine;
+    private final PersonalizationEngine personalizationEngine;
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<UserProfileBuilder.UserProfile> getProfile(@PathVariable Long userId) {

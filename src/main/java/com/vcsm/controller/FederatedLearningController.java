@@ -12,10 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/federated")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class FederatedLearningController {
 
-    @Autowired
-    private FederatedLearningService federatedLearningService;
+    private final FederatedLearningService federatedLearningService;
 
     @PostMapping("/start")
     public ResponseEntity<FederatedLearningService.FederatedRound> startRound() {

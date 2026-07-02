@@ -14,16 +14,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/transfer")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class TransferController {
 
-    @Autowired
-    private FederatedTransferService federatedTransferService;
+    private final FederatedTransferService federatedTransferService;
 
-    @Autowired
-    private DomainAdapter domainAdapter;
+    private final DomainAdapter domainAdapter;
 
-    @Autowired
-    private KnowledgeTransfer knowledgeTransfer;
+    private final KnowledgeTransfer knowledgeTransfer;
 
     @PostMapping("/node/register")
     public ResponseEntity<FederatedTransferService.FederatedNode> registerNode(

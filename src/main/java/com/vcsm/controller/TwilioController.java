@@ -23,21 +23,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/twilio")
+@lombok.RequiredArgsConstructor
 public class TwilioController {
 
     private static final Logger log = LoggerFactory.getLogger(TwilioController.class);
 
-    @Autowired
-    private TwilioService twilioService;
+    private final TwilioService twilioService;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     // Store call sessions (in production, use Redis or database)
     private final Map<String, Map<String, Object>> callSessions = new ConcurrentHashMap<>();

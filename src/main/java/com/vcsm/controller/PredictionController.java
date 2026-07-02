@@ -10,10 +10,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/predict")
+@lombok.RequiredArgsConstructor
 public class PredictionController {
 
-    @Autowired
-    private PredictionService predictionService;
+    private final PredictionService predictionService;
 
     @GetMapping("/complaints")
     public ResponseEntity<Map<String, Object>> predictComplaints(

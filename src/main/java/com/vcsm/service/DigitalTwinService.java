@@ -12,13 +12,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class DigitalTwinService {
 
-    @Autowired
-    private DigitalTwinRepository digitalTwinRepository;
+    private final DigitalTwinRepository digitalTwinRepository;
 
-    @Autowired
-    private SimulationEngine simulationEngine;
+    private final SimulationEngine simulationEngine;
 
     private final Map<Long, DigitalTwin> activeTwins = new ConcurrentHashMap<>();
 

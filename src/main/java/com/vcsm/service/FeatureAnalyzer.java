@@ -10,10 +10,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class FeatureAnalyzer {
 
-    @Autowired
-    private FeatureUsageRepository featureUsageRepository;
+    private final FeatureUsageRepository featureUsageRepository;
 
     /**
      * Analyze feature usage and generate recommendations

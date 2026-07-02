@@ -10,13 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class QuantumFederatedService {
 
-    @Autowired
-    private QuantumSecureAggregation secureAggregation;
+    private final QuantumSecureAggregation secureAggregation;
 
-    @Autowired
-    private QuantumCircuitBuilder circuitBuilder;
+    private final QuantumCircuitBuilder circuitBuilder;
 
     private final Map<String, FederatedRound> rounds = new ConcurrentHashMap<>();
     private final Map<String, QuantumClientStatus> clientStatus = new ConcurrentHashMap<>();

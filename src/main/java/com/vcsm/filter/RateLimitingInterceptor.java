@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class RateLimitingInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private RateLimitingService rateLimitingService;
+    private final RateLimitingService rateLimitingService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

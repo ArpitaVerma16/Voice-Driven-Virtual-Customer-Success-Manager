@@ -12,16 +12,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SmartRouter {
 
-    @Autowired
-    private TicketClassifier classifier;
+    private final TicketClassifier classifier;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     // Admin expertise mapping
     private static final Map<String, List<String>> ADMIN_EXPERTISE = new HashMap<>();

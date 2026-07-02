@@ -12,10 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/encryption")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class EncryptionController {
 
-    @Autowired
-    private HomomorphicEncryptionService encryptionService;
+    private final HomomorphicEncryptionService encryptionService;
 
     @PostMapping("/keys/generate")
     public ResponseEntity<HomomorphicEncryptionService.KeyPair> generateKeys(@RequestParam String userId) {

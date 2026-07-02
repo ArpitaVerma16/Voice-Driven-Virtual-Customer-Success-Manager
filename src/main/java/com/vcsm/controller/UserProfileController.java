@@ -19,13 +19,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/users")
+@lombok.RequiredArgsConstructor
 public class UserProfileController {
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
-    @Autowired
-    private UserActivityService userActivityService;
+    private final UserActivityService userActivityService;
     
     @GetMapping("/{id}/profile")
     public ResponseEntity<?> getProfile(@PathVariable Long id) {

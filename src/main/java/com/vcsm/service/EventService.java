@@ -17,22 +17,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class EventService {
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EventRegistrationRepository eventRegistrationRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private EventWaitlistRepository eventWaitlistRepository;
+    private final EventWaitlistRepository eventWaitlistRepository;
 
-    @Autowired
-    private EmailLogRepository emailLogRepository;
+    private final EmailLogRepository emailLogRepository;
 
     @Transactional
     public Event createEvent(Event event) { return eventRepository.save(event); }

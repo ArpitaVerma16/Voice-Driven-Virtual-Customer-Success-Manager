@@ -12,10 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/quantum-fed")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class QuantumFederatedController {
 
-    @Autowired
-    private QuantumFederatedService quantumFederatedService;
+    private final QuantumFederatedService quantumFederatedService;
 
     @PostMapping("/start")
     public ResponseEntity<QuantumFederatedService.FederatedRound> startRound() {

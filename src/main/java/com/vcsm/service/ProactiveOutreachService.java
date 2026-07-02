@@ -12,18 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ProactiveOutreachService {
 
     private static final Logger log = LoggerFactory.getLogger(ProactiveOutreachService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserBehaviorMonitor behaviorMonitor;
+    private final UserBehaviorMonitor behaviorMonitor;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     /**
      * Send proactive outreach to at-risk users

@@ -15,16 +15,14 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class IvrService {
 
-    @Autowired
-    private IvrFlowConfigRepository configRepository;
+    private final IvrFlowConfigRepository configRepository;
 
-    @Autowired
-    private IvrSessionRepository sessionRepository;
+    private final IvrSessionRepository sessionRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     private static final String DEFAULT_FLOW = "{\n" +
             "  \"id\": \"root\",\n" +

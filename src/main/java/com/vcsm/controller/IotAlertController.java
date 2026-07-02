@@ -16,16 +16,14 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/iot")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class IotAlertController {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TwilioService twilioService;
+    private final TwilioService twilioService;
 
     @PostMapping("/alert")
     public ResponseEntity<Map<String, Object>> handleIotAlert(@Valid @RequestBody IotAlertPayload payload) {

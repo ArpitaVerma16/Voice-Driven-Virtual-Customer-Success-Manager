@@ -6,16 +6,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class CausalEngine {
 
-    @Autowired
-    private RootCauseAnalyzer rootCauseAnalyzer;
+    private final RootCauseAnalyzer rootCauseAnalyzer;
 
-    @Autowired
-    private CounterfactualSimulator counterfactualSimulator;
+    private final CounterfactualSimulator counterfactualSimulator;
 
-    @Autowired
-    private CausalGraphBuilder causalGraphBuilder;
+    private final CausalGraphBuilder causalGraphBuilder;
 
     /**
      * Complete causal analysis

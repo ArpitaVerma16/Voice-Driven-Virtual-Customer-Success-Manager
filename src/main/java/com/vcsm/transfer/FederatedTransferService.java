@@ -8,13 +8,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class FederatedTransferService {
 
-    @Autowired
-    private DomainAdapter domainAdapter;
+    private final DomainAdapter domainAdapter;
 
-    @Autowired
-    private KnowledgeTransfer knowledgeTransfer;
+    private final KnowledgeTransfer knowledgeTransfer;
 
     private final Map<String, FederatedNode> nodes = new ConcurrentHashMap<>();
     private final Map<String, List<TransferRound>> transferRounds = new ConcurrentHashMap<>();

@@ -8,10 +8,10 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class QuantumMLService {
 
-    @Autowired
-    private QuantumCircuitBuilder circuitBuilder;
+    private final QuantumCircuitBuilder circuitBuilder;
 
     private double[] globalModelParams;
     private static final int NUM_QUBITS = 4;

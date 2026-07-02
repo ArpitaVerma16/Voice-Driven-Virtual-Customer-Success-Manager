@@ -9,13 +9,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SmartContractService {
 
-    @Autowired
-    private SmartContractRepository smartContractRepository;
+    private final SmartContractRepository smartContractRepository;
 
-    @Autowired
-    private OracleService oracleService;
+    private final OracleService oracleService;
 
     /**
      * Create a new smart contract

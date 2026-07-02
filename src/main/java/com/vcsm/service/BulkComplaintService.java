@@ -15,21 +15,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class BulkComplaintService {
 
     private static final Logger log = LoggerFactory.getLogger(BulkComplaintService.class);
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserActivityService userActivityService;
+    private final UserActivityService userActivityService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     private boolean isAdmin() {
         var auth = SecurityContextHolder.getContext().getAuthentication();

@@ -14,10 +14,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/bci")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class BCIController {
 
-    @Autowired
-    private BCIService bciService;
+    private final BCIService bciService;
 
     private boolean isOwnerOrAdmin(CustomUserDetails userDetails, String targetUserId) {
         if (userDetails == null) {

@@ -11,10 +11,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/intents")
 @CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class IntentClassificationController {
 
-    @Autowired
-    private IntentClassificationService intentClassificationService;
+    private final IntentClassificationService intentClassificationService;
 
     @PostMapping("/classify")
     public ResponseEntity<Map<String, Object>> classify(@Valid @RequestBody Map<String, String> request) {

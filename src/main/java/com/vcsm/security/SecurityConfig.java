@@ -29,16 +29,14 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@lombok.RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;
 
-    @Autowired
-    private HmacAuthenticationFilter hmacAuthenticationFilter;
+    private final HmacAuthenticationFilter hmacAuthenticationFilter;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public AuthenticationManager authenticationManager() {
