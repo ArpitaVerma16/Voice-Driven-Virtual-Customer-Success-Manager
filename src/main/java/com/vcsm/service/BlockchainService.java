@@ -3,8 +3,7 @@ package com.vcsm.service;
 import com.vcsm.model.Complaint;
 import com.vcsm.repository.ComplaintRepository;
 import org.springframework.stereotype.Service;
-import org.web3j.crypto.Hash;
-import org.web3j.protocol.Web3j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;

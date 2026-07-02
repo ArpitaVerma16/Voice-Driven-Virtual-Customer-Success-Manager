@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -81,6 +82,7 @@ public class ComplaintService {
         return userRepository.findByEmail(username).orElse(null);
     }
 
+    @Transactional
     public Complaint fileComplaint(Complaint complaint) {
         String username = currentUsername();
         if (username == null) throw new RuntimeException("Unauthorized");
@@ -193,6 +195,7 @@ public class ComplaintService {
         return complaintRepository.findByPriority(priority);
     }
 
+    @Transactional
     public Complaint updateStatus(Long id, String status, String resolvedBy, String notes) {
         if (!isAdmin()) {
             throw new AccessDeniedException("Only admins can update complaint status");
@@ -285,6 +288,7 @@ public class ComplaintService {
         return updated;
     }
 
+    @Transactional
     public Complaint updatePriority(Long id, String newPriority) {
         if (!isAdmin()) {
             throw new AccessDeniedException("Only admins can manually update complaint priority");
@@ -330,6 +334,7 @@ public class ComplaintService {
         return updated;
     }
 
+    @Transactional
     public void deleteComplaint(Long id) {
         if (!isAdmin()) {
             throw new AccessDeniedException("Only admins can delete complaints");

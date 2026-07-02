@@ -10,8 +10,13 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class ComplaintClassifier {
+
+    private static final Logger log = LoggerFactory.getLogger(ComplaintClassifier.class);
 
     private DoccatModel model;
     private DocumentCategorizerME categorizer;
@@ -192,4 +197,3 @@ public class ComplaintClassifier {
         }
     }
 }
-
