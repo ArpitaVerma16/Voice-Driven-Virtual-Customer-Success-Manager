@@ -111,7 +111,7 @@ public class VoiceOtpService {
      */
     public String normalizeToDigits(String text) {
         if (text == null) {
-            return "";
+            return org.springframework.http.ResponseEntity.ok("");
         }
         String lower = text.toLowerCase();
         

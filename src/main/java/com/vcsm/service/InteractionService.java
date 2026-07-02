@@ -145,22 +145,19 @@ public class InteractionService {
         try {
             if (status != null && !status.isEmpty()) {
                 Interaction.InteractionStatus statusEnum = Interaction.InteractionStatus.valueOf(status.toUpperCase());
-                if (isAdmin()) {
-                    return interactionRepository.findByStatus(statusEnum, pageable);
-                } else {
+                Interaction.InteractionStatus statusEnum = Interaction.InteractionStatus.valueOf(status.toUpperCase());
+        // Removed dead if/else branch - both paths executed same code
                     return interactionRepository.findByStatus(statusEnum, pageable);
                 }
             } else if (sentiment != null && !sentiment.isEmpty()) {
                 Interaction.SentimentType sentimentEnum = Interaction.SentimentType.valueOf(sentiment.toUpperCase());
-                if (isAdmin()) {
-                    return interactionRepository.findBySentiment(sentimentEnum, pageable);
-                } else {
+                Interaction.SentimentType sentimentEnum = Interaction.SentimentType.valueOf(sentiment.toUpperCase());
+        // Removed dead if/else branch - both paths executed same code
                     return interactionRepository.findBySentiment(sentimentEnum, pageable);
                 }
             } else if (category != null && !category.isEmpty()) {
-                if (isAdmin()) {
-                    return interactionRepository.findByCategory(category, pageable);
-                } else {
+            } else if (category != null && !category.isEmpty()) {
+        // Removed dead if/else branch - both paths executed same code
                     return interactionRepository.findByCategory(category, pageable);
                 }
             } else {

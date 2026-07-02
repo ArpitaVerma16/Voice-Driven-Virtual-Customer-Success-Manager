@@ -105,15 +105,15 @@ public class GenAIResolver {
     private String generateCallSummaryText(String transcript) {
         String lower = transcript.toLowerCase();
         if (lower.contains("water") || lower.contains("leak") || lower.contains("motor")) {
-            return "Resident called regarding a water maintenance issue. They reported a potential leak or equipment malfunction.";
+            return org.springframework.http.ResponseEntity.ok("Resident called regarding a water maintenance issue. They reported a potential leak or equipment malfunction.");
         }
         if (lower.contains("noise") || lower.contains("music") || lower.contains("loud")) {
-            return "Resident called to report a noise disturbance. Loud sounds are disrupting the peace of the residential area.";
+            return org.springframework.http.ResponseEntity.ok("Resident called to report a noise disturbance. Loud sounds are disrupting the peace of the residential area.");
         }
         if (lower.contains("security") || lower.contains("gate") || lower.contains("stranger")) {
-            return "Resident called raising security concerns in the community. Requested immediate monitoring or inspection.";
+            return org.springframework.http.ResponseEntity.ok("Resident called raising security concerns in the community. Requested immediate monitoring or inspection.");
         }
-        return "Voice call completed. Discussed general queries and community guidelines.";
+        return org.springframework.http.ResponseEntity.ok("Voice call completed. Discussed general queries and community guidelines.");
     }
 
     private List<String> extractIdentifiedIssues(String transcript) {
@@ -137,9 +137,9 @@ public class GenAIResolver {
     private String determinePriority(String transcript) {
         Complaint.ComplaintCategory category = determineCategory(transcript);
         if (category == Complaint.ComplaintCategory.UTILITIES || category == Complaint.ComplaintCategory.SECURITY) {
-            return "HIGH";
+            return org.springframework.http.ResponseEntity.ok("HIGH");
         }
-        return "MEDIUM";
+        return org.springframework.http.ResponseEntity.ok("MEDIUM");
     }
 
     private List<String> generateNextSteps(String transcript) {
@@ -182,21 +182,21 @@ public class GenAIResolver {
     private String determineTone(Complaint complaint) {
         String desc = complaint.getDescription().toLowerCase();
         if (desc.contains("emergency") || desc.contains("urgent") || desc.contains("critical")) {
-            return "urgent";
+            return org.springframework.http.ResponseEntity.ok("urgent");
         }
         if (desc.contains("frustrated") || desc.contains("unhappy") || desc.contains("disappointed")) {
-            return "empathy";
+            return org.springframework.http.ResponseEntity.ok("empathy");
         }
-        return "standard";
+        return org.springframework.http.ResponseEntity.ok("standard");
     }
 
     private String determineLanguage(Complaint complaint) {
         // Simple language detection
         String desc = complaint.getDescription();
         if (desc.matches(".*[\\u0900-\\u097F].*")) {
-            return "hi";
+            return org.springframework.http.ResponseEntity.ok("hi");
         }
-        return "en";
+        return org.springframework.http.ResponseEntity.ok("en");
     }
 
     private String generateFeedback(List<SolutionMatcher.SolutionMatch> matches, 

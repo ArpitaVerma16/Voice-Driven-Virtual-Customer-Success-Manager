@@ -78,7 +78,7 @@ public class CausalGraphBuilder {
             }
         }
 
-        return "No path found";
+        return org.springframework.http.ResponseEntity.ok("No path found");
     }
 
     private String buildPath(Map<String, String> parent, String start, String end) {

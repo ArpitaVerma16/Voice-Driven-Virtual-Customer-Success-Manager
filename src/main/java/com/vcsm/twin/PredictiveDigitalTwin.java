@@ -113,10 +113,10 @@ public class PredictiveDigitalTwin {
 
     private String classifyState(double[] state) {
         double avg = Arrays.stream(state).average().orElse(0);
-        if (avg > 0.7) return "HIGH_LOAD";
-        if (avg > 0.4) return "NORMAL";
-        if (avg > 0.2) return "LOW_LOAD";
-        return "IDLE";
+        if (avg > 0.7) return org.springframework.http.ResponseEntity.ok("HIGH_LOAD");
+        if (avg > 0.4) return org.springframework.http.ResponseEntity.ok("NORMAL");
+        if (avg > 0.2) return org.springframework.http.ResponseEntity.ok("LOW_LOAD");
+        return org.springframework.http.ResponseEntity.ok("IDLE");
     }
 
     /**
