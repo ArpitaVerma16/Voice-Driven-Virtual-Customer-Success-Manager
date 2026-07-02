@@ -79,11 +79,11 @@ public class IvrService {
                 });
         try {
             return objectMapper.readValue(config.getFlowJson(), IvrNode.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Error parsing IVR flow JSON: " + e.getMessage());
             try {
                 return objectMapper.readValue(DEFAULT_FLOW, IvrNode.class);
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 throw new RuntimeException("Fallback default flow is invalid: " + ex.getMessage());
             }
         }
@@ -144,7 +144,7 @@ public class IvrService {
                         matchedChild = child;
                         break;
                     }
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     if (lower.contains(child.getPattern().toLowerCase())) {
                         matchedChild = child;
                         break;

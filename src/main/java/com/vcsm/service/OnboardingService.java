@@ -41,7 +41,7 @@ public class OnboardingService {
             
             log.info("✅ Tutorial steps loaded: " + tutorialSteps.size() + " steps");
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("❌ Failed to load tutorial steps: " + e.getMessage());
             log.error("Failed to load tutorial steps: {}", e.getMessage(), e);
         }

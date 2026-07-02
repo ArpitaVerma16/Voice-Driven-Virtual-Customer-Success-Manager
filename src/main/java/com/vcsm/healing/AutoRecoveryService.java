@@ -33,7 +33,7 @@ public class AutoRecoveryService {
             recoveryHistory.add(logEntry);
 
             return new RecoveryResult(recoveryId, status, action, logEntry);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Recovery {} failed for action {}: {}", recoveryId, action.getType(), e.getMessage(), e);
             return new RecoveryResult(recoveryId, "FAILED", action, "Recovery failed: " + e.getMessage());
         }

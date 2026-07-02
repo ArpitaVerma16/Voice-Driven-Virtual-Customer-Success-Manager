@@ -51,7 +51,7 @@ public class ChatbotService {
 
             log.info("✅ Chatbot loaded with " + faqs.size() + " FAQs");
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("❌ Failed to load FAQs: " + e.getMessage());
             log.error("Failed to load FAQs: {}", e.getMessage(), e);
         }

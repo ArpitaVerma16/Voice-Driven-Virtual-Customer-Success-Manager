@@ -159,7 +159,7 @@ public class WebController {
             if (endDate != null && !endDate.isEmpty()) {
                 end = LocalDateTime.parse(endDate + "T23:59:59");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // Ignore date parsing errors
         }
 
@@ -260,7 +260,7 @@ public class WebController {
                 stats.put("negative", 0L);
             }
             model.addAttribute("interactionStats", stats);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             model.addAttribute("interactionStats", new HashMap<>());
         }
         return "interaction-history";

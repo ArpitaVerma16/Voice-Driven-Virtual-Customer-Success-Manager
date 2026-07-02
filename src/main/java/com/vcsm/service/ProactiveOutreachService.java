@@ -99,7 +99,7 @@ public class ProactiveOutreachService {
         try {
             emailService.sendSimpleEmail(user.getEmail(), subject, message);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Failed to send email: " + e.getMessage());
             log.error("Failed to send email to {}: {}", user.getEmail(), e.getMessage(), e);
             return false;

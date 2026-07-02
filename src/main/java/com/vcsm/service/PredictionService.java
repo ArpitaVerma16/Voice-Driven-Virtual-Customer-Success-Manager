@@ -51,7 +51,7 @@ public class PredictionService {
         
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
@@ -80,7 +80,7 @@ public class PredictionService {
         
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
@@ -109,7 +109,7 @@ public class PredictionService {
         
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
@@ -127,7 +127,7 @@ public class PredictionService {
         
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to parse ML service response", e);
         }
     }
@@ -272,7 +272,7 @@ public class PredictionService {
                 System.out.println("🚨 High dissatisfaction detected for resident: " + user.getEmail() + " (CDI: " + cdi + "). Triggering preemptive outreach.");
                 try {
                     proactiveOutreachService.sendProactiveOutreach(user.getId(), "email");
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     System.err.println("❌ Failed to trigger outreach: " + e.getMessage());
                 }
             }

@@ -33,7 +33,7 @@ public class LanguageDetectionEnhancedService {
         try {
             SupportedLanguage.fromCode(languageCode);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
     }

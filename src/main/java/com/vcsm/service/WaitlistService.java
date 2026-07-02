@@ -101,10 +101,10 @@ public class WaitlistService {
                 .findFirstByEventAndConfirmedFalseAndNotifiedAtIsNullOrderByJoinedAtAsc(event);
             
             log.info("✅ Notification sent to user: " + user.getEmail());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("❌ Failed to send notification: " + e.getMessage());
             System.out.println("✅ Notification sent to user: " + user.getEmail());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Failed to send waitlist notification to user {}: {}", user.getEmail(), e.getMessage(), e);
         }
     }

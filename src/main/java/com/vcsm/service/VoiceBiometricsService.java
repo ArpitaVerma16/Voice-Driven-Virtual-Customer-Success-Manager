@@ -85,7 +85,7 @@ public class VoiceBiometricsService {
             return new VoiceVerificationResponse(true, 1.0, 
                 "Voice enrollment successful! You can now use voice commands.", userId, user.getName());
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Voice enrollment failed for user {}: {}", userId, e.getMessage(), e);
             return new VoiceVerificationResponse(false, 0, 
                 "Enrollment failed: " + e.getMessage());
@@ -152,7 +152,7 @@ public class VoiceBiometricsService {
             
             return new VoiceVerificationResponse(verified, similarity, message, userId, user.getName());
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Voice verification failed for user {}: {}", userId, e.getMessage(), e);
             return new VoiceVerificationResponse(false, 0, 
                 "Verification failed: " + e.getMessage());

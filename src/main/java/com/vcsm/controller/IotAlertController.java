@@ -88,7 +88,7 @@ public class IotAlertController {
             if (sms != null) {
                 smsTriggered = true;
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // Ignore
         }
 
@@ -97,7 +97,7 @@ public class IotAlertController {
             if (call != null) {
                 callTriggered = true;
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // Ignore
         }
 

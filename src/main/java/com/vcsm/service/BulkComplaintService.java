@@ -93,7 +93,7 @@ public class BulkComplaintService {
                 } else {
                     processed.add(id);
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 failed.add(id);
                 log.warn("Failed to resolve complaint {}: {}", id, e.getMessage(), e);
             }
@@ -146,7 +146,7 @@ public class BulkComplaintService {
                         id
                     );
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 failed.add(id);
                 log.warn("Failed to update complaint {}: {}", id, e.getMessage(), e);
             }

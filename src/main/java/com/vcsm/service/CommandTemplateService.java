@@ -45,7 +45,7 @@ public class CommandTemplateService {
 
             log.info("✅ Command templates loaded: " + templates.size());
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("❌ Failed to load command templates: " + e.getMessage());
             log.error("Failed to load command templates: {}", e.getMessage(), e);
         }

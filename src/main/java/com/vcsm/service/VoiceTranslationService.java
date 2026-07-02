@@ -92,7 +92,7 @@ public class VoiceTranslationService {
             
             return text;
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException("Translation API call failed", e);
         }
     }
