@@ -1,5 +1,6 @@
 package com.vcsm.service;
 
+import com.vcsm.exception.EventCapacityExceededException;
 import com.vcsm.model.Event;
 import com.vcsm.model.User;
 import com.vcsm.model.EventRegistration;
@@ -90,10 +91,10 @@ public class EventService {
 
         // Capacity validation
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException(
-                "Event Full! Maximum capacity of "
-                        + event.getMaxCapacity()
-                        + " participants reached."
+            throw new EventCapacityExceededException(
+                "Event has reached its maximum capacity of "
+                    + event.getMaxCapacity()
+                    + " participants."
             );
         }
 
