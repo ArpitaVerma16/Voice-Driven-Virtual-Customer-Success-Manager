@@ -13,9 +13,9 @@ import java.util.Map;
 @Service
 public class HindiCommandMapper {
     
-    private Map<String, String> commandMap = new HashMap<>();
-    private Map<String, String> responseMap = new HashMap<>();
-    private Map<String, String[]> keywordMap = new HashMap<>();
+    private Map<String, String> commandMap = new ConcurrentHashMap<>();
+    private Map<String, String> responseMap = new ConcurrentHashMap<>();
+    private Map<String, String[]> keywordMap = new ConcurrentHashMap<>();
     
     @PostConstruct
     public void init() {

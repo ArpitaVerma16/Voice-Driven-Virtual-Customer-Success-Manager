@@ -2,13 +2,14 @@ package com.vcsm.service;
 
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 @Service
 public class PriorityClassifierService {
 
-    private static final Map<Pattern, String> PRIORITY_KEYWORDS = new HashMap<>();
+    private static final Map<Pattern, String> PRIORITY_KEYWORDS = new ConcurrentHashMap<>();
 
     static {
         // CRITICAL - Immediate attention (1 hour response)

@@ -24,7 +24,7 @@ public class TriageService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final Map<String, Integer> CATEGORY_URGENCY = new HashMap<>();
+    private static final Map<String, Integer> CATEGORY_URGENCY = new ConcurrentHashMap<>();
 
     static {
         CATEGORY_URGENCY.put("SECURITY", 100);

@@ -18,7 +18,7 @@ public class FederatedLearningService {
     @Autowired
     private PrivacyEngine privacyEngine;
 
-    private final Map<String, FederatedRound> rounds = new HashMap<>();
+    private final Map<String, FederatedRound> rounds = new ConcurrentHashMap<>();
     private int roundNumber = 0;
 
     /**

@@ -3,6 +3,7 @@ package com.vcsm.service;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -13,8 +14,8 @@ public class LanguageDetector {
     private static final Pattern HINDI_PATTERN = Pattern.compile("[\\u0900-\\u097F]");
     
     // Language codes mapping
-    private static final Map<String, String> LANGUAGE_NAMES = new HashMap<>();
-    private static final Map<String, String> LANGUAGE_CODES = new HashMap<>();
+    private static final Map<String, String> LANGUAGE_NAMES = new ConcurrentHashMap<>();
+    private static final Map<String, String> LANGUAGE_CODES = new ConcurrentHashMap<>();
     
     static {
         LANGUAGE_NAMES.put("hi", "Hindi");

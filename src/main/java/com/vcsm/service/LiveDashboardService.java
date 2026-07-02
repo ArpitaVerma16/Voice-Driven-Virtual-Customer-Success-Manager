@@ -26,7 +26,7 @@ public class LiveDashboardService {
     private final AtomicInteger totalActiveUsers = new AtomicInteger(0);
 
     // Live stats cache
-    private Map<String, Object> cachedStats = new HashMap<>();
+    private Map<String, Object> cachedStats = new ConcurrentHashMap<>();
     private long lastUpdateTime = 0;
 
     public Map<String, Object> getLiveStats() {
