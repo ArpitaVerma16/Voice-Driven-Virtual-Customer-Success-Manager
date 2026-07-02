@@ -2,6 +2,8 @@ package com.vcsm.service;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.repository.ComplaintRepository;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class BlockchainService {
     /**
      * Initialize blockchain with genesis block
      */
+    @PostConstruct
     public void initBlockchain() {
         if (blockchain.isEmpty()) {
             Block genesisBlock = new Block(
