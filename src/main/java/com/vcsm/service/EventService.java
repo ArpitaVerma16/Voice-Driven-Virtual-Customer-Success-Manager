@@ -70,7 +70,11 @@ public class EventService {
 
     @Transactional
     public Event registerForEvent(Long eventId, Long userId) {
-        Event event = eventRepository.findById(eventId)
+        // Pessimistic lock: concurrent registrations for the same event are
+        // serialized here, so the duplicate and capacity checks below cannot
+        // pass simultaneously in two transactions (double-click, network
+        // retry, or parallel clients).
+        Event event = eventRepository.findWithLockById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
@@ -98,9 +102,16 @@ public class EventService {
             );
         }
 
-        // Create and save event registration
+        // Create and save event registration. The unique (user_id, event_id)
+        // constraint on event_registrations is the last line of defense: if a
+        // duplicate slips past the check above, translate the constraint
+        // violation into the same friendly error instead of a 500.
         EventRegistration registration = new EventRegistration(user, event);
-        registration = eventRegistrationRepository.save(registration);
+        try {
+            registration = eventRegistrationRepository.saveAndFlush(registration);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("User already registered for this event");
+        }
 
         // Generate signed ticket token
         String token = jwtService.generateTicketToken(registration.getId(), user.getId(), event.getId());
