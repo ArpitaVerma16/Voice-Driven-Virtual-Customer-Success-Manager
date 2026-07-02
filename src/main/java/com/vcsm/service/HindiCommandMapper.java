@@ -82,11 +82,11 @@ public class HindiCommandMapper {
     
     private String mapKeywordToAction(String keyword) {
         switch (keyword) {
-            case "complaint": return "file_complaint";
-            case "event": return "show_events";
-            case "status": return "complaint_status";
-            case "help": return "help";
-            case "cancel": return "cancel_registration";
+            case "complaint": return org.springframework.http.ResponseEntity.ok("file_complaint");
+            case "event": return org.springframework.http.ResponseEntity.ok("show_events");
+            case "status": return org.springframework.http.ResponseEntity.ok("complaint_status");
+            case "help": return org.springframework.http.ResponseEntity.ok("help");
+            case "cancel": return org.springframework.http.ResponseEntity.ok("cancel_registration");
             default: return null;
         }
     }

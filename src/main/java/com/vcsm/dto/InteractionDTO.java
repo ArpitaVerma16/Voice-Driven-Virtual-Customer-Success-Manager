@@ -98,13 +98,13 @@ public class InteractionDTO {
 
     // Helper method to format dates for display
     public String getFormattedCreatedAt() {
-        if (createdAt == null) return "";
+        if (createdAt == null) return org.springframework.http.ResponseEntity.ok("");
         return createdAt.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm"));
     }
 
     // Helper method for sentiment badge color
     public String getSentimentBadgeClass() {
-        if (sentiment == null) return "badge-secondary";
+        if (sentiment == null) return org.springframework.http.ResponseEntity.ok("badge-secondary");
         return switch (sentiment) {
             case "POSITIVE" -> "badge-success";
             case "NEGATIVE" -> "badge-danger";
@@ -114,7 +114,7 @@ public class InteractionDTO {
 
     // Helper method for status badge color
     public String getStatusBadgeClass() {
-        if (status == null) return "badge-secondary";
+        if (status == null) return org.springframework.http.ResponseEntity.ok("badge-secondary");
         return switch (status) {
             case "COMPLETED" -> "badge-success";
             case "IN_PROGRESS" -> "badge-info";

@@ -29,9 +29,9 @@ public class SentimentResult {
 
     public String getEscalationReason() {
         if (!requiresEscalation) return null;
-        if (sentiment == Sentiment.DISTRESSED) return "Distressed customer detected";
-        if (negativeScore > 0.7) return "High negativity score";
-        if (negativeKeywords > 5) return "Multiple escalation keywords";
-        return "Escalation threshold exceeded";
+        if (sentiment == Sentiment.DISTRESSED) return org.springframework.http.ResponseEntity.ok("Distressed customer detected");
+        if (negativeScore > 0.7) return org.springframework.http.ResponseEntity.ok("High negativity score");
+        if (negativeKeywords > 5) return org.springframework.http.ResponseEntity.ok("Multiple escalation keywords");
+        return org.springframework.http.ResponseEntity.ok("Escalation threshold exceeded");
     }
 }
