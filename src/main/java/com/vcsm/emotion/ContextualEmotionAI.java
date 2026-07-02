@@ -50,60 +50,60 @@ public class ContextualEmotionAI {
     }
 
     private String analyzeTextSentiment(String text) {
-        if (text == null || text.isEmpty()) return "NEUTRAL";
+        if (text == null || text.isEmpty()) return org.springframework.http.ResponseEntity.ok("NEUTRAL");
 
         String lower = text.toLowerCase();
         if (lower.contains("happy") || lower.contains("love") || lower.contains("great") || lower.contains("good")) {
-            return "POSITIVE";
+            return org.springframework.http.ResponseEntity.ok("POSITIVE");
         } else if (lower.contains("sad") || lower.contains("angry") || lower.contains("frustrated") || lower.contains("bad")) {
-            return "NEGATIVE";
+            return org.springframework.http.ResponseEntity.ok("NEGATIVE");
         } else if (lower.contains("excited") || lower.contains("amazing") || lower.contains("wonderful")) {
-            return "VERY_POSITIVE";
+            return org.springframework.http.ResponseEntity.ok("VERY_POSITIVE");
         } else if (lower.contains("terrible") || lower.contains("awful") || lower.contains("horrible")) {
-            return "VERY_NEGATIVE";
+            return org.springframework.http.ResponseEntity.ok("VERY_NEGATIVE");
         }
-        return "NEUTRAL";
+        return org.springframework.http.ResponseEntity.ok("NEUTRAL");
     }
 
     private String detectVoiceEmotion(double[] voiceFeatures) {
-        if (voiceFeatures == null || voiceFeatures.length == 0) return "NEUTRAL";
+        if (voiceFeatures == null || voiceFeatures.length == 0) return org.springframework.http.ResponseEntity.ok("NEUTRAL");
 
         // Simulate voice emotion detection
         double avg = Arrays.stream(voiceFeatures).average().orElse(0);
         double variance = calculateVariance(voiceFeatures);
 
-        if (avg > 0.7 && variance < 0.2) return "EXCITED";
-        if (avg > 0.6 && variance > 0.3) return "ANGRY";
-        if (avg < 0.3 && variance < 0.1) return "SAD";
-        if (avg < 0.2 && variance < 0.05) return "DEPRESSED";
-        if (avg > 0.5 && variance < 0.15) return "HAPPY";
-        return "NEUTRAL";
+        if (avg > 0.7 && variance < 0.2) return org.springframework.http.ResponseEntity.ok("EXCITED");
+        if (avg > 0.6 && variance > 0.3) return org.springframework.http.ResponseEntity.ok("ANGRY");
+        if (avg < 0.3 && variance < 0.1) return org.springframework.http.ResponseEntity.ok("SAD");
+        if (avg < 0.2 && variance < 0.05) return org.springframework.http.ResponseEntity.ok("DEPRESSED");
+        if (avg > 0.5 && variance < 0.15) return org.springframework.http.ResponseEntity.ok("HAPPY");
+        return org.springframework.http.ResponseEntity.ok("NEUTRAL");
     }
 
     private String analyzeFacialExpression(double[] facialFeatures) {
-        if (facialFeatures == null || facialFeatures.length == 0) return "NEUTRAL";
+        if (facialFeatures == null || facialFeatures.length == 0) return org.springframework.http.ResponseEntity.ok("NEUTRAL");
 
         // Simulate facial expression analysis
         double avg = Arrays.stream(facialFeatures).average().orElse(0);
 
-        if (avg > 0.8) return "SMILING";
-        if (avg > 0.6) return "NEUTRAL";
-        if (avg > 0.4) return "FROWNING";
-        if (avg > 0.2) return "ANGRY";
-        return "CONFUSED";
+        if (avg > 0.8) return org.springframework.http.ResponseEntity.ok("SMILING");
+        if (avg > 0.6) return org.springframework.http.ResponseEntity.ok("NEUTRAL");
+        if (avg > 0.4) return org.springframework.http.ResponseEntity.ok("FROWNING");
+        if (avg > 0.2) return org.springframework.http.ResponseEntity.ok("ANGRY");
+        return org.springframework.http.ResponseEntity.ok("CONFUSED");
     }
 
     private String getContext(String userId) {
         EmotionHistory history = userHistory.get(userId);
         if (history == null || history.getEmotions().isEmpty()) {
-            return "FIRST_INTERACTION";
+            return org.springframework.http.ResponseEntity.ok("FIRST_INTERACTION");
         }
 
         List<String> recentEmotions = history.getEmotions();
         String lastEmotion = recentEmotions.get(recentEmotions.size() - 1);
 
         if (recentEmotions.size() > 5) {
-            return "REPEATED_INTERACTION";
+            return org.springframework.http.ResponseEntity.ok("REPEATED_INTERACTION");
         }
         return lastEmotion;
     }
@@ -248,7 +248,7 @@ public class ContextualEmotionAI {
         }
 
         public String getDominantEmotion() {
-            if (emotions.isEmpty()) return "NEUTRAL";
+            if (emotions.isEmpty()) return org.springframework.http.ResponseEntity.ok("NEUTRAL");
             Map<String, Long> counts = new HashMap<>();
             for (String e : emotions) {
                 counts.put(e, counts.getOrDefault(e, 0L) + 1);

@@ -38,7 +38,7 @@ public class VoiceTranslationService {
     @CircuitBreaker(name = "translationService", fallbackMethod = "translateTextFallback")
     public String translateText(String text, String sourceLang, String targetLang) {
         if (text == null || text.isEmpty()) {
-            return "";
+            return org.springframework.http.ResponseEntity.ok("");
         }
         
         if (sourceLang.equals(targetLang)) {
@@ -62,35 +62,35 @@ public class VoiceTranslationService {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(conn.getInputStream())
-            );
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-            
-            // Parse response
-            Map<String, Object> json = objectMapper.readValue(
-                response.toString(), 
-                Map.class
-            );
-            
-            Map<String, Object> data = (Map<String, Object>) json.get("data");
-            if (data != null) {
-                Object translations = data.get("translations");
-                if (translations instanceof java.util.List) {
-                    java.util.List<Map<String, Object>> list = 
-                        (java.util.List<Map<String, Object>>) translations;
-                    if (!list.isEmpty()) {
-                        return (String) list.get(0).get("translatedText");
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                
+                // Parse response
+                Map<String, Object> json = objectMapper.readValue(
+                    response.toString(),
+                    new TypeReference<Map<String, Object>>() {}
+                );
+                
+                Map<String, Object> data = (Map<String, Object>) json.get("data");
+                if (data != null) {
+                    Object translations = data.get("translations");
+                    if (translations instanceof java.util.List) {
+                        java.util.List<Map<String, Object>> list =
+                            (java.util.List<Map<String, Object>>) translations;
+                        if (!list.isEmpty()) {
+                            return (String) list.get(0).get("translatedText");
+                        }
                     }
                 }
+                return text;
+            } finally {
+                conn.disconnect();
             }
-            
-            return text;
             
         } catch (Exception e) {
             throw new RuntimeException("Translation API call failed", e);
@@ -107,7 +107,7 @@ public class VoiceTranslationService {
 
     public String translateTextFallback(String text, String sourceLang, String targetLang, Throwable t) {
         log.warn("Circuit breaker triggered for translation service: {}", t.getMessage());
-        return "Service temporarily unavailable, please try again.";
+        return org.springframework.http.ResponseEntity.ok("Service temporarily unavailable, please try again.");
     }
 
     /**
@@ -131,76 +131,76 @@ public class VoiceTranslationService {
         // Simple mock translations for common phrases
         String lower = text.toLowerCase();
         if (lower.contains("शिकायत") || lower.contains("shikayat")) {
-            return "Complaint filed successfully";
+            return org.springframework.http.ResponseEntity.ok("Complaint filed successfully");
         } else if (lower.contains("नमस्ते") || lower.contains("namaste")) {
-            return "Hello! How can I help you?";
+            return org.springframework.http.ResponseEntity.ok("Hello! How can I help you?");
         } else if (lower.contains("धन्यवाद") || lower.contains("dhanyavaad")) {
-            return "You're welcome!";
+            return org.springframework.http.ResponseEntity.ok("You're welcome!");
         } else if (lower.contains("मदद") || lower.contains("madad")) {
-            return "I'm here to help you";
+            return org.springframework.http.ResponseEntity.ok("I'm here to help you");
         } else if (lower.contains("स्टेटस") || lower.contains("status")) {
-            return "Your complaint status is: In Progress";
+            return org.springframework.http.ResponseEntity.ok("Your complaint status is: In Progress");
         } else if (lower.contains("इवेंट") || lower.contains("event")) {
-            return "Events are available on the Events page";
+            return org.springframework.http.ResponseEntity.ok("Events are available on the Events page");
         } else {
-            return "I understand your query. Our team will look into it.";
+            return org.springframework.http.ResponseEntity.ok("I understand your query. Our team will look into it.");
         }
     }
 
     private String getEnglishToHindiMock(String text) {
         String lower = text.toLowerCase();
         if (lower.contains("complaint")) {
-            return "शिकायत सफलतापूर्वक दर्ज की गई";
+            return org.springframework.http.ResponseEntity.ok("शिकायत सफलतापूर्वक दर्ज की गई");
         } else if (lower.contains("hello") || lower.contains("hi")) {
-            return "नमस्ते! मैं आपकी कैसे मदद कर सकता हूँ?";
+            return org.springframework.http.ResponseEntity.ok("नमस्ते! मैं आपकी कैसे मदद कर सकता हूँ?");
         } else if (lower.contains("thank")) {
-            return "आपका स्वागत है!";
+            return org.springframework.http.ResponseEntity.ok("आपका स्वागत है!");
         } else if (lower.contains("help")) {
-            return "मैं आपकी मदद के लिए यहाँ हूँ";
+            return org.springframework.http.ResponseEntity.ok("मैं आपकी मदद के लिए यहाँ हूँ");
         } else if (lower.contains("status")) {
-            return "आपकी शिकायत का स्टेटस: प्रगति पर है";
+            return org.springframework.http.ResponseEntity.ok("आपकी शिकायत का स्टेटस: प्रगति पर है");
         } else if (lower.contains("event")) {
-            return "इवेंट पेज पर इवेंट उपलब्ध हैं";
+            return org.springframework.http.ResponseEntity.ok("इवेंट पेज पर इवेंट उपलब्ध हैं");
         } else {
-            return "मैं आपका प्रश्न समझ गया। हमारी टीम इस पर ध्यान देगी।";
+            return org.springframework.http.ResponseEntity.ok("मैं आपका प्रश्न समझ गया। हमारी टीम इस पर ध्यान देगी।");
         }
     }
 
     private String getSpanishToEnglishMock(String text) {
         String lower = text.toLowerCase();
         if (lower.contains("problema") || lower.contains("queja")) {
-            return "Complaint filed successfully";
+            return org.springframework.http.ResponseEntity.ok("Complaint filed successfully");
         } else if (lower.contains("hola")) {
-            return "Hello! How can I help you?";
+            return org.springframework.http.ResponseEntity.ok("Hello! How can I help you?");
         } else if (lower.contains("gracias")) {
-            return "You're welcome!";
+            return org.springframework.http.ResponseEntity.ok("You're welcome!");
         } else if (lower.contains("ayuda")) {
-            return "I'm here to help you";
+            return org.springframework.http.ResponseEntity.ok("I'm here to help you");
         } else if (lower.contains("estado")) {
-            return "Your complaint status is: In Progress";
+            return org.springframework.http.ResponseEntity.ok("Your complaint status is: In Progress");
         } else if (lower.contains("evento")) {
-            return "Events are available on the Events page";
+            return org.springframework.http.ResponseEntity.ok("Events are available on the Events page");
         } else {
-            return "I understand your query. Our team will look into it.";
+            return org.springframework.http.ResponseEntity.ok("I understand your query. Our team will look into it.");
         }
     }
 
     private String getEnglishToSpanishMock(String text) {
         String lower = text.toLowerCase();
         if (lower.contains("complaint")) {
-            return "Queja registrada con éxito";
+            return org.springframework.http.ResponseEntity.ok("Queja registrada con éxito");
         } else if (lower.contains("hello") || lower.contains("hi")) {
-            return "¡Hola! ¿Cómo puedo ayudarte?";
+            return org.springframework.http.ResponseEntity.ok("¡Hola! ¿Cómo puedo ayudarte?");
         } else if (lower.contains("thank")) {
-            return "¡De nada!";
+            return org.springframework.http.ResponseEntity.ok("¡De nada!");
         } else if (lower.contains("help")) {
-            return "Estoy aquí para ayudarte";
+            return org.springframework.http.ResponseEntity.ok("Estoy aquí para ayudarte");
         } else if (lower.contains("status")) {
-            return "El estado de tu queja es: En progreso";
+            return org.springframework.http.ResponseEntity.ok("El estado de tu queja es: En progreso");
         } else if (lower.contains("event")) {
-            return "Los eventos están disponibles en la página de eventos";
+            return org.springframework.http.ResponseEntity.ok("Los eventos están disponibles en la página de eventos");
         } else {
-            return "Entiendo tu consulta. Nuestro equipo la revisará.";
+            return org.springframework.http.ResponseEntity.ok("Entiendo tu consulta. Nuestro equipo la revisará.");
         }
     }
 
@@ -211,3 +211,4 @@ public class VoiceTranslationService {
         return languageDetector.getSupportedLanguages();
     }
 }
+

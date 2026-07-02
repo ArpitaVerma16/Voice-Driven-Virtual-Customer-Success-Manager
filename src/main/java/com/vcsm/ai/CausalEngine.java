@@ -70,7 +70,7 @@ public class CausalEngine {
 
     private String generateImpactSummary(RootCauseAnalyzer.RootCauseAnalysis analysis) {
         if (analysis.getRootCauses().isEmpty()) {
-            return "No clear root causes identified";
+            return org.springframework.http.ResponseEntity.ok("No clear root causes identified");
         }
         return "Root causes: " + String.join(", ", analysis.getRootCauses());
     }

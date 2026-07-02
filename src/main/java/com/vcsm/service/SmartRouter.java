@@ -82,18 +82,11 @@ public class SmartRouter {
         urgency = categoryUrgency.getOrDefault(category, 50);
 
         // Keyword boosts
-        if (containsAny(lower, "emergency", "urgent", "critical", "danger", "fire")) urgency += 20;
-        if (containsAny(lower, "water", "leak", "flood", "power", "outage")) urgency += 15;
-        if (containsAny(lower, "again", "repeat", "still", "not fixed")) urgency += 10;
+        if (ComplaintRoutingUtils.containsAny(lower, "emergency", "urgent", "critical", "danger", "fire")) urgency += 20;
+        if (ComplaintRoutingUtils.containsAny(lower, "water", "leak", "flood", "power", "outage")) urgency += 15;
+        if (ComplaintRoutingUtils.containsAny(lower, "again", "repeat", "still", "not fixed")) urgency += 10;
 
         return Math.min(100, urgency);
-    }
-
-    private boolean containsAny(String text, String... keywords) {
-        for (String keyword : keywords) {
-            if (text.contains(keyword)) return true;
-        }
-        return false;
     }
 
     private User findBestAdmin(String category) {
