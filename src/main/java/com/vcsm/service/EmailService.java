@@ -154,7 +154,7 @@ public class EmailService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
         String formattedDate = event.getEventDate() != null ? event.getEventDate().format(formatter) : "TBD";
 
-        StringBuilder html = new StringBuilder();
+        StringBuffer html = new StringBuffer();
         html.append("<!DOCTYPE html><html><head><style>");
         html.append("body { font-family: Arial, sans-serif; color: #333; }");
         html.append(".container { max-width: 600px; margin: 0 auto; padding: 20px; }");
@@ -197,7 +197,7 @@ public class EmailService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
         String formattedDate = event.getEventDate() != null ? event.getEventDate().format(formatter) : "TBD";
 
-        StringBuilder html = new StringBuilder();
+        StringBuffer html = new StringBuffer();
         html.append("<!DOCTYPE html><html><head><style>");
         html.append("body { font-family: Arial, sans-serif; color: #333; }");
         html.append(".container { max-width: 600px; margin: 0 auto; padding: 20px; }");

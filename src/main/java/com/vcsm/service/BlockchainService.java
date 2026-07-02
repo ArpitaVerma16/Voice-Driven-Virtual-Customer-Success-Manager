@@ -217,7 +217,7 @@ public class BlockchainService {
     private String sha256(String input) {
         byte[] inputBytes = input.getBytes(StandardCharsets.UTF_8);
         byte[] hash = Hash.sha3(inputBytes);
-        StringBuilder hexString = new StringBuilder();
+        StringBuffer hexString = new StringBuffer();
         for (byte b : hash) {
             String hex = Integer.toHexString(0xff & b);
             if (hex.length() == 1) {

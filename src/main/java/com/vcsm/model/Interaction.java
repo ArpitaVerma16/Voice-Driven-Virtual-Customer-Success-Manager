@@ -90,7 +90,7 @@ public class Interaction {
     }
 
     private void generateSearchKeywords() {
-        StringBuilder keywords = new StringBuilder();
+        StringBuffer keywords = new StringBuffer();
         if (customerName != null) keywords.append(customerName).append(" ");
         if (interactionType != null) keywords.append(interactionType).append(" ");
         if (category != null) keywords.append(category).append(" ");

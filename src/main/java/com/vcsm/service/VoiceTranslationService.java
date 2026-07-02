@@ -65,7 +65,7 @@ public class VoiceTranslationService {
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(conn.getInputStream())
             );
-            StringBuilder response = new StringBuilder();
+            StringBuffer response = new StringBuffer();
             String line;
             while ((line = reader.readLine()) != null) {
                 response.append(line);

@@ -82,7 +82,7 @@ public class MultiAgentOrchestrator {
             return (String) responses.get(0).getOrDefault("message", "Done!");
         }
 
-        StringBuilder merged = new StringBuilder();
+        StringBuffer merged = new StringBuffer();
         for (int i = 0; i < responses.size(); i++) {
             Map<String, Object> response = responses.get(i);
             String message = (String) response.getOrDefault("message", "");

@@ -56,7 +56,7 @@ public class SessionManagementService {
             session.setResolutionStatus(resolutionStatus);
 
             List<SessionTurn> turns = turnRepository.findBySessionIdOrderByTurnIndexAsc(sessionId);
-            StringBuilder transcript = new StringBuilder();
+            StringBuffer transcript = new StringBuffer();
             for (SessionTurn turn : turns) {
                 transcript.append("[").append(turn.getSpeaker()).append("] ")
                          .append(turn.getContent()).append("\n");

@@ -69,7 +69,7 @@ public class VoiceOtpService {
         }
 
         // 3. Format the OTP digits for voice biometrics verification (separated by spaces for natural detection)
-        StringBuilder spacedOtp = new StringBuilder();
+        StringBuffer spacedOtp = new StringBuffer();
         for (int i = 0; i < session.getOtpCode().length(); i++) {
             spacedOtp.append(session.getOtpCode().charAt(i)).append(" ");
         }

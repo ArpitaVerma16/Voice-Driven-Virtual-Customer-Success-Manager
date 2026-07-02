@@ -86,7 +86,7 @@ public class TwilioService {
      * Generate TwiML for voice menu
      */
     public String generateVoiceMenuXml(String message, Map<String, String> options) {
-        StringBuilder xml = new StringBuilder();
+        StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("<Response>");
         
@@ -116,7 +116,7 @@ public class TwilioService {
      * Generate TwiML for complaint filing
      */
     public String getComplaintTwiML() {
-        StringBuilder xml = new StringBuilder();
+        StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("<Response>");
         xml.append("<Say voice=\"alice\">");
@@ -134,7 +134,7 @@ public class TwilioService {
      * Generate TwiML for complaint status
      */
     public String getStatusTwiML(String status) {
-        StringBuilder xml = new StringBuilder();
+        StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("<Response>");
         xml.append("<Say voice=\"alice\">");
@@ -159,7 +159,7 @@ public class TwilioService {
      * Generate TwiML for event registration
      */
     public String getEventTwiML() {
-        StringBuilder xml = new StringBuilder();
+        StringBuffer xml = new StringBuffer();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("<Response>");
         xml.append("<Say voice=\"alice\">");

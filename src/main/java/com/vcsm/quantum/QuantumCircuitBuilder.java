@@ -104,7 +104,7 @@ public class QuantumCircuitBuilder {
         public List<QuantumGate> getGates() { return gates; }
 
         public String getCircuitString() {
-            StringBuilder sb = new StringBuilder();
+            StringBuffer sb = new StringBuffer();
             sb.append("Circuit with ").append(numQubits).append(" qubits\n");
             for (QuantumGate gate : gates) {
                 sb.append("  ").append(gate.toString()).append("\n");

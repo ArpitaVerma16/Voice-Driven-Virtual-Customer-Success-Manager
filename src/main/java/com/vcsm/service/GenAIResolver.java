@@ -201,7 +201,7 @@ public class GenAIResolver {
 
     private String generateFeedback(List<SolutionMatcher.SolutionMatch> matches, 
                                     ResponseGenerator.ResolutionResponse response) {
-        StringBuilder feedback = new StringBuilder();
+        StringBuffer feedback = new StringBuffer();
         feedback.append("📊 Resolution Analysis:\n");
         feedback.append("- Confidence: " + String.format("%.0f%%", response.getConfidence() * 100) + "\n");
         feedback.append("- Solutions Found: " + matches.size() + "\n");

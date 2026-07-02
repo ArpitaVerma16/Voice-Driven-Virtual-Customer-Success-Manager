@@ -62,7 +62,7 @@ public class ProactiveOutreachService {
     }
 
     private String generateProactiveMessage(UserBehaviorMonitor.BehaviorAnalysis analysis) {
-        StringBuilder message = new StringBuilder();
+        StringBuffer message = new StringBuffer();
 
         message.append("Hello " + analysis.getUserName() + ",\n\n");
         message.append("We noticed you've been interacting with our support system.\n\n");

@@ -119,7 +119,7 @@ public class VoiceFeatureService {
     }
     
     public String featuresToJson(double[] features) {
-        StringBuilder json = new StringBuilder("[");
+        StringBuffer json = new StringBuffer("[");
         for (int i = 0; i < features.length; i++) {
             json.append(features[i]);
             if (i < features.length - 1) {

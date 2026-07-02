@@ -240,7 +240,7 @@ public class OmnidimService {
     private String handleEventQuery() {
         var upcoming = eventService.getUpcomingEvents();
         if (upcoming.isEmpty()) return "No upcoming events right now. Check back soon!";
-        StringBuilder sb = new StringBuilder("Upcoming: ");
+        StringBuffer sb = new StringBuffer("Upcoming: ");
         upcoming.stream().limit(3).forEach(e -> sb.append(e.getName()).append(", "));
         return sb.toString().replaceAll(", $", ". Visit Events section for details!");
     }

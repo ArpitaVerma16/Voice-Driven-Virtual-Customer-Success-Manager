@@ -39,7 +39,7 @@ public class ExplainabilityService {
      * Generate human-readable summary
      */
     public String getSummary(DecisionExplanation explanation) {
-        StringBuilder summary = new StringBuilder();
+        StringBuffer summary = new StringBuffer();
         summary.append("📋 Decision: ").append(explanation.getDecisionType()).append("\n");
         summary.append("🔍 Reasons:\n");
         for (String reason : explanation.getReasons()) {

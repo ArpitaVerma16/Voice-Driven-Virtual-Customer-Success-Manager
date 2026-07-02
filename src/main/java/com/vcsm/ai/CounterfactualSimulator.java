@@ -53,7 +53,7 @@ public class CounterfactualSimulator {
     }
 
     private String generateAnalysis(String issue, String change, String changeValue, List<String> effects) {
-        StringBuilder analysis = new StringBuilder();
+        StringBuffer analysis = new StringBuffer();
         analysis.append("🔍 What-if Analysis for: " + issue + "\n");
         analysis.append("📌 If we change '" + change + "' to '" + changeValue + "':\n\n");
 
