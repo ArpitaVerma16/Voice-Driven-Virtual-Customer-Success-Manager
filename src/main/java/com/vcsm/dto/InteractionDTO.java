@@ -1,6 +1,8 @@
 package com.vcsm.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vcsm.model.Interaction;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 public class InteractionDTO {
@@ -8,10 +10,13 @@ public class InteractionDTO {
     @JsonProperty("id")
     private Long id;
     @JsonProperty("customerName")
+    @NotBlank(message = "Customer name is required")
     private String customerName;
     @JsonProperty("interactionType")
+    @NotBlank(message = "Interaction type is required")
     private String interactionType;
     @JsonProperty("summary")
+    @NotBlank(message = "Summary is required")
     private String summary;
     @JsonProperty("details")
     private String details;
@@ -98,13 +103,13 @@ public class InteractionDTO {
 
     // Helper method to format dates for display
     public String getFormattedCreatedAt() {
-        if (createdAt == null) return org.springframework.http.ResponseEntity.ok("");
+        if (createdAt == null) return "";
         return createdAt.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm"));
     }
 
     // Helper method for sentiment badge color
     public String getSentimentBadgeClass() {
-        if (sentiment == null) return org.springframework.http.ResponseEntity.ok("badge-secondary");
+        if (sentiment == null) return "badge-secondary";
         return switch (sentiment) {
             case "POSITIVE" -> "badge-success";
             case "NEGATIVE" -> "badge-danger";
@@ -114,7 +119,7 @@ public class InteractionDTO {
 
     // Helper method for status badge color
     public String getStatusBadgeClass() {
-        if (status == null) return org.springframework.http.ResponseEntity.ok("badge-secondary");
+        if (status == null) return "badge-secondary";
         return switch (status) {
             case "COMPLETED" -> "badge-success";
             case "IN_PROGRESS" -> "badge-info";
