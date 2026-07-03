@@ -28,9 +28,6 @@ public class User {
     @Column(nullable = false)
     private String name;
     
-    @Size(min = 8, max = 100)
-    private String password;
-    
     @Column(name = "preferred_language")
     private String preferredLanguage = "en";
     
