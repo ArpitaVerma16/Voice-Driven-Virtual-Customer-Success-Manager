@@ -107,7 +107,7 @@ public class OmnidimService {
                 boolean success = !intent.equals("UNKNOWN");
                 voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
             }
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to log voice analytics: {}", e.getMessage(), e);
         }
 
@@ -187,7 +187,7 @@ public class OmnidimService {
         try {
             eventRegistrationService.cancelRegistration(matchedEvent, user);
             return "Successfully cancelled your registration for the event: " + matchedEvent.getName();
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return "Failed to cancel registration: " + e.getMessage();
         }
     }
@@ -366,7 +366,7 @@ public class OmnidimService {
         try {
             Event updatedEvent = eventService.registerForEvent(matchedEvent.getId(), user.getId());
             return org.springframework.http.ResponseEntity.ok("Success! You have been registered for " + updatedEvent.getName() + ". A confirmation email with your ticket check-in QR code has been sent to " + user.getEmail() + ".");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return "Could not complete booking: " + e.getMessage();
         }
     }

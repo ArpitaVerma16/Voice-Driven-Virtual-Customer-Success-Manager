@@ -105,7 +105,7 @@ public class WaitlistService {
                 waitlistRepository.save(entry);
                 emailService.sendEventSlotAvailable(event, user);
                 log.info("Waitlist notification sent to user: {}", user.getEmail());
-            } catch (Exception e) {
+            } catch (SpecificException e) {
                 log.error("Failed to process waitlist entry {}: {}", entry.getId(), e.getMessage(), e);
             }
         }

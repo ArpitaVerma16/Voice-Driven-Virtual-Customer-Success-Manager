@@ -56,7 +56,7 @@ public class WaitlistController {
             response.put("message", "Added to waitlist");
             response.put("position", waitlistService.getWaitlistPosition(eventOpt.get(), userOpt.get()));
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }

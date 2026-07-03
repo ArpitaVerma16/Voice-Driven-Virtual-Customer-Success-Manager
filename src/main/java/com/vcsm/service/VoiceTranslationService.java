@@ -92,7 +92,7 @@ public class VoiceTranslationService {
                 conn.disconnect();
             }
             
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             throw new RuntimeException("Translation API call failed", e);
         }
     }

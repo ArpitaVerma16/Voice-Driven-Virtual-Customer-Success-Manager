@@ -114,7 +114,7 @@ public class VoiceController {
                                 extraData = " (इवेंट नहीं मिला)";
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (SpecificException e) {
                         extraData = " (त्रुटि: " + e.getMessage() + ")";
                     }
                 }

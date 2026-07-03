@@ -36,7 +36,7 @@ public class SpeechToTextService {
             if (decodedStr.startsWith("mock-otp:")) {
                 return decodedStr.substring("mock-otp:".length()).trim();
             }
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             // Ignore and proceed
         }
 
@@ -94,7 +94,7 @@ public class SpeechToTextService {
             } else {
                 throw new RuntimeException("Speech API call failed with response code: " + responseCode);
             }
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             throw new RuntimeException("Speech API call failed", e);
         }
 

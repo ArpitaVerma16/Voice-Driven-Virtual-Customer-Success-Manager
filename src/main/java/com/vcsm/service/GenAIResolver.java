@@ -82,7 +82,7 @@ public class GenAIResolver {
                 try {
                     Complaint saved = complaintService.fileComplaint(complaint);
                     ticketId = saved.getId();
-                } catch (Exception e) {
+                } catch (SpecificException e) {
                     System.err.println("Failed to auto-file complaint: " + e.getMessage());
                 }
             }

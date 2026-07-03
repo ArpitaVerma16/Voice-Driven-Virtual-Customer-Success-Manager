@@ -44,7 +44,7 @@ public class ModelEvolutionService {
     public ModelVersion trainModel(String modelName) {
         try {
             return autoTrainer.trainNewModel(modelName);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             throw new RuntimeException("Failed to train model: " + e.getMessage(), e);
         }
     }
@@ -55,7 +55,7 @@ public class ModelEvolutionService {
             try {
                 ModelVersion newVersion = autoTrainer.trainNewModel(modelName);
                 System.out.println("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
-            } catch (Exception e) {
+            } catch (SpecificException e) {
                 System.err.println("❌ Failed to retrain model '" + modelName + "': " + e.getMessage());
             }
         }
