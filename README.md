@@ -216,6 +216,26 @@ omnidim.api.key=YOUR_ACTUAL_API_KEY
 
 ---
 
+---
+
+## Required Environment Variables
+
+The application uses environment variables for all secrets and configuration. Copy these into your `.env` file or set them in your deployment environment:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `JWT_SECRET` | Yes | — | JWT signing key (min 32 chars) |
+| `OMNIDIM_API_KEY` | Yes | — | Omnidim.io Voice AI API key |
+| `HMAC_SECRET` | Yes | — | HMAC request signing key |
+| `ADMIN_USERNAME` | No | `admin` | Default admin seed username |
+| `ADMIN_PASSWORD` | No | — | Default admin seed password |
+| `JWT_EXPIRATION` | No | `86400000` | Access token expiry (ms) |
+| `JWT_REFRESH_EXPIRATION` | No | `604800000` | Refresh token expiry (ms) |
+| `TWILIO_AUTH_TOKEN` | No | — | Twilio account auth token |
+| `PORT` | No | `8080` | Server port |
+
+---
+
 ## 📡 API 
 
 ### Complaints
