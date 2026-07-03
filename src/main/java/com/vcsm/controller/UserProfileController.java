@@ -91,13 +91,13 @@ public class UserProfileController {
     }
     
     @GetMapping("/{id}/activity/{type}")
-    public ResponseEntity<?> getActivityByType(@PathVariable Long id, @PathVariable String type) {
+    public ResponseEntity<?> getActivityByType(@PathVariable Long id, @PathVariable String type, Pageable pageable) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         
-        List<UserActivity> activities = userActivityService.getUserActivitiesByType(userOpt.get(), type);
+        Page<UserActivity> activities = userActivityService.getUserActivitiesByType(userOpt.get(), type, pageable);
         return ResponseEntity.ok(activities);
     }
     

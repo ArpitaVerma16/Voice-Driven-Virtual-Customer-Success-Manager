@@ -37,6 +37,10 @@ public class UserActivityService {
     public List<UserActivity> getUserActivitiesByType(User user, String actionType) {
         return userActivityRepository.findByUserAndActionTypeOrderByCreatedAtDesc(user, actionType);
     }
+
+    public Page<UserActivity> getUserActivitiesByType(User user, String actionType, Pageable pageable) {
+        return userActivityRepository.findByUserAndActionType(user, actionType, pageable);
+    }
     
     public long getActivityCount(User user) {
         return userActivityRepository.countByUser(user);

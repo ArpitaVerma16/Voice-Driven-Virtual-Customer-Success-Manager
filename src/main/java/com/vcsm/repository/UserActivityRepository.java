@@ -17,6 +17,8 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Long
     Page<UserActivity> findByUser(User user, Pageable pageable);
     
     List<UserActivity> findByUserAndActionTypeOrderByCreatedAtDesc(User user, String actionType);
+
+    Page<UserActivity> findByUserAndActionType(User user, String actionType, Pageable pageable);
     
     List<UserActivity> findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(User user, LocalDateTime start, LocalDateTime end);
     
