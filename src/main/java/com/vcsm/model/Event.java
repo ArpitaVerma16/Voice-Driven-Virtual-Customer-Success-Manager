@@ -36,6 +36,9 @@ public class Event {
     private String organizer;
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<EventRegistration> registrationList = new ArrayList<>();
+
 
 
     @PrePersist
