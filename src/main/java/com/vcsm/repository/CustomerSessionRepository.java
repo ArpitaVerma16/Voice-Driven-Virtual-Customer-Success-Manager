@@ -1,6 +1,8 @@
 package com.vcsm.repository;
 
 import com.vcsm.model.CustomerSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +30,8 @@ public interface CustomerSessionRepository extends JpaRepository<CustomerSession
     List<CustomerSession> findSessionsEligibleForArchival(@Param("cutoffDate") LocalDateTime cutoffDate);
 
     long countByCustomerId(String customerId);
+
+    Page<CustomerSession> findByCustomerId(String customerId, Pageable pageable);
+
+    List<CustomerSession> findByCustomerIdAndStartedAtAfter(String customerId, LocalDateTime startDate);
 }
