@@ -123,8 +123,6 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>,
     List<Complaint> findOpenComplaintsOlderThan(
             @Param("cutoff") LocalDateTime cutoff
     );
-}
 
-    @Query("SELECT c.id FROM Complaint c WHERE c.status = :status")
-    List<Long> findIdsByStatus(@Param("status") Complaint.ComplaintStatus status);
+    List<Complaint> findBySubCategory(Complaint.SubCategory subCategory);
 }

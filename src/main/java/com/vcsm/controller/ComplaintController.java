@@ -160,6 +160,30 @@ public class ComplaintController {
         return ResponseEntity.ok(complaintService.getPriorityStats());
     }
 
+    @Operation(summary = "Get all complaint categories with sub-categories")
+    @GetMapping("/categories")
+    public ResponseEntity<Map<String, List<String>>> getCategories() {
+        Map<String, List<String>> categories = new java.util.LinkedHashMap<>();
+        for (Complaint.ComplaintCategory cat : Complaint.ComplaintCategory.values()) {
+            List<String> subCategories = new java.util.ArrayList<>();
+            for (Complaint.SubCategory sub : Complaint.SubCategory.values()) {
+                if (sub.name().endsWith("_" + cat.name()) || 
+                    (cat == Complaint.ComplaintCategory.OTHER && sub == Complaint.SubCategory.GENERAL)) {
+                    subCategories.add(sub.name());
+                }
+            }
+            categories.put(cat.name(), subCategories);
+        }
+        return ResponseEntity.ok(categories);
+    }
+
+    @Operation(summary = "Get complaints by sub-category")
+    @GetMapping("/sub-category/{subCategory}")
+    public ResponseEntity<List<Complaint>> getBySubCategory(@PathVariable String subCategory) {
+        return ResponseEntity.ok(complaintService.getComplaintsBySubCategory(
+            Complaint.SubCategory.valueOf(subCategory.toUpperCase())));
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalState(
             IllegalStateException ex,

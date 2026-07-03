@@ -217,6 +217,13 @@ public class ComplaintService {
         return complaintRepository.findByPriority(priority);
     }
 
+    public List<Complaint> getComplaintsBySubCategory(Complaint.SubCategory subCategory) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("Only admins can view complaints by sub-category");
+        }
+        return complaintRepository.findBySubCategory(subCategory);
+    }
+
     @Transactional
     public Complaint updateStatus(Long id, String status, String resolvedBy, String notes) {
         if (!isAdmin()) {

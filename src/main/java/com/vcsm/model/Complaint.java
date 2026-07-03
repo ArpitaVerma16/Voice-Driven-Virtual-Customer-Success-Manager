@@ -36,6 +36,10 @@ public class Complaint {
     @NotNull
     private ComplaintCategory category;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sub_category")
+    private SubCategory subCategory;
+
     @Column(length = 20)
     private String apartmentNumber;
 
@@ -105,6 +109,10 @@ public class Complaint {
         return category;
     }
 
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
     public String getApartmentNumber() {
         return apartmentNumber;
     }
@@ -165,6 +173,10 @@ public class Complaint {
 
     public void setCategory(ComplaintCategory category) {
         this.category = category;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
     }
 
     public void setApartmentNumber(String apartmentNumber) {
@@ -238,11 +250,40 @@ public class Complaint {
         OTHER
     }
 
+    public enum SubCategory {
+        // Noise sub-categories
+        LOUD_MUSIC, PARTY_NOISE, CONSTRUCTION_NOISE, ANIMAL_BARKING, OTHER_NOISE,
+        // Maintenance sub-categories
+        PLUMBING, ELECTRICAL, HVAC, APPLIANCE_REPAIR, STRUCTURAL, OTHER_MAINTENANCE,
+        // Security sub-categories
+        SUSPICIOUS_ACTIVITY, UNAUTHORIZED_ACCESS, VANDALISM, THEFT, OTHER_SECURITY,
+        // Cleanliness sub-categories
+        GARBAGE_DISPOSAL, PEST_CONTROL, COMMON_AREA_CLEANING, OTHER_CLEANLINESS,
+        // Parking sub-categories
+        UNAUTHORIZED_PARKING, DAMAGED_VEHICLE, BLOCKED_ACCESS, OTHER_PARKING,
+        // Utilities sub-categories
+        WATER_OUTAGE, POWER_OUTAGE, GAS_LEAK, INTERNET_OUTAGE, OTHER_UTILITY,
+        // General
+        GENERAL
+    }
+
     public enum PriorityLevel {
         CRITICAL,
         HIGH,
         MEDIUM,
         LOW
+    }
+
+    public static SubCategory getDefaultSubCategory(ComplaintCategory category) {
+        switch (category) {
+            case NOISE: return SubCategory.OTHER_NOISE;
+            case MAINTENANCE: return SubCategory.OTHER_MAINTENANCE;
+            case SECURITY: return SubCategory.OTHER_SECURITY;
+            case CLEANLINESS: return SubCategory.OTHER_CLEANLINESS;
+            case PARKING: return SubCategory.OTHER_PARKING;
+            case UTILITIES: return SubCategory.OTHER_UTILITY;
+            default: return SubCategory.GENERAL;
+        }
     }
 
     @Override
@@ -251,6 +292,7 @@ public class Complaint {
                 "id=" + id +
                 ", status=" + status +
                 ", category=" + category +
+                ", subCategory=" + subCategory +
                 ", priority='" + priority + '\'' +
                 ", residentUsername='" + residentUsername + '\'' +
                 '}';
