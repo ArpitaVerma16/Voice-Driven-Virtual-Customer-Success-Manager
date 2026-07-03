@@ -117,6 +117,7 @@
                 <a class="nav-link" href="/analytics"><i class="fas fa-chart-bar me-1"></i>Analytics</a>
                 <a class="nav-link" href="/voice-analytics">Voice Analytics</a>
                 <a class="nav-link" href="/voice-templates"><i class="fas fa-microphone me-1"></i>Voice Commands</a>
+                <a class="nav-link" href="/interactions"><i class="fas fa-comments me-1"></i>Interactions</a>
             </div>
 
             <div class="ms-auto d-flex align-items-center gap-2">
@@ -371,6 +372,44 @@
         </div>
     </div>
 
+    <!-- Customer Interaction History -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-comments me-2 text-purple"></i>Customer Interaction History</span>
+            <a href="/interactions" class="btn btn-sm btn-outline-purple">
+                <i class="fas fa-external-link-alt me-1"></i>View All
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div id="interactionsContainer" class="p-3">
+                <div class="text-center text-muted py-3" id="interactionsLoading">
+                    <div class="spinner-border spinner-border-sm text-purple me-2" role="status"></div>
+                    Loading interactions...
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="row g-2" id="interactionStats">
+                <div class="col-3 col-md-3 text-center">
+                    <small class="text-muted d-block">Total</small>
+                    <strong id="totalInteractions" class="text-purple">-</strong>
+                </div>
+                <div class="col-3 col-md-3 text-center">
+                    <small class="text-muted d-block">Completed</small>
+                    <strong id="completedCount" class="text-success">-</strong>
+                </div>
+                <div class="col-3 col-md-3 text-center">
+                    <small class="text-muted d-block">Pending</small>
+                    <strong id="pendingCount" class="text-warning">-</strong>
+                </div>
+                <div class="col-3 col-md-3 text-center">
+                    <small class="text-muted d-block">Positive</small>
+                    <strong id="positiveCount" class="text-info">-</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick File Complaint - Responsive form -->
     <div class="card mt-4 shadow-sm">
         <div class="card-header bg-white fw-bold">
@@ -428,6 +467,7 @@
 <script src="/js/back-to-top.js"></script>
 <script src="/js/dark-mode.js"></script>
 <script src="/js/confirm-dialogs.js"></script>
+<script src="/js/interaction-history.js"></script>
 
 <script>
     // Initialize toast
