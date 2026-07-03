@@ -57,7 +57,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").denyAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
-                        .requestMatchers("/api/auth/admin/seed").permitAll()
                         .requestMatchers("/api/voice/command").permitAll()
                         .requestMatchers("/api/voice/flow-config").permitAll()
                         .requestMatchers("/api/voice/feedback/**").permitAll()
