@@ -1,3 +1,18 @@
+// ===== ERROR HANDLING UTILITY =====
+function showUserError(context, err) {
+    const msg = err && err.message ? err.message : String(err || 'An error occurred');
+    console.warn(context + ':', err);
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    container.innerHTML = '<div class="toast align-items-center text-white bg-danger border-0" role="alert">'
+        + '<div class="d-flex"><div class="toast-body">' + context + ': ' + msg + '</div>'
+        + '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>';
+    document.body.appendChild(container);
+    const t = new bootstrap.Toast(container.querySelector('.toast'), { delay: 5000 });
+    t.show();
+}
+
 // ===== VOICE ASSISTANT =====
 let recognition = null;
 let isRecording = false;
@@ -80,7 +95,7 @@ function startVoice() {
     };
 
     recognition.onerror = (e) => {
-        console.error('Voice error:', e);
+        showUserError('Voice recognition error', e);
         isRecording = false;
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
@@ -167,11 +182,12 @@ renderConversation();
 
         input.value = '';
 
-    } catch (err) {
-        console.error('Error sending command:', err);
+} catch (err) {
+        showUserError('Command failed', err);
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
         }
+    }
         if (typeof toast !== 'undefined') {
             toast.error('Error processing command', 'Error');
         }
@@ -353,12 +369,11 @@ async function quickFileComplaint() {
                 location.reload();
             }, 2000);
         }
-    } catch (err) {
-        console.error('Error filing complaint:', err);
+} catch (err) {
+        showUserError('Complaint filing failed', err);
     }
 }
 
-// ===== COMPLAINT MODAL (Complaints page) =====
 async function submitComplaint() {
     const complaint = {
         residentName: document.getElementById('m_name')?.value?.trim(),
@@ -382,8 +397,8 @@ async function submitComplaint() {
         if (res.ok) {
             location.reload();
         }
-    } catch (err) {
-        console.error('Error:', err);
+} catch (err) {
+        showUserError('Complaint submission failed', err);
     }
 }
 
@@ -394,7 +409,7 @@ async function updateComplaintStatus(id) {
         await fetch(`/api/complaints/${id}/status?status=${status.toUpperCase()}`, { method: 'PUT', headers: withAuthHeaders() });
         location.reload();
     } catch (err) {
-        console.error('Error updating status:', err);
+        showUserError('Status update failed', err);
     }
 }
 
@@ -424,7 +439,7 @@ async function submitEvent() {
         });
         if (res.ok) location.reload();
     } catch (err) {
-        console.error('Error creating event:', err);
+        showUserError('Event creation failed', err);
     }
 }
 
@@ -439,7 +454,7 @@ async function registerEvent(id) {
             alert('Registration failed: ' + msg);
         }
     } catch (err) {
-        console.error('Error registering:', err);
+        showUserError('Event registration failed', err);
     }
 
 
@@ -603,10 +618,10 @@ function connectWebSocket() {
                 showNotification(data);
             });
         }, function(error) {
-            console.error('WebSocket connection failed:', error);
+            console.warn('WebSocket connection failed:', error);
         });
     } catch (e) {
-        console.error('WebSocket error:', e);
+        showUserError('WebSocket error', e);
     }
 }
 
@@ -646,7 +661,7 @@ function updateNotificationCount() {
                 }
             }
         })
-        .catch(err => console.error('Error fetching notification count:', err));
+        .catch(err => console.warn('Error fetching notification count:', err));
 }
 
 function toggleNotifications() {
@@ -692,7 +707,7 @@ function loadNotifications() {
                 </div>
             `).join('');
         })
-        .catch(err => console.error('Error loading notifications:', err));
+        .catch(err => console.warn('Error loading notifications:', err));
 }
 
 function markAsRead(id) {
@@ -701,7 +716,7 @@ function markAsRead(id) {
             updateNotificationCount();
             loadNotifications();
         })
-        .catch(err => console.error('Error marking as read:', err));
+        .catch(err => console.warn('Error marking as read:', err));
 }
 
 function markAllRead() {
@@ -713,7 +728,7 @@ function markAllRead() {
                 toast.success('All notifications marked as read', 'Success');
             }
         })
-        .catch(err => console.error('Error marking all as read:', err));
+        .catch(err => console.warn('Error marking all as read:', err));
 }
 
 // Close dropdown when clicking outside
