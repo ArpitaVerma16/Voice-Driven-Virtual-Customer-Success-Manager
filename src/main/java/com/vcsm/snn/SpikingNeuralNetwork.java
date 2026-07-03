@@ -61,7 +61,7 @@ public class SpikingNeuralNetwork {
      */
     public SNNResponse forward(double[] input) {
         if (!initialized) {
-            throw new RuntimeException("SNN not initialized. Call initialize() first.");
+            throw new CustomDomainException("SNN not initialized. Call initialize() first.");
         }
 
         double timeStep = 1.0;
@@ -99,7 +99,7 @@ public class SpikingNeuralNetwork {
      */
     public void train(double[][] trainingData, int epochs) {
         if (!initialized) {
-            throw new RuntimeException("SNN not initialized. Call initialize() first.");
+            throw new CustomDomainException("SNN not initialized. Call initialize() first.");
         }
 
         for (int epoch = 0; epoch < epochs; epoch++) {

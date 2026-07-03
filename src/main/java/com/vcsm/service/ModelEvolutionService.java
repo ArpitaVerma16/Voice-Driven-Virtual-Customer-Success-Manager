@@ -45,7 +45,7 @@ public class ModelEvolutionService {
         try {
             return autoTrainer.trainNewModel(modelName);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to train model: " + e.getMessage(), e);
+            throw new CustomDomainException("Failed to train model: " + e.getMessage(), e);
         }
     }
 
@@ -85,7 +85,7 @@ public class ModelEvolutionService {
     public ModelVersion rollback(String modelName) {
         List<ModelVersion> versions = modelVersionRepository.findByModelNameOrderByCreatedAtDesc(modelName);
         if (versions.size() < 2) {
-            throw new RuntimeException("No previous version to rollback to");
+            throw new CustomDomainException("No previous version to rollback to");
         }
 
         // Deactivate current

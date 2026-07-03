@@ -92,13 +92,13 @@ public class SpeechToTextService {
                     }
                 }
             } else {
-                throw new RuntimeException("Speech API call failed with response code: " + responseCode);
+                throw new CustomDomainException("Speech API call failed with response code: " + responseCode);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Speech API call failed", e);
+            throw new CustomDomainException("Speech API call failed", e);
         }
 
-        throw new RuntimeException("Speech API call returned no transcript");
+        throw new CustomDomainException("Speech API call returned no transcript");
     }
 
     public String transcribeFallback(String base64Audio, String languageCode, Throwable t) {

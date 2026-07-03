@@ -37,7 +37,7 @@ public class FederatedTransferService {
         FederatedNode target = nodes.get(targetNodeId);
 
         if (source == null || target == null) {
-            throw new RuntimeException("Node not found");
+            throw new CustomDomainException("Node not found");
         }
 
         roundNumber++;
@@ -75,7 +75,7 @@ public class FederatedTransferService {
         FederatedNode target = nodes.get(targetNodeId);
 
         if (source == null || target == null) {
-            throw new RuntimeException("Node not found");
+            throw new CustomDomainException("Node not found");
         }
 
         double similarity = domainAdapter.getDomainSimilarity(source.getDomain(), target.getDomain());

@@ -29,7 +29,7 @@ public class AuthService {
 
     public AuthResponse signupResident(AuthRequest req) {
         if (userRepository.existsByUsername(req.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new CustomDomainException("Username already exists");
         }
         AppUser user = new AppUser();
         user.setUsername(req.getUsername());

@@ -28,7 +28,7 @@ public class KnowledgeTransfer {
         KnowledgeBase target = knowledgeBases.get(targetDomain);
 
         if (source == null || target == null) {
-            throw new RuntimeException("Knowledge base not found");
+            throw new CustomDomainException("Knowledge base not found");
         }
 
         // Extract knowledge from source

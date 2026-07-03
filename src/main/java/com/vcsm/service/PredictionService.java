@@ -52,7 +52,7 @@ public class PredictionService {
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse ML service response", e);
+            throw new CustomDomainException("Failed to parse ML service response", e);
         }
     }
 
@@ -81,7 +81,7 @@ public class PredictionService {
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse ML service response", e);
+            throw new CustomDomainException("Failed to parse ML service response", e);
         }
     }
 
@@ -110,7 +110,7 @@ public class PredictionService {
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse ML service response", e);
+            throw new CustomDomainException("Failed to parse ML service response", e);
         }
     }
 
@@ -128,7 +128,7 @@ public class PredictionService {
         try {
             return objectMapper.readValue(response.getBody(), Map.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse ML service response", e);
+            throw new CustomDomainException("Failed to parse ML service response", e);
         }
     }
 

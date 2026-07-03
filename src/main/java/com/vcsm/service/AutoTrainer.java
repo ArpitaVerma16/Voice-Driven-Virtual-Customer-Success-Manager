@@ -31,7 +31,7 @@ public class AutoTrainer {
 
         List<Complaint> trainingData = complaintRepository.findAll();
         if (trainingData.isEmpty()) {
-            throw new RuntimeException("No training data available");
+            throw new CustomDomainException("No training data available");
         }
 
         // Simulate training
