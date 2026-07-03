@@ -23,19 +23,19 @@ public class ModelEvolutionService {
      */
     @Scheduled(cron = "0 0 2 * * MON") // Every Monday at 2 AM
     public void runEvolutionCycle() {
-        System.out.println("🧬 Starting model evolution cycle...");
+        log.info("🧬 Starting model evolution cycle...");
 
         // Check drift
         DriftDetector.DriftResult drift = driftDetector.detectDrift();
 
         if (drift.isHasDrift()) {
-            System.out.println("⚠️ Data drift detected! Retraining models...");
+            log.info("⚠️ Data drift detected! Retraining models...");
             retrainAllModels();
         } else {
-            System.out.println("✅ No significant drift. Models are healthy.");
+            log.info("✅ No significant drift. Models are healthy.");
         }
 
-        System.out.println("✅ Evolution cycle completed");
+        log.info("✅ Evolution cycle completed");
     }
 
     /**
@@ -54,7 +54,7 @@ public class ModelEvolutionService {
         for (String modelName : modelNames) {
             try {
                 ModelVersion newVersion = autoTrainer.trainNewModel(modelName);
-                System.out.println("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
+                log.info("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
             } catch (Exception e) {
                 System.err.println("❌ Failed to retrain model '" + modelName + "': " + e.getMessage());
             }
