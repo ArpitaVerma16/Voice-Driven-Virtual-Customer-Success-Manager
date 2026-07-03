@@ -441,9 +441,6 @@ async function registerEvent(id) {
     } catch (err) {
         console.error('Error registering:', err);
     }
-
-
-
 }
 
 
@@ -729,13 +726,10 @@ document.addEventListener('click', function(event) {
 
 // Connect WebSocket on page load (if not already connected)
 document.addEventListener('DOMContentLoaded', function() {
-    // Connect WebSocket after a small delay
     setTimeout(function() {
         connectWebSocket();
         updateNotificationCount();
     }, 500);
-
-
 });
 
 
