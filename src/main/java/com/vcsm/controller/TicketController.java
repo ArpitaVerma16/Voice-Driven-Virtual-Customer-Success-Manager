@@ -11,10 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
+@lombok.RequiredArgsConstructor
 public class TicketController {
 
-    @Autowired
-    private SmartRouter smartRouter;
+    private final SmartRouter smartRouter;
 
     @PostMapping("/classify")
     public ResponseEntity<SmartRouter.RoutingResult> classifyTicket(@Valid @RequestBody Complaint complaint) {

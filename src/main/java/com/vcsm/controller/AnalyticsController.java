@@ -11,18 +11,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/analytics")
 @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+@lombok.RequiredArgsConstructor
 public class AnalyticsController {
 
 
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
-    @Autowired
-    private com.vcsm.service.AnalyticsService analyticsService;
+    private final com.vcsm.service.AnalyticsService analyticsService;
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> analytics() {

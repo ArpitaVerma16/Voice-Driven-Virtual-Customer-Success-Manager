@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+@Profile("!dev")
 @RestControllerAdvice
+@lombok.extern.slf4j.Slf4j
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
@@ -197,7 +200,7 @@ public class GlobalExceptionHandler {
 
         // Log the error for debugging
         log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-        ex.printStackTrace();
+        log.error("An unexpected error occurred", ex);
 
         log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(), ex);
         

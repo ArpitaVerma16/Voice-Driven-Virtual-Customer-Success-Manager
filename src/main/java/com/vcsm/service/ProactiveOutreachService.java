@@ -12,18 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ProactiveOutreachService {
 
     private static final Logger log = LoggerFactory.getLogger(ProactiveOutreachService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserBehaviorMonitor behaviorMonitor;
+    private final UserBehaviorMonitor behaviorMonitor;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     /**
      * Send proactive outreach to at-risk users
@@ -87,11 +85,11 @@ public class ProactiveOutreachService {
 
     private String getSubjectForRisk(int riskScore) {
         if (riskScore >= 70) {
-            return "🔴 We're Here to Help - Urgent Support Needed";
+            return org.springframework.http.ResponseEntity.ok("🔴 We're Here to Help - Urgent Support Needed");
         } else if (riskScore >= 40) {
-            return "🟡 We Noticed Your Recent Interactions - Let's Help";
+            return org.springframework.http.ResponseEntity.ok("🟡 We Noticed Your Recent Interactions - Let's Help");
         } else {
-            return "ℹ️ Check-in: How Are Things Going?";
+            return org.springframework.http.ResponseEntity.ok("ℹ️ Check-in: How Are Things Going?");
         }
     }
 

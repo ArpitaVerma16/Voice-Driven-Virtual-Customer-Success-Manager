@@ -12,13 +12,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agent")
+@lombok.RequiredArgsConstructor
 public class MultiAgentController {
 
-    @Autowired
-    private MultiAgentOrchestrator orchestrator;
+    private final MultiAgentOrchestrator orchestrator;
 
-    @Autowired
-    private AgentRouter agentRouter;
+    private final AgentRouter agentRouter;
 
     @PostMapping("/process")
     public ResponseEntity<Map<String, Object>> process(@Valid @RequestBody AgentRequest request) {

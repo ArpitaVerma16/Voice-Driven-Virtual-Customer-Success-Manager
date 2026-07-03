@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class RateLimiterService {
 
     private static final int DEFAULT_LIMIT = 10;
 
-    @Autowired
-    private RateLimitConfig rateLimitConfig;
+    private final RateLimitConfig rateLimitConfig;
 
     private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();
 

@@ -14,13 +14,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sentiment")
+@lombok.RequiredArgsConstructor
 public class SentimentController {
     
-    @Autowired
-    private SentimentAnalysisService sentimentService;
+    private final SentimentAnalysisService sentimentService;
     
-    @Autowired
-    private SentimentClassifier sentimentClassifier;
+    private final SentimentClassifier sentimentClassifier;
     
     @PostMapping("/analyze")
     public ResponseEntity<Map<String, Object>> analyzeSentiment(@Valid @RequestBody VoiceVerificationRequest request) {

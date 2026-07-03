@@ -20,33 +20,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ComplaintService {
 
     private static final Logger log = LoggerFactory.getLogger(ComplaintService.class);
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private AuditLogService auditLogService;
+    private final AuditLogService auditLogService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private PriorityClassifierService priorityClassifierService;
+    private final PriorityClassifierService priorityClassifierService;
 
-    @Autowired
-    private UserActivityService userActivityService;
+    private final UserActivityService userActivityService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private BlockchainService blockchainService;
+    private final BlockchainService blockchainService;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
 
     private void safelyExecute(Runnable operation, String description) {
@@ -160,6 +153,18 @@ public class ComplaintService {
     }
 
 
+    /**
+     * The newest complaints, fetched with a LIMIT query instead of loading
+     * the entire complaints table. Permission-aware like getAllComplaints:
+     * admins see all complaints, residents see their own.
+     */
+    public List<Complaint> getRecentComplaints(int limit) {
+        var pageable = org.springframework.data.domain.PageRequest.of(
+                0, limit, org.springframework.data.domain.Sort.by(
+                        org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        return getPaginatedComplaints(pageable).getContent();
+    }
+
     // Pagination method
 
     public Page<Complaint> getPaginatedComplaints(Pageable pageable) {
@@ -202,7 +207,7 @@ public class ComplaintService {
             return complaintRepository.findByStatus(status);
         }
         String username = currentUsername();
-        return getAllComplaints().stream().filter(c -> c.getStatus() == status).toList();
+        return getAllComplaints().stream().parallel().filter(c -> c.getStatus() == status).toList();
     }
 
     public List<Complaint> getComplaintsByPriority(String priority) {

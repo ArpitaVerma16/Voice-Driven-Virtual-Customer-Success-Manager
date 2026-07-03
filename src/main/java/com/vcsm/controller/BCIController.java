@@ -13,11 +13,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bci")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class BCIController {
 
-    @Autowired
-    private BCIService bciService;
+    private final BCIService bciService;
 
     private boolean isOwnerOrAdmin(CustomUserDetails userDetails, String targetUserId) {
         if (userDetails == null) {
@@ -64,7 +63,7 @@ public class BCIController {
     @PostMapping("/signal")
     public ResponseEntity<?> processSignal(
             @RequestParam String sessionId,
-            @RequestBody double[] signalData,
+            @Valid @RequestBody double[] signalData,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
@@ -120,12 +119,18 @@ public class BCIController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getStats() {
+    public ResponseEntity<?> getStats(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
         return ResponseEntity.ok(bciService.getBCIStats());
     }
 
     @GetMapping("/status")
-    public ResponseEntity<Map<String, Object>> getStatus() {
+    public ResponseEntity<?> getStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
         Map<String, Object> status = new HashMap<>();
         status.put("status", "BCI System active");
         status.put("features", new String[]{

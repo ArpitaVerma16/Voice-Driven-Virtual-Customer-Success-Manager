@@ -17,21 +17,18 @@ import java.util.Optional;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class WaitlistService {
 
     private static final Logger log = LoggerFactory.getLogger(WaitlistService.class);
     
-    @Autowired
-    private EventWaitlistRepository waitlistRepository;
+    private final EventWaitlistRepository waitlistRepository;
     
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
     
-    @Autowired
-    private EventRegistrationService eventRegistrationService;
+    private final EventRegistrationService eventRegistrationService;
     
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
     
     /**
      * Add user to waitlist
@@ -87,25 +84,30 @@ public class WaitlistService {
      */
     @Transactional
     public void processWaitlist(Event event) {
-        // Calculate actual available slots: maxCapacity - registrations - pendingUnexpiredInvitations
         long pendingUnexpired = waitlistRepository.countByEventAndConfirmedFalseAndExpiresAtAfter(event, LocalDateTime.now());
         long availableSlots = event.getMaxCapacity() - event.getRegistrations() - pendingUnexpired;
         
         if (availableSlots <= 0) {
-            return; // No slots available
+            return;
         }
         
-        // Loop and promote the first availableSlots unnotified users
         for (int i = 0; i < availableSlots; i++) {
-            Optional<EventWaitlist> firstWaitlist = waitlistRepository
+            Optional<EventWaitlist> nextOpt = waitlistRepository
                 .findFirstByEventAndConfirmedFalseAndNotifiedAtIsNullOrderByJoinedAtAsc(event);
-            
-            log.info("✅ Notification sent to user: " + user.getEmail());
-        } catch (Exception e) {
-            log.error("❌ Failed to send notification: " + e.getMessage());
-            System.out.println("✅ Notification sent to user: " + user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send waitlist notification to user {}: {}", user.getEmail(), e.getMessage(), e);
+            if (nextOpt.isEmpty()) {
+                break;
+            }
+            EventWaitlist entry = nextOpt.get();
+            try {
+                User user = entry.getUser();
+                entry.setNotifiedAt(LocalDateTime.now());
+                entry.setExpiresAt(LocalDateTime.now().plusHours(24));
+                waitlistRepository.save(entry);
+                emailService.sendEventSlotAvailable(event, user);
+                log.info("Waitlist notification sent to user: {}", user.getEmail());
+            } catch (Exception e) {
+                log.error("Failed to process waitlist entry {}: {}", entry.getId(), e.getMessage(), e);
+            }
         }
     }
     

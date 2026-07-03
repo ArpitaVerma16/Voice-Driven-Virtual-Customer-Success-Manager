@@ -19,31 +19,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@lombok.RequiredArgsConstructor
 public class EventBookingQrCodeTest {
 
-    @Autowired
-    private QRCodeService qrCodeService;
+    private final QRCodeService qrCodeService;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private OmnidimService omnidimService;
+    private final OmnidimService omnidimService;
 
-    @Autowired
-    private EventController eventController;
+    private final EventController eventController;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EventRegistrationRepository eventRegistrationRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private EmailQueueRepository emailQueueRepository;
+    private final EmailQueueRepository emailQueueRepository;
 
     private Event testEvent;
     private User testUser;

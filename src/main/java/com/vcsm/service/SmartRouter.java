@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
@@ -12,24 +14,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SmartRouter {
 
-    @Autowired
-    private TicketClassifier classifier;
+    private final TicketClassifier classifier;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     // Admin expertise mapping
     private static final Map<String, List<String>> ADMIN_EXPERTISE = new HashMap<>();
 
     static {
-        ADMIN_EXPERTISE.put("admin@example.com", Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
-        ADMIN_EXPERTISE.put("security@example.com", Arrays.asList("SECURITY", "PARKING"));
-        ADMIN_EXPERTISE.put("maintenance@example.com", Arrays.asList("MAINTENANCE", "UTILITIES"));
+        ADMIN_EXPERTISE.put(AppConstants.ADMIN_EMAIL, Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
+        ADMIN_EXPERTISE.put(AppConstants.SECURITY_EMAIL, Arrays.asList("SECURITY", "PARKING"));
+        ADMIN_EXPERTISE.put(AppConstants.MAINTENANCE_EMAIL, Arrays.asList("MAINTENANCE", "UTILITIES"));
     }
 
     /**
@@ -89,10 +89,7 @@ public class SmartRouter {
         return Math.min(100, urgency);
     }
 
-    private boolean containsAny(String text, String... keywords) {
-        for (String keyword : keywords) {
-            if (text.contains(keyword)) return true;
-        }
+    // Replaced by ComplaintRoutingUtils.containsAny()
         return false;
     }
 
@@ -104,22 +101,10 @@ public class SmartRouter {
             }
         }
         // Fallback to first admin
-        return userRepository.findByEmail("admin@example.com").orElse(null);
+        return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
     }
 
-    private List<Complaint> findDuplicates(Complaint complaint) {
-        List<Complaint> allComplaints = complaintRepository.findAll();
-        return allComplaints.stream()
-            .filter(c -> !c.getId().equals(complaint.getId()))
-            .filter(c -> c.getStatus() != Complaint.ComplaintStatus.RESOLVED)
-            .filter(c -> {
-                String desc1 = c.getDescription().toLowerCase();
-                String desc2 = complaint.getDescription().toLowerCase();
-                String[] words = desc2.split(" ");
-                long matches = 0;
-                for (String w : words) {
-                    if (desc1.contains(w) && w.length() > 3) matches++;
-                }
+    // Replaced by ComplaintRoutingUtils.findSimilarComplaints()
                 return matches >= 2;
             })
             .limit(5)
@@ -128,13 +113,13 @@ public class SmartRouter {
 
     private String generateRecommendation(String category, int urgency) {
         if (urgency >= 80) {
-            return "⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.";
+            return org.springframework.http.ResponseEntity.ok("⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.");
         } else if (urgency >= 60) {
-            return "🔴 HIGH: Priority action needed within 4 hours.";
+            return org.springframework.http.ResponseEntity.ok("🔴 HIGH: Priority action needed within 4 hours.");
         } else if (urgency >= 40) {
-            return "🟡 MEDIUM: Normal priority. Handle within 24 hours.";
+            return org.springframework.http.ResponseEntity.ok("🟡 MEDIUM: Normal priority. Handle within 24 hours.");
         } else {
-            return "🟢 LOW: Standard priority. Handle within 48 hours.";
+            return org.springframework.http.ResponseEntity.ok("🟢 LOW: Standard priority. Handle within 48 hours.");
         }
     }
 

@@ -12,14 +12,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/neuro")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class NeuroSymbolicController {
 
-    @Autowired
-    private NeuroSymbolicEngine neuroSymbolicEngine;
+    private final NeuroSymbolicEngine neuroSymbolicEngine;
 
-    @Autowired
-    private RuleExtractor ruleExtractor;
+    private final RuleExtractor ruleExtractor;
 
     @PostMapping("/reason")
     public ResponseEntity<NeuroSymbolicEngine.NeuroSymbolicResult> reason(
@@ -38,7 +36,7 @@ public class NeuroSymbolicController {
     }
 
     @PostMapping("/rules/add")
-    public ResponseEntity<Map<String, String>> addRule(@RequestBody RuleExtractor.Rule rule) {
+    public ResponseEntity<Map<String, String>> addRule(@Valid @RequestBody RuleExtractor.Rule rule) {
         ruleExtractor.addRule(rule);
         return ResponseEntity.ok(Map.of("status", "success", "message", "Rule added successfully"));
     }

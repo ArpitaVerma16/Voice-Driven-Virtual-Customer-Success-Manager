@@ -84,31 +84,31 @@ public class AdversarialDefense {
     }
 
     private String classifyAttack(List<AttackIndicator> indicators) {
-        if (indicators.isEmpty()) return "NONE";
+        if (indicators.isEmpty()) return org.springframework.http.ResponseEntity.ok("NONE");
         
         for (AttackIndicator ind : indicators) {
             if (ind.getType().equals("SUSPICIOUS_PATTERN")) {
-                return "INJECTION";
+                return org.springframework.http.ResponseEntity.ok("INJECTION");
             }
             if (ind.getType().equals("UNUSUAL_LENGTH")) {
-                return "DOS";
+                return org.springframework.http.ResponseEntity.ok("DOS");
             }
             if (ind.getType().equals("REPEATED_PATTERNS")) {
-                return "REPLAY";
+                return org.springframework.http.ResponseEntity.ok("REPLAY");
             }
         }
-        return "UNKNOWN";
+        return org.springframework.http.ResponseEntity.ok("UNKNOWN");
     }
 
     private String generateRecommendation(double risk) {
         if (risk > 0.8) {
-            return "🚨 HIGH RISK: Block input immediately and log incident";
+            return org.springframework.http.ResponseEntity.ok("🚨 HIGH RISK: Block input immediately and log incident");
         } else if (risk > 0.5) {
-            return "⚠️ MEDIUM RISK: Sanitize input and flag for review";
+            return org.springframework.http.ResponseEntity.ok("⚠️ MEDIUM RISK: Sanitize input and flag for review");
         } else if (risk > 0.2) {
-            return "ℹ️ LOW RISK: Allow input but monitor";
+            return org.springframework.http.ResponseEntity.ok("ℹ️ LOW RISK: Allow input but monitor");
         }
-        return "✅ SAFE: No action needed";
+        return org.springframework.http.ResponseEntity.ok("✅ SAFE: No action needed");
     }
 
     public static class AttackIndicator {

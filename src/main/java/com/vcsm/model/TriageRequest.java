@@ -3,6 +3,8 @@ package com.vcsm.model;
 import java.time.LocalDateTime;
 import jakarta.validation.constraints.*;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class TriageRequest {
     @NotNull
     private Long complaintId;

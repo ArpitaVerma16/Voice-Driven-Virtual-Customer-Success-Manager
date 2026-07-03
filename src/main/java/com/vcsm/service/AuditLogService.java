@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class AuditLogService {
 
-    @Autowired
-    private AuditLogRepository auditLogRepository;
+    private final AuditLogRepository auditLogRepository;
 
     public void logAction(User admin, String actionType, String description) {
         AuditLog log = new AuditLog(admin, actionType, description);

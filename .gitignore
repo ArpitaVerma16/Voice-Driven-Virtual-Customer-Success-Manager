@@ -33,5 +33,7 @@ application-prod.properties
 .DS_Store
 Thumbs.db
 
-
-
+# H2 file database (local persistence)
+data/
+*.mv.db
+*.trace.db

@@ -30,34 +30,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@lombok.RequiredArgsConstructor
 public class PredictiveDissatisfactionTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
-    @Autowired
-    private PredictionService predictionService;
+    private final PredictionService predictionService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private SentimentAnalysisRepository sentimentAnalysisRepository;
+    private final SentimentAnalysisRepository sentimentAnalysisRepository;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private com.vcsm.security.repo.AppUserRepository appUserRepository;
+    private final com.vcsm.security.repo.AppUserRepository appUserRepository;
 
-    @Autowired
-    private com.vcsm.security.service.CustomUserDetailsService customUserDetailsService;
+    private final com.vcsm.security.service.CustomUserDetailsService customUserDetailsService;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     private User testUser;
 

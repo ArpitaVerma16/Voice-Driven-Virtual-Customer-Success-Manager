@@ -10,14 +10,12 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/languages")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class MultilingualController {
 
-    @Autowired
-    private LanguageDetectionEnhancedService languageDetectionService;
+    private final LanguageDetectionEnhancedService languageDetectionService;
 
-    @Autowired
-    private MultilingualResponseService multilingualResponseService;
+    private final MultilingualResponseService multilingualResponseService;
 
     @GetMapping("/supported")
     public ResponseEntity<Map<String, Object>> getSupportedLanguages() {
@@ -36,7 +34,7 @@ public class MultilingualController {
     }
 
     @PostMapping("/detect")
-    public ResponseEntity<Map<String, Object>> detectLanguage(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> detectLanguage(@Valid @RequestBody Map<String, String> request) {
         String audioTranscript = request.get("transcript");
 
         if (audioTranscript == null || audioTranscript.isEmpty()) {
@@ -57,7 +55,7 @@ public class MultilingualController {
     }
 
     @PostMapping("/response")
-    public ResponseEntity<Map<String, Object>> getResponse(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> getResponse(@Valid @RequestBody Map<String, String> request) {
         String languageCode = request.get("language");
         String responseKey = request.get("responseKey");
 
@@ -88,3 +86,4 @@ public class MultilingualController {
         ));
     }
 }
+

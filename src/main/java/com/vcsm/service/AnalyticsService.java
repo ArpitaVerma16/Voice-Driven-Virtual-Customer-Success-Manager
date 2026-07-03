@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class AnalyticsService {
 
     private final SentimentAnalysisRepository sentimentRepository;

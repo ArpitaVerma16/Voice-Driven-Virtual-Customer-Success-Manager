@@ -3,6 +3,8 @@ package com.vcsm.dto;
 import com.vcsm.model.CustomerIntent;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class IntentResult {
     private final CustomerIntent classifiedIntent;
     private final double confidence;

@@ -23,13 +23,12 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/audit")
+@lombok.RequiredArgsConstructor
 public class AuditLogController {
 
-    @Autowired
-    private AuditLogService auditLogService;
+    private final AuditLogService auditLogService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private User getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();

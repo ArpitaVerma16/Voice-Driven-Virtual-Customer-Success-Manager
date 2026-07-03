@@ -17,9 +17,9 @@ public class HindiCommandMapper {
 
     private static final Logger log = LoggerFactory.getLogger(HindiCommandMapper.class);
     
-    private Map<String, String> commandMap = new HashMap<>();
-    private Map<String, String> responseMap = new HashMap<>();
-    private Map<String, String[]> keywordMap = new HashMap<>();
+    private Map<String, String> commandMap = new ConcurrentHashMap<>();
+    private Map<String, String> responseMap = new ConcurrentHashMap<>();
+    private Map<String, String[]> keywordMap = new ConcurrentHashMap<>();
     
     @PostConstruct
     public void init() {
@@ -82,11 +82,11 @@ public class HindiCommandMapper {
     
     private String mapKeywordToAction(String keyword) {
         switch (keyword) {
-            case "complaint": return "file_complaint";
-            case "event": return "show_events";
-            case "status": return "complaint_status";
-            case "help": return "help";
-            case "cancel": return "cancel_registration";
+            case "complaint": return org.springframework.http.ResponseEntity.ok("file_complaint");
+            case "event": return org.springframework.http.ResponseEntity.ok("show_events");
+            case "status": return org.springframework.http.ResponseEntity.ok("complaint_status");
+            case "help": return org.springframework.http.ResponseEntity.ok("help");
+            case "cancel": return org.springframework.http.ResponseEntity.ok("cancel_registration");
             default: return null;
         }
     }

@@ -11,16 +11,15 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceOtpService {
 
     private final Map<String, VoiceOtpSession> sessions = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
-    @Autowired
-    private SpeechToTextService speechToTextService;
+    private final SpeechToTextService speechToTextService;
 
-    @Autowired
-    private VoiceBiometricsService voiceBiometricsService;
+    private final VoiceBiometricsService voiceBiometricsService;
 
     /**
      * Generate a new 4-digit OTP challenge session
@@ -111,7 +110,7 @@ public class VoiceOtpService {
      */
     public String normalizeToDigits(String text) {
         if (text == null) {
-            return "";
+            return org.springframework.http.ResponseEntity.ok("");
         }
         String lower = text.toLowerCase();
         

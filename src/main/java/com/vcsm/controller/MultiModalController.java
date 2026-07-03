@@ -10,16 +10,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/multimodal")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class MultiModalController {
 
-    @Autowired
-    private ContextualEmotionAI contextualEmotionAI;
+    private final ContextualEmotionAI contextualEmotionAI;
 
     @PostMapping("/analyze")
     public ResponseEntity<ContextualEmotionAI.EmotionAnalysis> analyzeEmotion(
             @RequestParam String userId,
-            @RequestBody MultiModalRequest request) {
+            @Valid @RequestBody MultiModalRequest request) {
         return ResponseEntity.ok(contextualEmotionAI.analyzeEmotion(
             userId,
             request.getText(),

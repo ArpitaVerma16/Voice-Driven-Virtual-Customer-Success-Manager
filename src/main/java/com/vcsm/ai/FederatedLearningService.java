@@ -7,18 +7,16 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class FederatedLearningService {
 
-    @Autowired
-    private LocalModelTrainer localModelTrainer;
+    private final LocalModelTrainer localModelTrainer;
 
-    @Autowired
-    private SecureAggregator secureAggregator;
+    private final SecureAggregator secureAggregator;
 
-    @Autowired
-    private PrivacyEngine privacyEngine;
+    private final PrivacyEngine privacyEngine;
 
-    private final Map<String, FederatedRound> rounds = new HashMap<>();
+    private final Map<String, FederatedRound> rounds = new ConcurrentHashMap<>();
     private int roundNumber = 0;
 
     /**

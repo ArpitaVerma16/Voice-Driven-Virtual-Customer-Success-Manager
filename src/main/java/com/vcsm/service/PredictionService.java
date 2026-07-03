@@ -8,6 +8,7 @@ import com.vcsm.repository.UserRepository;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.SentimentAnalysisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Profile("dev")
 @Service
 public class PredictionService {
 

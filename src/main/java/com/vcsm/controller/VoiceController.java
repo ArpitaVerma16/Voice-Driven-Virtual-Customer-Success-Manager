@@ -26,29 +26,26 @@ import com.vcsm.dto.VoiceCommandRequest;
 
 @RestController
 @RequestMapping("/api/voice")
+@lombok.RequiredArgsConstructor
 public class VoiceController {
 
-    @Autowired
-    private OmnidimService omnidimService;
+    private final OmnidimService omnidimService;
     
-    @Autowired
-    private SentimentAnalysisService sentimentService;
+    private final SentimentAnalysisService sentimentService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private LanguageDetectionService languageDetectionService;
+    private final LanguageDetectionService languageDetectionService;
 
-    @Autowired
-    private HindiCommandMapper hindiCommandMapper;
+    private final HindiCommandMapper hindiCommandMapper;
 
-    @Autowired
-    private com.vcsm.service.EventRegistrationService eventRegistrationService;
+    private final com.vcsm.service.EventRegistrationService eventRegistrationService;
 
     @PostMapping("/command")
     public ResponseEntity<Map<String, Object>> command(@Valid @RequestBody VoiceCommandRequest request) {
         String transcript = request.getTranscript();
+    public ResponseEntity<?> command(@Valid @RequestBody Map<String, String> body) {
+        String transcript = body.get("transcript");
         
         if (transcript == null || transcript.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Transcript required", "success", false));
@@ -160,7 +157,7 @@ public class VoiceController {
     }
 
     @PostMapping("/flow-config")
-    public ResponseEntity<Map<String, Object>> saveFlowConfig(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, Object>> saveFlowConfig(@Valid @RequestBody Map<String, String> body) {
         String flowJson = body.get("flowJson");
         if (flowJson == null || flowJson.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "flowJson is required", "success", false));

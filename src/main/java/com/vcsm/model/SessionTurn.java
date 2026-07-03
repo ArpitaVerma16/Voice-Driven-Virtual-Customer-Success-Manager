@@ -3,6 +3,8 @@ package com.vcsm.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
 @Table(name = "session_turns")
 public class SessionTurn {

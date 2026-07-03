@@ -105,6 +105,18 @@
     fetch('/api/analytics/voice/commands')
         .then(r => r.json())
         .then(data => {
+            if (!data || data.length === 0) {
+                document.getElementById('intentChart').closest('.card-body').innerHTML = `
+                    <div class="empty-state-small">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-chart-bar" style="font-size: 40px; color: #8b5cf6;"></i>
+                        </div>
+                        <p class="text-muted">No command data available yet</p>
+                        <p class="small text-muted">Voice commands will appear here once residents start using the system</p>
+                    </div>
+                `;
+                return;
+            }
             new Chart(document.getElementById('intentChart'), {
                 type: 'bar',
                 data: {
@@ -121,6 +133,18 @@
     fetch('/api/analytics/voice/hourly')
         .then(r => r.json())
         .then(data => {
+            if (!data || data.length === 0) {
+                document.getElementById('hourlyChart').closest('.card-body').innerHTML = `
+                    <div class="empty-state-small">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-clock" style="font-size: 40px; color: #8b5cf6;"></i>
+                        </div>
+                        <p class="text-muted">No hourly usage data yet</p>
+                        <p class="small text-muted">Usage trends will appear as residents interact with the voice system</p>
+                    </div>
+                `;
+                return;
+            }
             new Chart(document.getElementById('hourlyChart'), {
                 type: 'line',
                 data: {

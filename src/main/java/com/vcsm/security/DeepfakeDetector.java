@@ -63,11 +63,11 @@ public class DeepfakeDetector {
 
     private String generateRecommendation(double anomalyScore) {
         if (anomalyScore > 0.8) {
-            return "🚨 HIGH RISK: Voice appears to be deepfake. Block access and notify admin.";
+            return org.springframework.http.ResponseEntity.ok("🚨 HIGH RISK: Voice appears to be deepfake. Block access and notify admin.");
         } else if (anomalyScore > 0.5) {
-            return "⚠️ MEDIUM RISK: Suspicious voice detected. Recommend additional verification.";
+            return org.springframework.http.ResponseEntity.ok("⚠️ MEDIUM RISK: Suspicious voice detected. Recommend additional verification.");
         } else {
-            return "✅ LOW RISK: Voice appears legitimate. Proceed with normal authentication.";
+            return org.springframework.http.ResponseEntity.ok("✅ LOW RISK: Voice appears legitimate. Proceed with normal authentication.");
         }
     }
 

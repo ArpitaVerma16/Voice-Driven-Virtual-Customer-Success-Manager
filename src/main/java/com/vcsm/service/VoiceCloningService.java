@@ -4,6 +4,7 @@ import com.vcsm.model.User;
 import com.vcsm.model.VoiceProfile;
 import com.vcsm.repository.VoiceProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +22,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceCloningService {
 
     private static final Logger log = LoggerFactory.getLogger(VoiceCloningService.class);
 
-    @Autowired
-    private VoiceProfileRepository voiceProfileRepository;
+    private final VoiceProfileRepository voiceProfileRepository;
 
-    @Autowired
-    private com.vcsm.repository.SentimentAnalysisRepository sentimentAnalysisRepository;
+    private final com.vcsm.repository.SentimentAnalysisRepository sentimentAnalysisRepository;
 
-    @Autowired
-    private VoiceToneAdapterService voiceToneAdapterService;
+    private final VoiceToneAdapterService voiceToneAdapterService;
 
     @Value("${voice.cloning.upload.dir:uploads/voices}")
     private String uploadDir;

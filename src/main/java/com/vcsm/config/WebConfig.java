@@ -7,10 +7,10 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@lombok.RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private RateLimitingInterceptor rateLimitingInterceptor;
+    private final RateLimitingInterceptor rateLimitingInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

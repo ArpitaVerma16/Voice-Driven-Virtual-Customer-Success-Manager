@@ -23,66 +23,62 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@lombok.RequiredArgsConstructor
 public class WebController {
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
-    @Autowired
-    private OmnidimService omnidimService;
+    private final OmnidimService omnidimService;
 
-    @Autowired
-    private InteractionService interactionService;
+    private final InteractionService interactionService;
 
-    @Autowired
-    private com.vcsm.repository.UserRepository userRepository;
+    private final com.vcsm.repository.UserRepository userRepository;
 
     @GetMapping("/landing")
     public String landing() {
-        return "landing";
+        return org.springframework.http.ResponseEntity.ok("landing");
     }
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return org.springframework.http.ResponseEntity.ok("login");
     }
 
     @GetMapping("/chatbot")
     public String chatbot() {
-        return "chatbot-ui";
+        return org.springframework.http.ResponseEntity.ok("chatbot-ui");
     }
 
     @GetMapping("/voice-templates")
     public String voiceTemplates() {
-        return "voice-templates";
+        return org.springframework.http.ResponseEntity.ok("voice-templates");
     }
 
     @GetMapping("/profile")
     public String profile() {
-        return "profile";
+        return org.springframework.http.ResponseEntity.ok("profile");
     }
 
     @GetMapping("/onboarding")
     public String onboarding() {
-        return "onboarding";
+        return org.springframework.http.ResponseEntity.ok("onboarding");
     }
 
     @GetMapping("/voice-analytics")
     public String voiceAnalytics() {
-        return "voice-analytics";
+        return org.springframework.http.ResponseEntity.ok("voice-analytics");
     }
 
     @GetMapping("/audit-logs")
     public String auditLogs() {
-        return "audit-logs";
+        return org.springframework.http.ResponseEntity.ok("audit-logs");
     }
 
     @GetMapping("/ivr-builder")
     public String ivrBuilder() {
-        return "ivr-builder";
+        return org.springframework.http.ResponseEntity.ok("ivr-builder");
     }
 
     @GetMapping("/")
@@ -97,10 +93,12 @@ public class WebController {
             stats.put("resolved", 0L);
         }
 
-        List<?> complaints = complaintService.getAllComplaints();
+        // Recent complaints via a LIMIT 5 query instead of loading the whole
+        // complaints table; page load time no longer scales with table size.
+        List<?> recentComplaints = complaintService.getRecentComplaints(5);
 
-        if (complaints == null) {
-            complaints = new ArrayList<>();
+        if (recentComplaints == null) {
+            recentComplaints = new ArrayList<>();
         }
 
         List<?> commands = omnidimService.getRecentCommands();
@@ -111,28 +109,24 @@ public class WebController {
 
         model.addAttribute("complaintStats", stats);
 
-        model.addAttribute("activeEvents",
-                eventService.getActiveEvents() != null
-                        ? eventService.getActiveEvents().size()
-                        : 0);
+        // Dashboard cards only need counts: COUNT(*) in the database instead
+        // of materializing every event row (twice, previously).
+        model.addAttribute("activeEvents", eventService.countActiveEvents());
 
-        model.addAttribute("upcomingEvents",
-                eventService.getUpcomingEvents() != null
-                        ? eventService.getUpcomingEvents().size()
-                        : 0);
+        model.addAttribute("upcomingEvents", eventService.countUpcomingEvents());
 
-        model.addAttribute("recentComplaints",
-                complaints.stream().limit(5).toList());
+        model.addAttribute("recentComplaints", recentComplaints);
 
         model.addAttribute("recentCommands",
                 commands.stream().limit(5).toList());
 
-        List<com.vcsm.model.User> highRiskUsers = userRepository.findAll().stream()
-                .filter(u -> u.getDissatisfactionScore() >= 75.0)
-                .toList();
+        // High-risk residents filtered in the database rather than streaming
+        // the entire users table into memory.
+        List<com.vcsm.model.User> highRiskUsers =
+                userRepository.findByDissatisfactionScoreGreaterThanEqual(75.0);
         model.addAttribute("highRiskUsers", highRiskUsers);
 
-        return "dashboard";
+        return org.springframework.http.ResponseEntity.ok("dashboard");
     }
 
     @GetMapping("/complaints")
@@ -170,7 +164,7 @@ public class WebController {
         model.addAttribute("page", complaintPage);
         model.addAttribute("stats", complaintService.getComplaintStats());
 
-        return "complaints";
+        return org.springframework.http.ResponseEntity.ok("complaints");
     }
 
     @GetMapping("/events")
@@ -186,22 +180,22 @@ public class WebController {
                         ? eventService.getUpcomingEvents().size()
                         : 0);
 
-        return "events";
+        return org.springframework.http.ResponseEntity.ok("events");
     }
 
     @GetMapping("/voice-cloning")
     public String voiceCloning() {
-       return "voice-cloning-ui";
+       return org.springframework.http.ResponseEntity.ok("voice-cloning-ui");
     }
 
     @GetMapping("/live-dashboard")
     public String liveDashboard() {
-        return "live-dashboard";
+        return org.springframework.http.ResponseEntity.ok("live-dashboard");
     }
 
     @GetMapping("/translation")
     public String translation() {
-        return "translation-ui";
+        return org.springframework.http.ResponseEntity.ok("translation-ui");
     }
 
     @GetMapping("/analytics")
@@ -227,22 +221,22 @@ public class WebController {
                         ? eventService.getActiveEvents().size()
                         : 0);
 
-        return "analytics";
+        return org.springframework.http.ResponseEntity.ok("analytics");
     }
 
     @GetMapping("/blockchain-verify")
     public String blockchainVerify() {
-        return "blockchain-verify";
+        return org.springframework.http.ResponseEntity.ok("blockchain-verify");
     }
 
     @GetMapping("/offline")
     public String offline() {
-        return "offline";
+        return org.springframework.http.ResponseEntity.ok("offline");
     }
 
     @GetMapping("/twilio-demo")
     public String twilioDemo() {
-        return "twilio-demo";
+        return org.springframework.http.ResponseEntity.ok("twilio-demo");
     }
 
     @GetMapping("/interaction-history")
@@ -263,7 +257,7 @@ public class WebController {
         } catch (Exception e) {
             model.addAttribute("interactionStats", new HashMap<>());
         }
-        return "interaction-history";
+        return org.springframework.http.ResponseEntity.ok("interaction-history");
     }
 
 }

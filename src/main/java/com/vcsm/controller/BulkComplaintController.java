@@ -10,10 +10,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/complaints/bulk")
+@lombok.RequiredArgsConstructor
 public class BulkComplaintController {
 
-    @Autowired
-    private BulkComplaintService bulkComplaintService;
+    private final BulkComplaintService bulkComplaintService;
 
     @PostMapping("/resolve")
     public ResponseEntity<Map<String, Object>> bulkResolve(

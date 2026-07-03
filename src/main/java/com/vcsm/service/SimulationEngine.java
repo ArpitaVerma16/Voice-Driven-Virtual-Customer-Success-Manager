@@ -6,20 +6,21 @@ import com.vcsm.model.Event;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class SimulationEngine {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     /**
      * Run simulation on digital twin
@@ -136,7 +137,7 @@ public class SimulationEngine {
             .count();
 
         long totalEvents = events.size();
-        long activeEvents = events.stream().filter(Event::isActive).count();
+        long activeEvents = events.stream().parallel().filter(Event::isActive).count();
 
         result.setTotalComplaints(totalComplaints);
         result.setResolvedComplaints(resolvedComplaints);

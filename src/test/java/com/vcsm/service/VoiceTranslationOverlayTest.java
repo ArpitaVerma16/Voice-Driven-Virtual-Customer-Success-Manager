@@ -19,19 +19,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@lombok.RequiredArgsConstructor
 public class VoiceTranslationOverlayTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
-    @Autowired
-    private VoiceTranslationService translationService;
+    private final VoiceTranslationService translationService;
 
-    @Autowired
-    private LanguageDetector languageDetector;
+    private final LanguageDetector languageDetector;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Test
     public void testSpanishDetection() {

@@ -10,14 +10,13 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/sessions")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SessionController {
 
-    @Autowired
-    private SessionManagementService sessionManagementService;
+    private final SessionManagementService sessionManagementService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createSession(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody Map<String, String> request) {
         String customerId = request.get("customerId");
 
         if (customerId == null || customerId.trim().isEmpty()) {
@@ -36,7 +35,7 @@ public class SessionController {
     @PostMapping("/{sessionId}/turn")
     public ResponseEntity<Map<String, String>> addTurn(
             @PathVariable String sessionId,
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         String speaker = request.get("speaker");
         String content = request.get("content");
 
@@ -51,7 +50,7 @@ public class SessionController {
     @PostMapping("/{sessionId}/end")
     public ResponseEntity<Map<String, Object>> endSession(
             @PathVariable String sessionId,
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         String intent = request.get("intent");
         String resolutionStatus = request.getOrDefault("resolutionStatus", "unresolved");
 
@@ -118,7 +117,7 @@ public class SessionController {
     @PatchMapping("/{sessionId}/resolution")
     public ResponseEntity<Map<String, String>> updateResolution(
             @PathVariable String sessionId,
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         String newStatus = request.get("status");
 
         if (newStatus == null || newStatus.trim().isEmpty()) {
@@ -129,3 +128,4 @@ public class SessionController {
         return ResponseEntity.ok(Map.of("success", "true"));
     }
 }
+

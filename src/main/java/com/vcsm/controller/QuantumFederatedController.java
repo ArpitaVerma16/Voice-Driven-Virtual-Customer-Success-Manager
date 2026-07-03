@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quantum-fed")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class QuantumFederatedController {
 
-    @Autowired
-    private QuantumFederatedService quantumFederatedService;
+    private final QuantumFederatedService quantumFederatedService;
 
     @PostMapping("/start")
     public ResponseEntity<QuantumFederatedService.FederatedRound> startRound() {
@@ -26,7 +25,7 @@ public class QuantumFederatedController {
     public ResponseEntity<QuantumFederatedService.ClientParticipation> participate(
             @RequestParam String roundId,
             @RequestParam String clientId,
-            @RequestBody ClientUpdateRequest request) {
+            @Valid @RequestBody ClientUpdateRequest request) {
         return ResponseEntity.ok(quantumFederatedService.participate(
             roundId, clientId, request.getWeights(), request.getDataSize()
         ));
@@ -38,7 +37,7 @@ public class QuantumFederatedController {
     }
 
     @PostMapping("/predict")
-    public ResponseEntity<QuantumFederatedService.QuantumInferenceResult> predict(@RequestBody double[] input) {
+    public ResponseEntity<QuantumFederatedService.QuantumInferenceResult> predict(@Valid @RequestBody double[] input) {
         return ResponseEntity.ok(quantumFederatedService.quantumPredict(input));
     }
 

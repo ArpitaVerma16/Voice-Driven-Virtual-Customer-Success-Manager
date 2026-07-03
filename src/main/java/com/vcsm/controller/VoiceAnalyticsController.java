@@ -10,10 +10,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics/voice")
+@lombok.RequiredArgsConstructor
 public class VoiceAnalyticsController {
     
-    @Autowired
-    private VoiceAnalyticsService voiceAnalyticsService;
+    private final VoiceAnalyticsService voiceAnalyticsService;
     
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Object>> getSummary() {

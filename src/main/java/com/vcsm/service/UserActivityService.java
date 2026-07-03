@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class UserActivityService {
     
-    @Autowired
-    private UserActivityRepository userActivityRepository;
+    private final UserActivityRepository userActivityRepository;
     
     public void logActivity(User user, String actionType, String description, Long referenceId) {
         UserActivity activity = new UserActivity(user, actionType, description, referenceId);

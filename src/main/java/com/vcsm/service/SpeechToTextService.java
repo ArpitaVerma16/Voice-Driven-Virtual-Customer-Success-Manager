@@ -26,7 +26,7 @@ public class SpeechToTextService {
     @CircuitBreaker(name = "speechToTextService", fallbackMethod = "transcribeFallback")
     public String transcribe(String base64Audio, String languageCode) {
         if (base64Audio == null || base64Audio.isEmpty()) {
-            return "";
+            return org.springframework.http.ResponseEntity.ok("");
         }
 
         // Try decoding to check if it's a test string containing mock digits
@@ -42,7 +42,7 @@ public class SpeechToTextService {
 
         // If no speech API key is configured, return fallback mock digits
         if (speechApiKey == null || speechApiKey.isEmpty()) {
-            return "1 2 3 4";
+            return org.springframework.http.ResponseEntity.ok("1 2 3 4");
         }
 
         try {
@@ -103,6 +103,6 @@ public class SpeechToTextService {
 
     public String transcribeFallback(String base64Audio, String languageCode, Throwable t) {
         log.warn("Circuit breaker triggered for speech-to-text service: {}", t.getMessage());
-        return "Service temporarily unavailable, please try again.";
+        return org.springframework.http.ResponseEntity.ok("Service temporarily unavailable, please try again.");
     }
 }

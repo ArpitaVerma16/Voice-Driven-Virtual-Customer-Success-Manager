@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.EmailLog;
 import com.vcsm.model.EmailQueue;
@@ -21,24 +23,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private EmailLogRepository emailLogRepository;
+    private final EmailLogRepository emailLogRepository;
 
-    @Autowired
-    private EmailQueueRepository emailQueueRepository;
+    private final EmailQueueRepository emailQueueRepository;
 
-    @Autowired
-    private com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
+    private final com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private com.vcsm.service.QRCodeService qrCodeService;
+    private final com.vcsm.service.QRCodeService qrCodeService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -143,9 +141,9 @@ public class EmailService {
     private String getSubject(String reminderType, String eventName) {
         switch (reminderType) {
             case "CONFIRMATION": return "✅ Registration Confirmed: " + eventName;
-            case "DAY_BEFORE":   return "⏰ Reminder: " + eventName + " is tomorrow!";
-            case "HOUR_BEFORE":  return "🔔 " + eventName + " starts in 1 hour!";
-            case "FOLLOW_UP":    return "📝 How was " + eventName + "?";
+            case "DAY_BEFORE":   return org.springframework.http.ResponseEntity.ok("⏰ Reminder: " + eventName + " is tomorrow!");
+            case "HOUR_BEFORE":  return org.springframework.http.ResponseEntity.ok("🔔 " + eventName + " starts in 1 hour!");
+            case "FOLLOW_UP":    return org.springframework.http.ResponseEntity.ok("📝 How was " + eventName + "?");
             default:             return "Event Reminder: " + eventName;
         }
     }
@@ -235,11 +233,11 @@ public class EmailService {
 
     private String getReminderMessage(String reminderType) {
         switch (reminderType) {
-            case "CONFIRMATION": return "You have successfully registered!";
-            case "DAY_BEFORE":   return "This event is happening tomorrow!";
-            case "HOUR_BEFORE":  return "This event starts in 1 hour!";
-            case "FOLLOW_UP":    return "We hope you enjoyed the event!";
-            default:             return "Event Reminder";
+            case "CONFIRMATION": return org.springframework.http.ResponseEntity.ok("You have successfully registered!");
+            case "DAY_BEFORE":   return org.springframework.http.ResponseEntity.ok("This event is happening tomorrow!");
+            case "HOUR_BEFORE":  return org.springframework.http.ResponseEntity.ok("This event starts in 1 hour!");
+            case "FOLLOW_UP":    return org.springframework.http.ResponseEntity.ok("We hope you enjoyed the event!");
+            default:             return org.springframework.http.ResponseEntity.ok("Event Reminder");
         }
     }
 }
