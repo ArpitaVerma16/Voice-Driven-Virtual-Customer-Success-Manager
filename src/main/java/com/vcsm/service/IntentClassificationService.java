@@ -4,10 +4,14 @@ import com.vcsm.dto.IntentResult;
 import com.vcsm.dto.IntentScore;
 import com.vcsm.model.CustomerIntent;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Service
 public class IntentClassificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(IntentClassificationService.class);
 
     private static final Map<CustomerIntent, Set<String>> INTENT_KEYWORDS = new HashMap<>();
     private static final double CONFIDENCE_THRESHOLD = 0.5;
@@ -62,7 +66,7 @@ public class IntentClassificationService {
 
         long processingTime = System.currentTimeMillis() - startTime;
         if (processingTime > 100) {
-            System.err.println("Warning: Intent classification took " + processingTime + "ms");
+            log.warn("Warning: Intent classification took {}ms", processingTime);
         }
 
         return new IntentResult(finalIntent, topScore.getScore(), scores);

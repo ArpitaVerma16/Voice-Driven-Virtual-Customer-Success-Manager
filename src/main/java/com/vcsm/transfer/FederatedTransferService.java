@@ -3,6 +3,8 @@ package com.vcsm.transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @lombok.RequiredArgsConstructor
 public class FederatedTransferService {
+
+    private static final Logger log = LoggerFactory.getLogger(FederatedTransferService.class);
 
     private final DomainAdapter domainAdapter;
 
@@ -126,7 +130,7 @@ public class FederatedTransferService {
      */
     @Scheduled(fixedDelay = 300000) // 5 minutes
     public void autoTransfer() {
-        System.out.println("🔄 Auto-triggering federated transfer learning...");
+        log.info("🔄 Auto-triggering federated transfer learning...");
         List<FederatedNode> nodeList = getAllNodes();
         if (nodeList.size() >= 2) {
             // Transfer from first node to second

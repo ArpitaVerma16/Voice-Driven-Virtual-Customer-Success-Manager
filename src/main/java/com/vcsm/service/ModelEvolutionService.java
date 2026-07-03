@@ -5,12 +5,16 @@ import com.vcsm.repository.ModelVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @Service
 @lombok.RequiredArgsConstructor
 public class ModelEvolutionService {
+
+    private static final Logger log = LoggerFactory.getLogger(ModelEvolutionService.class);
 
     private final ModelVersionRepository modelVersionRepository;
 
@@ -23,19 +27,19 @@ public class ModelEvolutionService {
      */
     @Scheduled(cron = "0 0 2 * * MON") // Every Monday at 2 AM
     public void runEvolutionCycle() {
-        System.out.println("🧬 Starting model evolution cycle...");
+        log.info("🧬 Starting model evolution cycle...");
 
         // Check drift
         DriftDetector.DriftResult drift = driftDetector.detectDrift();
 
         if (drift.isHasDrift()) {
-            System.out.println("⚠️ Data drift detected! Retraining models...");
+            log.info("⚠️ Data drift detected! Retraining models...");
             retrainAllModels();
         } else {
-            System.out.println("✅ No significant drift. Models are healthy.");
+            log.info("✅ No significant drift. Models are healthy.");
         }
 
-        System.out.println("✅ Evolution cycle completed");
+        log.info("✅ Evolution cycle completed");
     }
 
     /**
@@ -54,9 +58,9 @@ public class ModelEvolutionService {
         for (String modelName : modelNames) {
             try {
                 ModelVersion newVersion = autoTrainer.trainNewModel(modelName);
-                System.out.println("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
+                log.info("✅ Model '{}' retrained. New version: {}", modelName, newVersion.getVersion());
             } catch (Exception e) {
-                System.err.println("❌ Failed to retrain model '" + modelName + "': " + e.getMessage());
+                log.error("❌ Failed to retrain model '{}': {}", modelName, e.getMessage());
             }
         }
     }

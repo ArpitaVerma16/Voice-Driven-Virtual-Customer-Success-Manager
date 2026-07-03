@@ -3,12 +3,16 @@ package com.vcsm.ai;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @Service
 @lombok.RequiredArgsConstructor
 public class FederatedLearningService {
+
+    private static final Logger log = LoggerFactory.getLogger(FederatedLearningService.class);
 
     private final LocalModelTrainer localModelTrainer;
 
@@ -98,7 +102,7 @@ public class FederatedLearningService {
      */
     @Scheduled(fixedDelay = 600000) // 10 minutes
     public void autoStartRound() {
-        System.out.println("🧬 Auto-starting federated learning round...");
+        log.info("🧬 Auto-starting federated learning round...");
         startRound();
     }
 
