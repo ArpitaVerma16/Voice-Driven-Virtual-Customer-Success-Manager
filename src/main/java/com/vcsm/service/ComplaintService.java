@@ -87,7 +87,7 @@ public class ComplaintService {
     @Transactional
     public Complaint fileComplaint(Complaint complaint) {
         String username = currentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new IllegalArgumentException("Unauthorized");
 
         complaint.setResidentUsername(username);
         
@@ -224,7 +224,7 @@ public class ComplaintService {
         }
 
         Complaint complaint = complaintRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Complaint not found: " + id));
         
         Complaint.ComplaintStatus oldStatus = complaint.getStatus();
         Complaint.ComplaintStatus newStatus = Complaint.ComplaintStatus.valueOf(status.toUpperCase());
@@ -328,7 +328,7 @@ public class ComplaintService {
         log.info("🔄 Manually updating complaint " + id + " priority to: " + newPriority);
         
         Complaint complaint = complaintRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Complaint not found: " + id));
         
         String oldPriority = complaint.getPriority();
         complaint.setPriority(newPriority);
@@ -375,7 +375,7 @@ public class ComplaintService {
         }
 
         Complaint complaint = complaintRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Complaint not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Complaint not found: " + id));
 
         safelyExecute(() -> blockchainService.addBlock(complaint, "COMPLAINT_DELETED"), "add blockchain entry for complaint deletion");
 
