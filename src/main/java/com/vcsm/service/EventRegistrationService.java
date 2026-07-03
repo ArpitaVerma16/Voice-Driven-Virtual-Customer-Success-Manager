@@ -66,6 +66,9 @@ public class EventRegistrationService {
         // Send confirmation email
         reminderScheduler.sendRegistrationConfirmation(updatedEvent, user);
 
+        // Queue upcoming reminders in the database-backed queue
+        reminderScheduler.queueRegistrationReminders(updatedEvent, user);
+
         return updatedEvent;
     }
 
