@@ -169,7 +169,7 @@
                         <span class="btn-spinner"></span>
                         <span class="btn-text"><i class="fas fa-microphone" id="micIcon"></i></span>
                     </button>
-                    <button class="btn btn-outline-purple" onclick="sendCommand()">
+                    <button class="btn btn-outline-purple" id="sendBtn" onclick="sendCommand()">
                         <span class="btn-spinner"></span>
                         <span class="btn-text"><i class="fas fa-paper-plane"></i> Send</span>
                     </button>
@@ -400,7 +400,7 @@
                     <input type="text" id="qDesc" class="form-control" placeholder="Describe the issue *">
                 </div>
                 <div class="col-12 col-md-2">
-                    <button class="btn btn-purple w-100" onclick="quickFileComplaint()">
+                    <button class="btn btn-purple w-100" id="quickSubmitBtn" onclick="quickFileComplaint()">
                         <span class="btn-spinner"></span>
                         <span class="btn-text"><i class="fas fa-paper-plane me-1"></i>Submit</span>
                     </button>

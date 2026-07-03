@@ -1,3 +1,19 @@
+// ===== UTILITY: Disable button during request =====
+function setButtonLoading(buttonId, loading) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    if (loading) {
+        btn.disabled = true;
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Processing...';
+    } else {
+        btn.disabled = false;
+        if (btn.dataset.originalHtml) {
+            btn.innerHTML = btn.dataset.originalHtml;
+        }
+    }
+}
+
 // ===== VOICE ASSISTANT =====
 let recognition = null;
 let isRecording = false;
@@ -107,6 +123,8 @@ async function sendCommand() {
         typingIndicator.showProcessing();
     }
 
+    setButtonLoading('sendBtn', true);
+
     try {
         const res = await fetch('/api/voice/command', {
             method: 'POST',
@@ -175,8 +193,8 @@ renderConversation();
         if (typeof toast !== 'undefined') {
             toast.error('Error processing command', 'Error');
         }
-
-
+    } finally {
+        setButtonLoading('sendBtn', false);
     }
 }
 
@@ -330,6 +348,8 @@ async function quickFileComplaint() {
         return;
     }
 
+    setButtonLoading('quickSubmitBtn', true);
+
     const complaint = {
         residentName: name,
         apartmentNumber: apt || null,
@@ -355,6 +375,8 @@ async function quickFileComplaint() {
         }
     } catch (err) {
         console.error('Error filing complaint:', err);
+    } finally {
+        setButtonLoading('quickSubmitBtn', false);
     }
 }
 
@@ -373,6 +395,8 @@ async function submitComplaint() {
         return;
     }
 
+    setButtonLoading('submitComplaintBtn', true);
+
     try {
         const res = await fetch('/api/complaints', {
             method: 'POST',
@@ -384,6 +408,8 @@ async function submitComplaint() {
         }
     } catch (err) {
         console.error('Error:', err);
+    } finally {
+        setButtonLoading('submitComplaintBtn', false);
     }
 }
 
@@ -416,6 +442,8 @@ async function submitEvent() {
         return;
     }
 
+    setButtonLoading('submitEventBtn', true);
+
     try {
         const res = await fetch('/api/events', {
             method: 'POST',
@@ -425,10 +453,13 @@ async function submitEvent() {
         if (res.ok) location.reload();
     } catch (err) {
         console.error('Error creating event:', err);
+    } finally {
+        setButtonLoading('submitEventBtn', false);
     }
 }
 
 async function registerEvent(id) {
+    setButtonLoading('registerBtn', true);
     try {
         const res = await fetch(`/api/events/${id}/register`, { method: 'POST', headers: withAuthHeaders() });
         if (res.ok) {
@@ -440,10 +471,9 @@ async function registerEvent(id) {
         }
     } catch (err) {
         console.error('Error registering:', err);
+    } finally {
+        setButtonLoading('registerBtn', false);
     }
-
-
-
 }
 
 
@@ -494,6 +524,8 @@ function bulkUpdateStatus() {
         return;
     }
 
+    setButtonLoading('bulkUpdateBtn', true);
+
     fetch('/api/complaints/bulk/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -519,7 +551,8 @@ function bulkUpdateStatus() {
         if (typeof toast !== 'undefined') {
             toast.error('Network error', 'Error');
         }
-    });
+    })
+    .finally(() => setButtonLoading('bulkUpdateBtn', false));
 }
 
 function bulkResolve() {
@@ -533,6 +566,8 @@ function bulkResolve() {
     if (!confirm('Are you sure you want to resolve ' + selectedIds.length + ' complaints?')) {
         return;
     }
+
+    setButtonLoading('bulkResolveBtn', true);
 
     fetch('/api/complaints/bulk/resolve', {
         method: 'POST',
@@ -559,7 +594,8 @@ function bulkResolve() {
         if (typeof toast !== 'undefined') {
             toast.error('Network error', 'Error');
         }
-    });
+    })
+    .finally(() => setButtonLoading('bulkResolveBtn', false));
 }
 
 // Event listeners for checkboxes
