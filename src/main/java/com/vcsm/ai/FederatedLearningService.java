@@ -98,7 +98,7 @@ public class FederatedLearningService {
      */
     @Scheduled(fixedDelay = 600000) // 10 minutes
     public void autoStartRound() {
-        System.out.println("🧬 Auto-starting federated learning round...");
+        log.info("🧬 Auto-starting federated learning round...");
         startRound();
     }
 
