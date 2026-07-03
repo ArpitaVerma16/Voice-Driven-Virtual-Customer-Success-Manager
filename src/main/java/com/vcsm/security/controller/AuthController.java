@@ -21,10 +21,6 @@ public class AuthController {
     private final AuthService authService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(
-            AppUserRepository userRepository,
-            AuthService authService,
-            PasswordEncoder passwordEncoder) {
     public AuthController(AppUserRepository userRepository,
                           AuthService authService,
                           PasswordEncoder passwordEncoder) {
@@ -58,7 +54,6 @@ public class AuthController {
                 "error", ex.getMessage(),
                 "success", false
         );
-        return errorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -68,8 +63,6 @@ public class AuthController {
                 "error", ex.getMessage(),
                 "success", false
         );
-    }
-        return errorResponse(ex.getMessage());
     }
 
 

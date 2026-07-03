@@ -23,7 +23,8 @@ public class DefaultAdminSeeder implements CommandLineRunner {
     @Value("${security.admin.password:}")
     private String adminPassword;
 
-    public DefaultAdminSeeder(AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DefaultAdminSeeder(AppUserRepository userRepository, PasswordEncoder passwordEncoder,
+                               com.vcsm.repository.UserRepository profileUserRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.profileUserRepository = profileUserRepository;

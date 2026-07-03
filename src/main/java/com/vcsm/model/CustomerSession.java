@@ -7,6 +7,8 @@ import java.util.List;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
 @Table(name = "customer_sessions")
 @SQLDelete(sql = "UPDATE customer_sessions SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id=?")

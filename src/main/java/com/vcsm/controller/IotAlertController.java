@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/iot")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class IotAlertController {
 
@@ -141,3 +140,4 @@ public class IotAlertController {
         public void setResidentPhoneNumber(String residentPhoneNumber) { this.residentPhoneNumber = residentPhoneNumber; }
     }
 }
+

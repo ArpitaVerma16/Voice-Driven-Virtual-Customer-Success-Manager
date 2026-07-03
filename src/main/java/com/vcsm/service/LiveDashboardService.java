@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.model.Event;
@@ -30,7 +32,7 @@ public class LiveDashboardService {
 
     public Map<String, Object> getLiveStats() {
         // Refresh cache every 5 seconds
-        if (System.currentTimeMillis() - lastUpdateTime > 5000) {
+        if (System.currentTimeMillis() - lastUpdateTime > AppConstants.CACHE_REFRESH_MS) {
             refreshStats();
         }
         return cachedStats;

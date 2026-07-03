@@ -1,9 +1,15 @@
 package com.vcsm.security.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class AuthRequest {
 
     private String username;
     private String email;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
     public AuthRequest() {}
