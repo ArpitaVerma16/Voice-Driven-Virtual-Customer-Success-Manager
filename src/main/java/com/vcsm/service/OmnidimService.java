@@ -31,7 +31,11 @@ public class OmnidimService {
 
     private final ComplaintService complaintService;
 
-    private final EventService eventService;
+    @Autowired
+    private com.vcsm.repository.ComplaintRepository complaintRepository;
+
+    @Autowired
+    private EventService eventService;
 
     private final EventRegistrationService eventRegistrationService;
 
@@ -72,7 +76,7 @@ public class OmnidimService {
         String intent = detectIntent(lower);
         String response = switch (intent) {
             case "FILE_COMPLAINT"      -> handleComplaintVoice(lower);
-            case "CHECK_COMPLAINT"     -> handleStatusCheck();
+            case "CHECK_COMPLAINT"     -> handleStatusCheck(lower);
             case "EVENT_QUERY"         -> handleEventQuery();
             case "CANCEL_REGISTRATION" -> handleCancelRegistration(lower);
             case "ANALYTICS"           -> handleAnalytics();
@@ -219,9 +223,69 @@ public class OmnidimService {
         return "Complaint filed successfully for " + cat + " issue. Reference ID: " + complaint.getId();
     }
 
-    private String handleStatusCheck() {
-        Map<String, Long> s = complaintService.getComplaintStats();
-        return org.springframework.http.ResponseEntity.ok("Currently " + s.get("open") + " open complaints and " + s.get("inProgress") + " in progress.");
+    // Filler words stripped before keyword matching; what remains is the
+    // topic of the resident's question ("water leak", "parking", ...).
+    private static final java.util.Set<String> STATUS_QUERY_STOPWORDS = java.util.Set.of(
+            "what", "is", "the", "of", "my", "a", "an", "please", "can", "you",
+            "tell", "me", "about", "status", "check", "complaint", "complaints");
+
+    private String handleStatusCheck(String t) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+
+        // Without a resident identity there is no safe way to answer a
+        // "my complaint" question; never fall back to another user's data.
+        if (email == null) {
+            return "Please log in so I can look up your complaints.";
+        }
+
+        List<Complaint> own = complaintRepository.findByResidentUsernameOrderByCreatedAtDesc(email);
+        if (own.isEmpty()) {
+            return "You have no complaints on record.";
+        }
+
+        // Keyword match strictly within the asking resident's own complaints
+        List<String> keywords = new java.util.ArrayList<>();
+        for (String word : t.split("[^a-z0-9]+")) {
+            if (word.length() > 2 && !STATUS_QUERY_STOPWORDS.contains(word)) {
+                keywords.add(word);
+            }
+        }
+
+        List<Complaint> matches = own;
+        if (!keywords.isEmpty()) {
+            matches = own.stream()
+                    .filter(c -> {
+                        String haystack = (c.getDescription() + " " + c.getCategory()).toLowerCase();
+                        return keywords.stream().anyMatch(haystack::contains);
+                    })
+                    .toList();
+            if (matches.isEmpty()) {
+                // Keyword matched nothing: say so rather than answering
+                // about an unrelated complaint.
+                return "I could not find a complaint of yours matching \"" + String.join(" ", keywords)
+                        + "\". You have " + own.size() + " complaint(s) on record.";
+            }
+        }
+
+        if (matches.size() == 1) {
+            Complaint c = matches.get(0);
+            return "Your complaint #" + c.getId() + " (" + summarize(c) + ") is " + c.getStatus() + ".";
+        }
+
+        // Multiple matches: surface the ambiguity explicitly instead of
+        // silently answering with the first record.
+        StringBuilder sb = new StringBuilder("Your question matches " + matches.size()
+                + " of your complaints. Please specify one: ");
+        matches.stream().limit(5).forEach(c ->
+                sb.append("#").append(c.getId()).append(" (").append(summarize(c))
+                  .append(", ").append(c.getStatus()).append("); "));
+        return sb.toString().replaceAll("; $", ".");
+    }
+
+    private String summarize(Complaint c) {
+        String d = c.getDescription() == null ? "" : c.getDescription().trim();
+        return d.length() > 40 ? d.substring(0, 40) + "..." : d;
     }
 
     private String handleEventQuery() {
