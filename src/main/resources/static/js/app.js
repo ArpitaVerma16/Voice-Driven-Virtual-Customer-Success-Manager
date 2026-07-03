@@ -2,6 +2,8 @@
 let recognition = null;
 let isRecording = false;
 let lastCommandId = null; // Store last command ID for feedback
+let recordingStartTime = null;
+let recordingTimerInterval = null;
 
 const STORAGE_KEY = "voiceConversationHistory";
 
@@ -51,11 +53,23 @@ function startVoice() {
     recognition.continuous = false;
     recognition.interimResults = false;
 
+    function updateRecordingTimer() {
+        const elapsed = Date.now() - recordingStartTime;
+        const totalSeconds = Math.floor(elapsed / 1000);
+        const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = minutes + ':' + seconds;
+    }
+
     recognition.onstart = () => {
         isRecording = true;
+        recordingStartTime = Date.now();
         document.getElementById('micBtn').classList.add('btn-danger', 'recording');
         document.getElementById('micBtn').classList.remove('btn-purple');
         document.getElementById('micIcon').className = 'fas fa-stop';
+        document.getElementById('recordingTimer').classList.remove('d-none');
+        document.getElementById('timerDisplay').textContent = '00:00';
+        recordingTimerInterval = setInterval(updateRecordingTimer, 200);
         if (typeof typingIndicator !== 'undefined') {
     typingIndicator.showListening();
 }
@@ -74,14 +88,26 @@ function startVoice() {
 
     recognition.onend = () => {
         isRecording = false;
+        if (recordingTimerInterval) {
+            clearInterval(recordingTimerInterval);
+            recordingTimerInterval = null;
+        }
+        recordingStartTime = null;
         document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
         document.getElementById('micBtn').classList.add('btn-purple');
         document.getElementById('micIcon').className = 'fas fa-microphone';
+        document.getElementById('recordingTimer').classList.add('d-none');
     };
 
     recognition.onerror = (e) => {
         console.error('Voice error:', e);
         isRecording = false;
+        if (recordingTimerInterval) {
+            clearInterval(recordingTimerInterval);
+            recordingTimerInterval = null;
+        }
+        recordingStartTime = null;
+        document.getElementById('recordingTimer').classList.add('d-none');
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
         }

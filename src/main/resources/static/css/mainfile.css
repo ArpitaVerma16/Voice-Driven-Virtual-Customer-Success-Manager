@@ -1089,6 +1089,30 @@ body{background:var(--bg);color:var(--ink);}
   border-radius:14px;
 }
 
+/* Recording Timer */
+.recording-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #dc2626;
+    white-space: nowrap;
+}
+
+.recording-pulse {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
 @media (max-width: 576px){
   .app-hero .lead{font-size:1rem;}
   .app-btn-primary,.btn-outline-light.app-btn-outline{width:100%;}
