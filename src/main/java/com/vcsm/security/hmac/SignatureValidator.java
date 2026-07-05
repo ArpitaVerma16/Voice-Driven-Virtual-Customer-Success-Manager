@@ -44,7 +44,7 @@ public class SignatureValidator {
             return HexFormat.of().formatHex(hash);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("HMAC signature generation failed", e);
         }
     }
 }
