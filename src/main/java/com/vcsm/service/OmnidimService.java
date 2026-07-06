@@ -37,6 +37,9 @@ public class OmnidimService {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private SmartLockService smartLockService;
+
     private final EventRegistrationService eventRegistrationService;
 
     private final VoiceModelRegistryService voiceModelRegistryService;
@@ -80,6 +83,7 @@ public class OmnidimService {
             case "EVENT_QUERY"         -> handleEventQuery();
             case "CANCEL_REGISTRATION" -> handleCancelRegistration(lower);
             case "ANALYTICS"           -> handleAnalytics();
+            case "GENERATE_GUEST_PASS" -> handleGuestPass(lower);
             default -> "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
         };
 
@@ -125,19 +129,20 @@ public class OmnidimService {
     private String detectIntent(String t) {
         if (t.contains("book") || t.contains("reserve") || t.contains("schedule")) {
             if (t.contains("hall") || t.contains("clubhouse") || t.contains("gym") || t.contains("venue")) {
-                return org.springframework.http.ResponseEntity.ok("BOOK_VENUE");
+                return "BOOK_VENUE";
             }
         }
-        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return org.springframework.http.ResponseEntity.ok("CHECK_COMPLAINT");
+        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return "CHECK_COMPLAINT";
         if (t.contains("complaint") || t.contains("noise") || t.contains("maintenance")
-                || t.contains("broken") || t.contains("security") || t.contains("parking")) return org.springframework.http.ResponseEntity.ok("FILE_COMPLAINT");
+                || t.contains("broken") || t.contains("security") || t.contains("parking")) return "FILE_COMPLAINT";
         if (t.contains("cancel") || t.contains("opt out") || t.contains("withdraw")
-                || t.contains("un-register") || t.contains("unregister")) return org.springframework.http.ResponseEntity.ok("CANCEL_REGISTRATION");
+                || t.contains("un-register") || t.contains("unregister")) return "CANCEL_REGISTRATION";
         if (t.contains("event") || t.contains("sports") || t.contains("cultural")
-                || t.contains("activity")) return org.springframework.http.ResponseEntity.ok("EVENT_QUERY");
+                || t.contains("activity")) return "EVENT_QUERY";
         if (t.contains("analytics") || t.contains("how many") || t.contains("total")
-                || t.contains("summary")) return org.springframework.http.ResponseEntity.ok("ANALYTICS");
-        return org.springframework.http.ResponseEntity.ok("UNKNOWN");
+                || t.contains("summary")) return "ANALYTICS";
+        if (t.contains("guest pass") || t.contains("visitor pass") || t.contains("generate pass")) return "GENERATE_GUEST_PASS";
+        return "UNKNOWN";
     }
 
     private String handleCancelRegistration(String t) {
@@ -369,5 +374,44 @@ public class OmnidimService {
         } catch (Exception e) {
             return "Could not complete booking: " + e.getMessage();
         }
+    }
+
+    private String handleGuestPass(String t) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+        User user = null;
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+
+        if (user == null) {
+            return "Please log in to generate a guest pass.";
+        }
+
+        String guestName = "your guest";
+        int hours = 2; // Default duration
+        
+        // Basic extraction for name (word after "for")
+        if (t.contains("for ")) {
+            String[] parts = t.split("for ");
+            if (parts.length > 1) {
+                String namePart = parts[1].split(" ")[0];
+                if (!namePart.matches("\\d+")) {
+                    guestName = namePart.substring(0, 1).toUpperCase() + namePart.substring(1);
+                }
+            }
+        }
+        
+        // Basic extraction for hours
+        if (t.contains(" hour")) {
+            for (String word : t.split("[^a-z0-9]+")) {
+                if (word.matches("\\d+")) {
+                    hours = Integer.parseInt(word);
+                    break;
+                }
+            }
+        }
+        
+        return smartLockService.generateGuestPass(user, guestName, hours);
     }
 }
