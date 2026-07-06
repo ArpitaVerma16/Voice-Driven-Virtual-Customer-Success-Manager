@@ -41,7 +41,8 @@ public class OmnidimService {
 
     private final VoiceModelRegistryService voiceModelRegistryService;
 
-    private final VoiceAnalyticsService voiceAnalyticsService;
+    @Autowired
+    private AnalyticsEventProducer analyticsEventProducer;
 
     private final UserRepository userRepository;
 
@@ -103,12 +104,13 @@ public class OmnidimService {
             }
 
 
-            if (user != null) {
-                boolean success = !intent.equals("UNKNOWN");
-                voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
-            }
+            boolean success = !intent.equals("UNKNOWN");
+            String userEmail = (user != null) ? user.getEmail() : null;
+            com.vcsm.dto.InteractionCompletedEvent event = new com.vcsm.dto.InteractionCompletedEvent(
+                    userEmail, transcript, intent, success, responseTime);
+            analyticsEventProducer.publishEvent(event);
         } catch (Exception e) {
-            log.warn("Failed to log voice analytics: {}", e.getMessage(), e);
+            log.warn("Failed to queue voice analytics event: {}", e.getMessage(), e);
         }
 
         Map<String, Object> result = new java.util.HashMap<>();
