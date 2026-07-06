@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,6 +37,7 @@ public class InteractionController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Interaction> createInteraction(@Valid @RequestBody Interaction interaction) {
         Interaction created = interactionService.createInteraction(interaction);
@@ -139,6 +141,7 @@ public class InteractionController {
     }
 
     @Operation(summary = "Update an interaction")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Interaction> updateInteraction(
             @PathVariable Long id,
@@ -152,6 +155,7 @@ public class InteractionController {
     }
 
     @Operation(summary = "Delete an interaction")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInteraction(@PathVariable Long id) {
         try {
