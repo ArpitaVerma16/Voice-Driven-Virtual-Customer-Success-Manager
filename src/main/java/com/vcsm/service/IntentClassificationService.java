@@ -6,8 +6,11 @@ import com.vcsm.model.CustomerIntent;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class IntentClassificationService {
+    private static final Logger log = LoggerFactory.getLogger(IntentClassificationService.class);
 
     private static final Map<CustomerIntent, Set<String>> INTENT_KEYWORDS = new HashMap<>();
     private static final double CONFIDENCE_THRESHOLD = 0.5;
