@@ -90,7 +90,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/complaints/**", "/events/**", "/analytics/**", "/interaction-history/**", "/voice-analytics/**").authenticated()
                         .requestMatchers("/chatbot/**", "/voice-templates/**").authenticated()
                         .requestMatchers("/profile/**", "/onboarding/**").authenticated()
-                        .requestMatchers("/audit-logs/**").hasRole("ADMIN")
+                        .requestMatchers("/audit-logs/**").hasAnyRole("ADMIN", "AUDITOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
