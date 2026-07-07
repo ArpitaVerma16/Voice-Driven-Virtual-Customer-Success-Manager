@@ -35,6 +35,9 @@ public class OmnidimService {
     private com.vcsm.repository.ComplaintRepository complaintRepository;
 
     @Autowired
+    private PiiRedactionService piiRedactionService;
+
+    @Autowired
     private EventService eventService;
 
     private final EventRegistrationService eventRegistrationService;
@@ -72,10 +75,11 @@ public class OmnidimService {
     }
 
     public Map<String, Object> processVoiceCommand(String transcript) {
+        String redactedTranscript = piiRedactionService.redactPii(transcript);
         long startTime = System.currentTimeMillis();
         
-        log.info("Processing: " + transcript);
-        String lower = transcript.toLowerCase();
+        log.info("Processing: " + redactedTranscript);
+        String lower = redactedTranscript.toLowerCase();
         String intent = detectIntent(lower);
         String response = switch (intent) {
             case "FILE_COMPLAINT"      -> handleComplaintVoice(lower);
@@ -96,7 +100,7 @@ public class OmnidimService {
         long responseTime = System.currentTimeMillis() - startTime;
 
         VoiceCommand cmd = new VoiceCommand();
-        cmd.setTranscript(transcript);
+        cmd.setTranscript(redactedTranscript);
         cmd.setIntent(intent);
         cmd.setResponse(response);
         cmd.setProcessed(true);
@@ -115,7 +119,7 @@ public class OmnidimService {
 
             if (user != null) {
                 boolean success = !intent.equals("UNKNOWN");
-                voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
+                voiceAnalyticsService.logCommand(user, redactedTranscript, intent, success, responseTime);
             }
         } catch (Exception e) {
             log.warn("Failed to log voice analytics: {}", e.getMessage(), e);
@@ -123,7 +127,7 @@ public class OmnidimService {
 
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("intent", intent);
-        result.put("transcript", transcript);
+        result.put("transcript", redactedTranscript);
         result.put("response", response);
         result.put("success", true);
         result.put("responseTime", responseTime);
