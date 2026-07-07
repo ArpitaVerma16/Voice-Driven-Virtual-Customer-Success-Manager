@@ -35,6 +35,9 @@ public class OmnidimService {
     private com.vcsm.repository.ComplaintRepository complaintRepository;
 
     @Autowired
+    private PiiRedactionService piiRedactionService;
+
+    @Autowired
     private EventService eventService;
 
     private final EventRegistrationService eventRegistrationService;
@@ -47,6 +50,9 @@ public class OmnidimService {
     private final UserRepository userRepository;
 
     private final SchedulingOptimizer schedulingOptimizer;
+
+    @Autowired
+    private RagService ragService;
 
     private final Map<Long, PendingBookingState> pendingBookings = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -70,10 +76,11 @@ public class OmnidimService {
     }
 
     public Map<String, Object> processVoiceCommand(String transcript) {
+        String redactedTranscript = piiRedactionService.redactPii(transcript);
         long startTime = System.currentTimeMillis();
         
-        log.info("Processing: " + transcript);
-        String lower = transcript.toLowerCase();
+        log.info("Processing: " + redactedTranscript);
+        String lower = redactedTranscript.toLowerCase();
         String intent = detectIntent(lower);
         String response = switch (intent) {
             case "FILE_COMPLAINT"      -> handleComplaintVoice(lower);
@@ -81,13 +88,20 @@ public class OmnidimService {
             case "EVENT_QUERY"         -> handleEventQuery();
             case "CANCEL_REGISTRATION" -> handleCancelRegistration(lower);
             case "ANALYTICS"           -> handleAnalytics();
-            default -> "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
+            default -> {
+                try {
+                    yield ragService.answerQuestion(transcript);
+                } catch (Exception e) {
+                    log.error("RAG fallback failed: ", e);
+                    yield "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
+                }
+            }
         };
 
         long responseTime = System.currentTimeMillis() - startTime;
 
         VoiceCommand cmd = new VoiceCommand();
-        cmd.setTranscript(transcript);
+        cmd.setTranscript(redactedTranscript);
         cmd.setIntent(intent);
         cmd.setResponse(response);
         cmd.setProcessed(true);
@@ -104,18 +118,17 @@ public class OmnidimService {
             }
 
 
-            boolean success = !intent.equals("UNKNOWN");
-            String userEmail = (user != null) ? user.getEmail() : null;
-            com.vcsm.dto.InteractionCompletedEvent event = new com.vcsm.dto.InteractionCompletedEvent(
-                    userEmail, transcript, intent, success, responseTime);
-            analyticsEventProducer.publishEvent(event);
+            if (user != null) {
+                boolean success = !intent.equals("UNKNOWN");
+                voiceAnalyticsService.logCommand(user, redactedTranscript, intent, success, responseTime);
+            }
         } catch (Exception e) {
             log.warn("Failed to queue voice analytics event: {}", e.getMessage(), e);
         }
 
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("intent", intent);
-        result.put("transcript", transcript);
+        result.put("transcript", redactedTranscript);
         result.put("response", response);
         result.put("success", true);
         result.put("responseTime", responseTime);
@@ -127,19 +140,19 @@ public class OmnidimService {
     private String detectIntent(String t) {
         if (t.contains("book") || t.contains("reserve") || t.contains("schedule")) {
             if (t.contains("hall") || t.contains("clubhouse") || t.contains("gym") || t.contains("venue")) {
-                return org.springframework.http.ResponseEntity.ok("BOOK_VENUE");
+                return "BOOK_VENUE";
             }
         }
-        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return org.springframework.http.ResponseEntity.ok("CHECK_COMPLAINT");
+        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return "CHECK_COMPLAINT";
         if (t.contains("complaint") || t.contains("noise") || t.contains("maintenance")
-                || t.contains("broken") || t.contains("security") || t.contains("parking")) return org.springframework.http.ResponseEntity.ok("FILE_COMPLAINT");
+                || t.contains("broken") || t.contains("security") || t.contains("parking")) return "FILE_COMPLAINT";
         if (t.contains("cancel") || t.contains("opt out") || t.contains("withdraw")
-                || t.contains("un-register") || t.contains("unregister")) return org.springframework.http.ResponseEntity.ok("CANCEL_REGISTRATION");
+                || t.contains("un-register") || t.contains("unregister")) return "CANCEL_REGISTRATION";
         if (t.contains("event") || t.contains("sports") || t.contains("cultural")
-                || t.contains("activity")) return org.springframework.http.ResponseEntity.ok("EVENT_QUERY");
+                || t.contains("activity")) return "EVENT_QUERY";
         if (t.contains("analytics") || t.contains("how many") || t.contains("total")
-                || t.contains("summary")) return org.springframework.http.ResponseEntity.ok("ANALYTICS");
-        return org.springframework.http.ResponseEntity.ok("UNKNOWN");
+                || t.contains("summary")) return "ANALYTICS";
+        return "UNKNOWN";
     }
 
     private String handleCancelRegistration(String t) {
