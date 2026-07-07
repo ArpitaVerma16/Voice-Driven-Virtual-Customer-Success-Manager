@@ -128,9 +128,7 @@ public class InteractionController {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
             Page<InteractionDTO> interactions = interactionService.getInteractionsByDateRange(start, end, pageable);
             return ResponseEntity.ok(interactions);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        } catch (IllegalArgumentException e) { return ResponseEntity.badRequest().build(); }
     }
 
     @Operation(summary = "Get interactions by customer email")
