@@ -47,6 +47,9 @@ public class OmnidimService {
 
     private final SchedulingOptimizer schedulingOptimizer;
 
+    @Autowired
+    private RagService ragService;
+
     private final Map<Long, PendingBookingState> pendingBookings = new java.util.concurrent.ConcurrentHashMap<>();
 
     public static class PendingBookingState {
@@ -80,7 +83,14 @@ public class OmnidimService {
             case "EVENT_QUERY"         -> handleEventQuery();
             case "CANCEL_REGISTRATION" -> handleCancelRegistration(lower);
             case "ANALYTICS"           -> handleAnalytics();
-            default -> "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
+            default -> {
+                try {
+                    yield ragService.answerQuestion(transcript);
+                } catch (Exception e) {
+                    log.error("RAG fallback failed: ", e);
+                    yield "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
+                }
+            }
         };
 
         long responseTime = System.currentTimeMillis() - startTime;
@@ -125,19 +135,19 @@ public class OmnidimService {
     private String detectIntent(String t) {
         if (t.contains("book") || t.contains("reserve") || t.contains("schedule")) {
             if (t.contains("hall") || t.contains("clubhouse") || t.contains("gym") || t.contains("venue")) {
-                return org.springframework.http.ResponseEntity.ok("BOOK_VENUE");
+                return "BOOK_VENUE";
             }
         }
-        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return org.springframework.http.ResponseEntity.ok("CHECK_COMPLAINT");
+        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return "CHECK_COMPLAINT";
         if (t.contains("complaint") || t.contains("noise") || t.contains("maintenance")
-                || t.contains("broken") || t.contains("security") || t.contains("parking")) return org.springframework.http.ResponseEntity.ok("FILE_COMPLAINT");
+                || t.contains("broken") || t.contains("security") || t.contains("parking")) return "FILE_COMPLAINT";
         if (t.contains("cancel") || t.contains("opt out") || t.contains("withdraw")
-                || t.contains("un-register") || t.contains("unregister")) return org.springframework.http.ResponseEntity.ok("CANCEL_REGISTRATION");
+                || t.contains("un-register") || t.contains("unregister")) return "CANCEL_REGISTRATION";
         if (t.contains("event") || t.contains("sports") || t.contains("cultural")
-                || t.contains("activity")) return org.springframework.http.ResponseEntity.ok("EVENT_QUERY");
+                || t.contains("activity")) return "EVENT_QUERY";
         if (t.contains("analytics") || t.contains("how many") || t.contains("total")
-                || t.contains("summary")) return org.springframework.http.ResponseEntity.ok("ANALYTICS");
-        return org.springframework.http.ResponseEntity.ok("UNKNOWN");
+                || t.contains("summary")) return "ANALYTICS";
+        return "UNKNOWN";
     }
 
     private String handleCancelRegistration(String t) {
