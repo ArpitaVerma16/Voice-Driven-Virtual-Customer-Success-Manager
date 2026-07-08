@@ -31,7 +31,14 @@ public class OmnidimService {
 
     private final ComplaintService complaintService;
 
-    private final EventService eventService;
+    @Autowired
+    private com.vcsm.repository.ComplaintRepository complaintRepository;
+
+    @Autowired
+    private PiiRedactionService piiRedactionService;
+
+    @Autowired
+    private EventService eventService;
 
     private final EventRegistrationService eventRegistrationService;
 
@@ -42,6 +49,9 @@ public class OmnidimService {
     private final UserRepository userRepository;
 
     private final SchedulingOptimizer schedulingOptimizer;
+
+    @Autowired
+    private RagService ragService;
 
     private final Map<Long, PendingBookingState> pendingBookings = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -65,24 +75,32 @@ public class OmnidimService {
     }
 
     public Map<String, Object> processVoiceCommand(String transcript) {
+        String redactedTranscript = piiRedactionService.redactPii(transcript);
         long startTime = System.currentTimeMillis();
         
-        log.info("Processing: " + transcript);
-        String lower = transcript.toLowerCase();
+        log.info("Processing: " + redactedTranscript);
+        String lower = redactedTranscript.toLowerCase();
         String intent = detectIntent(lower);
         String response = switch (intent) {
             case "FILE_COMPLAINT"      -> handleComplaintVoice(lower);
-            case "CHECK_COMPLAINT"     -> handleStatusCheck();
+            case "CHECK_COMPLAINT"     -> handleStatusCheck(lower);
             case "EVENT_QUERY"         -> handleEventQuery();
             case "CANCEL_REGISTRATION" -> handleCancelRegistration(lower);
             case "ANALYTICS"           -> handleAnalytics();
-            default -> "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
+            default -> {
+                try {
+                    yield ragService.answerQuestion(transcript);
+                } catch (Exception e) {
+                    log.error("RAG fallback failed: ", e);
+                    yield "I'm your Virtual Community Manager. I can help with complaints, events, and analytics!";
+                }
+            }
         };
 
         long responseTime = System.currentTimeMillis() - startTime;
 
         VoiceCommand cmd = new VoiceCommand();
-        cmd.setTranscript(transcript);
+        cmd.setTranscript(redactedTranscript);
         cmd.setIntent(intent);
         cmd.setResponse(response);
         cmd.setProcessed(true);
@@ -101,7 +119,7 @@ public class OmnidimService {
 
             if (user != null) {
                 boolean success = !intent.equals("UNKNOWN");
-                voiceAnalyticsService.logCommand(user, transcript, intent, success, responseTime);
+                voiceAnalyticsService.logCommand(user, redactedTranscript, intent, success, responseTime);
             }
         } catch (Exception e) {
             log.warn("Failed to log voice analytics: {}", e.getMessage(), e);
@@ -109,7 +127,7 @@ public class OmnidimService {
 
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("intent", intent);
-        result.put("transcript", transcript);
+        result.put("transcript", redactedTranscript);
         result.put("response", response);
         result.put("success", true);
         result.put("responseTime", responseTime);
@@ -121,19 +139,19 @@ public class OmnidimService {
     private String detectIntent(String t) {
         if (t.contains("book") || t.contains("reserve") || t.contains("schedule")) {
             if (t.contains("hall") || t.contains("clubhouse") || t.contains("gym") || t.contains("venue")) {
-                return org.springframework.http.ResponseEntity.ok("BOOK_VENUE");
+                return "BOOK_VENUE";
             }
         }
-        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return org.springframework.http.ResponseEntity.ok("CHECK_COMPLAINT");
+        if (t.contains("status") || t.contains("check") || t.contains("my complaint")) return "CHECK_COMPLAINT";
         if (t.contains("complaint") || t.contains("noise") || t.contains("maintenance")
-                || t.contains("broken") || t.contains("security") || t.contains("parking")) return org.springframework.http.ResponseEntity.ok("FILE_COMPLAINT");
+                || t.contains("broken") || t.contains("security") || t.contains("parking")) return "FILE_COMPLAINT";
         if (t.contains("cancel") || t.contains("opt out") || t.contains("withdraw")
-                || t.contains("un-register") || t.contains("unregister")) return org.springframework.http.ResponseEntity.ok("CANCEL_REGISTRATION");
+                || t.contains("un-register") || t.contains("unregister")) return "CANCEL_REGISTRATION";
         if (t.contains("event") || t.contains("sports") || t.contains("cultural")
-                || t.contains("activity")) return org.springframework.http.ResponseEntity.ok("EVENT_QUERY");
+                || t.contains("activity")) return "EVENT_QUERY";
         if (t.contains("analytics") || t.contains("how many") || t.contains("total")
-                || t.contains("summary")) return org.springframework.http.ResponseEntity.ok("ANALYTICS");
-        return org.springframework.http.ResponseEntity.ok("UNKNOWN");
+                || t.contains("summary")) return "ANALYTICS";
+        return "UNKNOWN";
     }
 
     private String handleCancelRegistration(String t) {
@@ -219,9 +237,69 @@ public class OmnidimService {
         return "Complaint filed successfully for " + cat + " issue. Reference ID: " + complaint.getId();
     }
 
-    private String handleStatusCheck() {
-        Map<String, Long> s = complaintService.getComplaintStats();
-        return org.springframework.http.ResponseEntity.ok("Currently " + s.get("open") + " open complaints and " + s.get("inProgress") + " in progress.");
+    // Filler words stripped before keyword matching; what remains is the
+    // topic of the resident's question ("water leak", "parking", ...).
+    private static final java.util.Set<String> STATUS_QUERY_STOPWORDS = java.util.Set.of(
+            "what", "is", "the", "of", "my", "a", "an", "please", "can", "you",
+            "tell", "me", "about", "status", "check", "complaint", "complaints");
+
+    private String handleStatusCheck(String t) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+
+        // Without a resident identity there is no safe way to answer a
+        // "my complaint" question; never fall back to another user's data.
+        if (email == null) {
+            return "Please log in so I can look up your complaints.";
+        }
+
+        List<Complaint> own = complaintRepository.findByResidentUsernameOrderByCreatedAtDesc(email);
+        if (own.isEmpty()) {
+            return "You have no complaints on record.";
+        }
+
+        // Keyword match strictly within the asking resident's own complaints
+        List<String> keywords = new java.util.ArrayList<>();
+        for (String word : t.split("[^a-z0-9]+")) {
+            if (word.length() > 2 && !STATUS_QUERY_STOPWORDS.contains(word)) {
+                keywords.add(word);
+            }
+        }
+
+        List<Complaint> matches = own;
+        if (!keywords.isEmpty()) {
+            matches = own.stream()
+                    .filter(c -> {
+                        String haystack = (c.getDescription() + " " + c.getCategory()).toLowerCase();
+                        return keywords.stream().anyMatch(haystack::contains);
+                    })
+                    .toList();
+            if (matches.isEmpty()) {
+                // Keyword matched nothing: say so rather than answering
+                // about an unrelated complaint.
+                return "I could not find a complaint of yours matching \"" + String.join(" ", keywords)
+                        + "\". You have " + own.size() + " complaint(s) on record.";
+            }
+        }
+
+        if (matches.size() == 1) {
+            Complaint c = matches.get(0);
+            return "Your complaint #" + c.getId() + " (" + summarize(c) + ") is " + c.getStatus() + ".";
+        }
+
+        // Multiple matches: surface the ambiguity explicitly instead of
+        // silently answering with the first record.
+        StringBuilder sb = new StringBuilder("Your question matches " + matches.size()
+                + " of your complaints. Please specify one: ");
+        matches.stream().limit(5).forEach(c ->
+                sb.append("#").append(c.getId()).append(" (").append(summarize(c))
+                  .append(", ").append(c.getStatus()).append("); "));
+        return sb.toString().replaceAll("; $", ".");
+    }
+
+    private String summarize(Complaint c) {
+        String d = c.getDescription() == null ? "" : c.getDescription().trim();
+        return d.length() > 40 ? d.substring(0, 40) + "..." : d;
     }
 
     private String handleEventQuery() {

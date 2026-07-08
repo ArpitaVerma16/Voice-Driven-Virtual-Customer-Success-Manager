@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.ml.TicketClassifier;
 import com.vcsm.model.Complaint;
@@ -98,7 +100,7 @@ public class TriageService {
     private User findBestAdmin(String category) {
         // In production, match based on expertise
         // For now, return first admin
-        return userRepository.findByEmail("admin@example.com").orElse(null);
+        return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
     }
 
     private String calculateETA(int severity) {

@@ -2,6 +2,8 @@ package com.vcsm.dto;
 
 import com.vcsm.model.CustomerIntent;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class IntentScore {
     private final CustomerIntent intent;
     private final double score;
@@ -30,4 +32,3 @@ public class IntentScore {
         return "IntentScore{" + "intent=" + intent + ", score=" + String.format("%.3f", score) + ", matches=" + keywordMatches + '}';
     }
 }
-
