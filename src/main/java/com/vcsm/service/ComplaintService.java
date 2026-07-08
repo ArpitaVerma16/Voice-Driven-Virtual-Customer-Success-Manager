@@ -50,14 +50,6 @@ public class ComplaintService {
         }
     }
 
-    private void safelyExecute(Runnable operation, String description) {
-        try {
-            operation.run();
-        } catch (Exception e) {
-            log.log(Level.SEVERE, "Failed: " + description, e);
-        }
-    }
-
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;

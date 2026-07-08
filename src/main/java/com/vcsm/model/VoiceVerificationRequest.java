@@ -1,5 +1,7 @@
 package com.vcsm.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class VoiceVerificationRequest {
     private Long userId;
     private String voiceSample;

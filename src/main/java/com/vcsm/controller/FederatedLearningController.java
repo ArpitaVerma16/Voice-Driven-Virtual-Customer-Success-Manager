@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/federated")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class FederatedLearningController {
 

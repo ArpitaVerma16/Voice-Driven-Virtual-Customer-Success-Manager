@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transfer")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class TransferController {
 

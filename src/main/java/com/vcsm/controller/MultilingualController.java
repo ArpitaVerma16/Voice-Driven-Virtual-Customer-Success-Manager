@@ -10,7 +10,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/languages")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class MultilingualController {
 
@@ -87,3 +86,4 @@ public class MultilingualController {
         ));
     }
 }
+

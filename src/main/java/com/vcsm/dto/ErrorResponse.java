@@ -2,6 +2,9 @@ package com.vcsm.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ErrorResponse {
 
     @JsonProperty("status")
@@ -95,4 +98,3 @@ public class ErrorResponse {
         this.timestamp = timestamp;
     }
 }
-

@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sentiment")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class SentimentAnalysisController {
 
@@ -55,3 +54,4 @@ public class SentimentAnalysisController {
         return ResponseEntity.ok(response);
     }
 }
+
