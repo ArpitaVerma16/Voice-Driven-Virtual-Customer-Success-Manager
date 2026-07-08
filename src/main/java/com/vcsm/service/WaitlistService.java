@@ -84,18 +84,30 @@ public class WaitlistService {
      */
     @Transactional
     public void processWaitlist(Event event) {
-        // Calculate actual available slots: maxCapacity - registrations - pendingUnexpiredInvitations
         long pendingUnexpired = waitlistRepository.countByEventAndConfirmedFalseAndExpiresAtAfter(event, LocalDateTime.now());
         long availableSlots = event.getMaxCapacity() - event.getRegistrations() - pendingUnexpired;
         
         if (availableSlots <= 0) {
-            return; // No slots available
+            return;
         }
         
-        // Loop and promote the first availableSlots unnotified users
         for (int i = 0; i < availableSlots; i++) {
-            Optional<EventWaitlist> firstWaitlist = waitlistRepository
+            Optional<EventWaitlist> nextOpt = waitlistRepository
                 .findFirstByEventAndConfirmedFalseAndNotifiedAtIsNullOrderByJoinedAtAsc(event);
+            if (nextOpt.isEmpty()) {
+                break;
+            }
+            EventWaitlist entry = nextOpt.get();
+            try {
+                User user = entry.getUser();
+                entry.setNotifiedAt(LocalDateTime.now());
+                entry.setExpiresAt(LocalDateTime.now().plusHours(24));
+                waitlistRepository.save(entry);
+                emailService.sendEventSlotAvailable(event, user);
+                log.info("Waitlist notification sent to user: {}", user.getEmail());
+            } catch (Exception e) {
+                log.error("Failed to process waitlist entry {}: {}", entry.getId(), e.getMessage(), e);
+            }
             
             log.info("✅ Notification sent to user: " + user.getEmail());
         } catch (Exception e) {

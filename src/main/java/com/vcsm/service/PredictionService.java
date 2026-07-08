@@ -269,6 +269,7 @@ public class PredictionService {
             userRepository.save(user);
 
             if (cdi >= 75.0) {
+                log.info("🚨 High dissatisfaction detected for resident: " + user.getEmail() + " (CDI: " + cdi + "). Triggering preemptive outreach.");
                 log.info("🚨 High dissatisfaction detected for resident: {} (CDI: {}). Triggering preemptive outreach.", user.getEmail(), cdi);
                 try {
                     proactiveOutreachService.sendProactiveOutreach(user.getId(), "email");

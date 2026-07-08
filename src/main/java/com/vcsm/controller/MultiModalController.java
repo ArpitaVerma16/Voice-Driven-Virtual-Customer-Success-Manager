@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/multimodal")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class MultiModalController {
 

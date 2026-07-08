@@ -15,9 +15,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class SessionManagementService {
+    private static final Logger log = LoggerFactory.getLogger(SessionManagementService.class);
 
     private static final Logger log = LoggerFactory.getLogger(SessionManagementService.class);
 
@@ -101,6 +104,7 @@ public class SessionManagementService {
         }
 
         if (!sessionsToArchive.isEmpty()) {
+            log.info("Archived " + sessionsToArchive.size() + " sessions older than " + SESSION_ARCHIVAL_DAYS + " days");
             log.info("Archived {} sessions older than {} days", sessionsToArchive.size(), SESSION_ARCHIVAL_DAYS);
         }
     }

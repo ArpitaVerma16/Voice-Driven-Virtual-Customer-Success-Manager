@@ -10,9 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class ModelEvolutionService {
+    private static final Logger log = LoggerFactory.getLogger(ModelEvolutionService.class);
 
     private static final Logger log = LoggerFactory.getLogger(ModelEvolutionService.class);
 
@@ -58,6 +61,7 @@ public class ModelEvolutionService {
         for (String modelName : modelNames) {
             try {
                 ModelVersion newVersion = autoTrainer.trainNewModel(modelName);
+                log.info("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
                 log.info("✅ Model '{}' retrained. New version: {}", modelName, newVersion.getVersion());
             } catch (Exception e) {
                 log.error("❌ Failed to retrain model '{}': {}", modelName, e.getMessage());

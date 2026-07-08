@@ -10,9 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class GenAIResolver {
+    private static final Logger log = LoggerFactory.getLogger(GenAIResolver.class);
 
     private static final Logger log = LoggerFactory.getLogger(GenAIResolver.class);
 

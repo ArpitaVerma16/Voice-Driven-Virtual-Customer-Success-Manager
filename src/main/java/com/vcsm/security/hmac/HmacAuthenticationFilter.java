@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Set;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 @Component
 public class HmacAuthenticationFilter extends OncePerRequestFilter {
 
@@ -109,6 +113,15 @@ public class HmacAuthenticationFilter extends OncePerRequestFilter {
         }
 
         nonceCacheService.save(nonce);
+
+        // Set security context so downstream code sees this request as authenticated
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        "hmac-service-account",
+                        null,
+                        java.util.List.of(new SimpleGrantedAuthority("ROLE_SERVICE"))
+                );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(wrappedRequest, response);
     }

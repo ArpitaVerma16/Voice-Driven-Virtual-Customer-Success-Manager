@@ -17,10 +17,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @SpringBootTest
 @Transactional
 @lombok.RequiredArgsConstructor
 public class EventBookingQrCodeTest {
+    private static final Logger log = LoggerFactory.getLogger(EventBookingQrCodeTest.class);
 
     private final QRCodeService qrCodeService;
 
@@ -89,9 +92,9 @@ public class EventBookingQrCodeTest {
 
     @Test
     void testVoiceDrivenEventBookingAndVerification() {
-        System.out.println("DEBUG - Saved testUser ID: " + testUser.getId() + ", Email: " + testUser.getEmail());
-        System.out.println("DEBUG - All users in DB: ");
-        userRepository.findAll().forEach(u -> System.out.println("  ID: " + u.getId() + ", Email: " + u.getEmail()));
+        log.info("DEBUG - Saved testUser ID: " + testUser.getId() + ", Email: " + testUser.getEmail());
+        log.info("DEBUG - All users in DB: ");
+        userRepository.findAll().forEach(u -> log.info("  ID: " + u.getId() + ", Email: " + u.getEmail()));
 
         // Reset the thread-local SecurityContext to prevent leaked mocks from other tests
         org.springframework.security.core.context.SecurityContextHolder.setContext(new org.springframework.security.core.context.SecurityContextImpl());
@@ -110,8 +113,8 @@ public class EventBookingQrCodeTest {
         );
 
         org.springframework.security.core.Authentication debugAuth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("DEBUG - Auth: " + debugAuth);
-        System.out.println("DEBUG - Auth name: " + (debugAuth != null ? debugAuth.getName() : "null"));
+        log.info("DEBUG - Auth: " + debugAuth);
+        log.info("DEBUG - Auth name: " + (debugAuth != null ? debugAuth.getName() : "null"));
 
         // 1. Process Voice Command
         String transcript = "I want to book a ticket for the summer festival, please";
@@ -119,7 +122,7 @@ public class EventBookingQrCodeTest {
 
         assertEquals("BOOK_EVENT", result.get("intent"));
         String response = (String) result.get("response");
-        System.out.println("DEBUG - Voice Command Response: " + response);
+        log.info("DEBUG - Voice Command Response: " + response);
         assertTrue(response.contains("Success") || response.contains("registered for Summer Festival"), "Response was: " + response);
 
         // 2. Verify Registration was created
