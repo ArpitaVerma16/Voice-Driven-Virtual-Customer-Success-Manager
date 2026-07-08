@@ -82,7 +82,33 @@ The Voice Assistant supports natural language commands and automatically routes 
 | "Show complaint summary"        | Displays complaint summary   |
 | "Show total complaints"         | Retrieves complaint counts   |
 
-> The assistant uses keyword-based intent detection and may support additional natural language variations of these commands.
+### 🗣️ Voice Profile & Biometrics
+
+| Example Command                                   | Action                                    |
+| ------------------------------------------------- | ----------------------------------------- |
+| "Enroll my voice"                                 | Registers voice print for future auth     |
+| "Verify my identity"                              | Performs voice biometric verification     |
+| "Change my language to Hindi"                     | Switches voice interface language         |
+| "Switch to English"                               | Switches back to English                  |
+
+### 👤 Account & Profile
+
+| Example Command              | Action                        |
+| ---------------------------- | ----------------------------- |
+| "Show my profile"            | Opens user profile page       |
+| "Update my apartment number" | Prompts to update apartment   |
+| "Log out"                    | Logs out of the application   |
+
+### 🆘 Help & Navigation
+
+| Example Command            | Action                         |
+| -------------------------- | ------------------------------ |
+| "Help"                     | Shows available voice commands |
+| "Go to dashboard"          | Navigates to dashboard         |
+| "Show navigation"          | Displays navigation menu       |
+| "What can I say?"          | Lists all supported commands   |
+
+> The assistant uses keyword-based intent detection and may support additional natural language variations of these commands. Say "Help" at any time to see available commands.
 
 ---
 
@@ -213,6 +239,26 @@ Password: (leave blank)
 ```properties
 omnidim.api.key=YOUR_ACTUAL_API_KEY
 ```
+
+---
+
+---
+
+## Required Environment Variables
+
+The application uses environment variables for all secrets and configuration. Copy these into your `.env` file or set them in your deployment environment:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `JWT_SECRET` | Yes | — | JWT signing key (min 32 chars) |
+| `OMNIDIM_API_KEY` | Yes | — | Omnidim.io Voice AI API key |
+| `HMAC_SECRET` | Yes | — | HMAC request signing key |
+| `ADMIN_USERNAME` | No | `admin` | Default admin seed username |
+| `ADMIN_PASSWORD` | No | — | Default admin seed password |
+| `JWT_EXPIRATION` | No | `86400000` | Access token expiry (ms) |
+| `JWT_REFRESH_EXPIRATION` | No | `604800000` | Refresh token expiry (ms) |
+| `TWILIO_AUTH_TOKEN` | No | — | Twilio account auth token |
+| `PORT` | No | `8080` | Server port |
 
 ---
 

@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/evolution")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class ModelEvolutionController {
 

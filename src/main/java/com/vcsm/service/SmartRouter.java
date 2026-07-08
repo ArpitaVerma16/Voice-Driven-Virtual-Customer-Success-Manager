@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
@@ -23,6 +25,12 @@ public class SmartRouter {
 
     @Value("#{${router.admin.expertise:{'admin@example.com':['NOISE','MAINTENANCE','SECURITY'],'security@example.com':['SECURITY','PARKING'],'maintenance@example.com':['MAINTENANCE','UTILITIES']}}}")
     private Map<String, List<String>> adminExpertise;
+
+    static {
+        ADMIN_EXPERTISE.put(AppConstants.ADMIN_EMAIL, Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
+        ADMIN_EXPERTISE.put(AppConstants.SECURITY_EMAIL, Arrays.asList("SECURITY", "PARKING"));
+        ADMIN_EXPERTISE.put(AppConstants.MAINTENANCE_EMAIL, Arrays.asList("MAINTENANCE", "UTILITIES"));
+    }
 
     /**
      * Classify and route complaint
@@ -94,6 +102,8 @@ return Math.min(100, urgency);
                 return userRepository.findByEmail(entry.getKey()).orElse(null);
             }
         }
+        // Fallback to first admin
+        return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
         String firstAdmin = adminExpertise.keySet().iterator().next();
         return userRepository.findByEmail(firstAdmin).orElse(null);
     }

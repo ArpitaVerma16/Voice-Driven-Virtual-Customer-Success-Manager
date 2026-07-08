@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/neuro")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class NeuroSymbolicController {
 
