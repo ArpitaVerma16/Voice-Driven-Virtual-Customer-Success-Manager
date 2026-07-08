@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/intents")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class IntentClassificationController {
 
@@ -40,3 +39,4 @@ public class IntentClassificationController {
         return ResponseEntity.ok(response);
     }
 }
+

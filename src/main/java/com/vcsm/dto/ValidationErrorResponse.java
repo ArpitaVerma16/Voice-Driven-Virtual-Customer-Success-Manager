@@ -3,6 +3,9 @@ package com.vcsm.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ValidationErrorResponse extends ErrorResponse {
     private List<String> errors = new ArrayList<>();
     

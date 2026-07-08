@@ -57,7 +57,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").denyAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
-                        .requestMatchers("/api/auth/admin/seed").permitAll()
                         .requestMatchers("/api/voice/command").permitAll()
                         .requestMatchers("/api/voice/flow-config").permitAll()
                         .requestMatchers("/api/voice/feedback/**").permitAll()
@@ -66,10 +65,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/translation/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
-                )
-                .addFilterBefore(
-                        hmacAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         jwtAuthFilter,
@@ -95,7 +90,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/complaints/**", "/events/**", "/analytics/**", "/interaction-history/**", "/voice-analytics/**").authenticated()
                         .requestMatchers("/chatbot/**", "/voice-templates/**").authenticated()
                         .requestMatchers("/profile/**", "/onboarding/**").authenticated()
-                        .requestMatchers("/audit-logs/**").hasRole("ADMIN")
+                        .requestMatchers("/audit-logs/**").hasAnyRole("ADMIN", "AUDITOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

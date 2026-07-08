@@ -197,86 +197,6 @@ renderConversation();
         setButtonLoading('sendBtn', false);
     }
 }
-
-// Submit feedback for voice command
-function submitFeedback(type) {
-    if (!lastCommandId) {
-        if (typeof toast !== 'undefined') {
-            toast.error('No command to rate. Try a voice command first.', 'Error');
-        }
-        return;
-
-
-    }
-
-    const userId = localStorage.getItem('userId') || 1;
-
-    fetch(`/api/voice/feedback?commandId=${lastCommandId}&userId=${userId}&feedback=${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (typeof toast !== 'undefined') {
-                toast.success('Thank you for your feedback!', 'Feedback');
-            }
-            const feedbackDiv = document.getElementById('feedbackButtons');
-            if (feedbackDiv) {
-                feedbackDiv.innerHTML = '<span class="text-muted">✅ Feedback submitted</span>';
-            }
-        } else {
-            if (typeof toast !== 'undefined') {
-                toast.error('Error submitting feedback', 'Error');
-            }
-        }
-    })
-    .catch(err => {
-        if (typeof toast !== 'undefined') {
-            toast.error('Network error. Please try again.', 'Error');
-        }
-    });
-}
-
-// Submit feedback for voice command
-function submitFeedback(type) {
-    if (!lastCommandId) {
-        if (typeof toast !== 'undefined') {
-            toast.error('No command to rate. Try a voice command first.', 'Error');
-        }
-        return;
-
-    }
-
-    const userId = localStorage.getItem('userId') || 1;
-
-    fetch(`/api/voice/feedback?commandId=${lastCommandId}&userId=${userId}&feedback=${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (typeof toast !== 'undefined') {
-                toast.success('Thank you for your feedback!', 'Feedback');
-            }
-            const feedbackDiv = document.getElementById('feedbackButtons');
-            if (feedbackDiv) {
-                feedbackDiv.innerHTML = '<span class="text-muted">✅ Feedback submitted</span>';
-            }
-        } else {
-            if (typeof toast !== 'undefined') {
-                toast.error('Error submitting feedback', 'Error');
-            }
-        }
-    })
-    .catch(err => {
-        if (typeof toast !== 'undefined') {
-            toast.error('Network error. Please try again.', 'Error');
-        }
-    });
-}
-
 // Submit feedback for voice command
 function submitFeedback(type) {
     if (!lastCommandId) {
@@ -344,7 +264,9 @@ async function quickFileComplaint() {
     const desc = document.getElementById('qDesc')?.value?.trim();
 
     if (!name || !desc) {
-        alert('Please fill in required fields (Name and Description).');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Please fill in required fields (Name and Description).', 'Validation');
+        }
         return;
     }
 
@@ -375,6 +297,9 @@ async function quickFileComplaint() {
         }
     } catch (err) {
         console.error('Error filing complaint:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to file complaint. Please try again.', 'Error');
+        }
     } finally {
         setButtonLoading('quickSubmitBtn', false);
     }
@@ -391,7 +316,9 @@ async function submitComplaint() {
     };
 
     if (!complaint.residentName || !complaint.description) {
-        alert('Please fill in required fields.');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Please fill in required fields.', 'Validation');
+        }
         return;
     }
 
@@ -408,6 +335,9 @@ async function submitComplaint() {
         }
     } catch (err) {
         console.error('Error:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to submit complaint. Please try again.', 'Error');
+        }
     } finally {
         setButtonLoading('submitComplaintBtn', false);
     }
@@ -415,12 +345,20 @@ async function submitComplaint() {
 
 async function updateComplaintStatus(id) {
     const status = prompt('Enter new status (OPEN, IN_PROGRESS, RESOLVED, CLOSED):');
-    if (!status) return;
+    if (!status) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Status update cancelled.', 'Info');
+        }
+        return;
+    }
     try {
         await fetch(`/api/complaints/${id}/status?status=${status.toUpperCase()}`, { method: 'PUT', headers: withAuthHeaders() });
         location.reload();
     } catch (err) {
         console.error('Error updating status:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to update status. Please try again.', 'Error');
+        }
     }
 }
 
@@ -438,7 +376,9 @@ async function submitEvent() {
     };
 
     if (!event.name) {
-        alert('Event name is required.');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Event name is required.', 'Validation');
+        }
         return;
     }
 
@@ -453,6 +393,9 @@ async function submitEvent() {
         if (res.ok) location.reload();
     } catch (err) {
         console.error('Error creating event:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to create event. Please try again.', 'Error');
+        }
     } finally {
         setButtonLoading('submitEventBtn', false);
     }
@@ -463,11 +406,15 @@ async function registerEvent(id) {
     try {
         const res = await fetch(`/api/events/${id}/register`, { method: 'POST', headers: withAuthHeaders() });
         if (res.ok) {
-            alert('Successfully registered for the event!');
+            if (typeof toast !== 'undefined') {
+                toast.success('Successfully registered for the event!', 'Registration');
+            }
             location.reload();
         } else {
             const msg = await res.text();
-            alert('Registration failed: ' + msg);
+            if (typeof toast !== 'undefined') {
+                toast.error('Registration failed: ' + msg, 'Error');
+            }
         }
     } catch (err) {
         console.error('Error registering:', err);

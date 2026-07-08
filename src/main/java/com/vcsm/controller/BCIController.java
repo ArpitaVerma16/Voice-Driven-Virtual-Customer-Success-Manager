@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bci")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class BCIController {
 
@@ -120,12 +119,18 @@ public class BCIController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getStats() {
+    public ResponseEntity<?> getStats(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
         return ResponseEntity.ok(bciService.getBCIStats());
     }
 
     @GetMapping("/status")
-    public ResponseEntity<Map<String, Object>> getStatus() {
+    public ResponseEntity<?> getStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
         Map<String, Object> status = new HashMap<>();
         status.put("status", "BCI System active");
         status.put("features", new String[]{
