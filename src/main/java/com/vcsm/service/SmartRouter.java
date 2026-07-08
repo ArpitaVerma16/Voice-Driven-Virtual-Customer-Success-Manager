@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
@@ -25,9 +27,9 @@ public class SmartRouter {
     private static final Map<String, List<String>> ADMIN_EXPERTISE = new HashMap<>();
 
     static {
-        ADMIN_EXPERTISE.put("admin@example.com", Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
-        ADMIN_EXPERTISE.put("security@example.com", Arrays.asList("SECURITY", "PARKING"));
-        ADMIN_EXPERTISE.put("maintenance@example.com", Arrays.asList("MAINTENANCE", "UTILITIES"));
+        ADMIN_EXPERTISE.put(AppConstants.ADMIN_EMAIL, Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
+        ADMIN_EXPERTISE.put(AppConstants.SECURITY_EMAIL, Arrays.asList("SECURITY", "PARKING"));
+        ADMIN_EXPERTISE.put(AppConstants.MAINTENANCE_EMAIL, Arrays.asList("MAINTENANCE", "UTILITIES"));
     }
 
     /**
@@ -99,7 +101,7 @@ public class SmartRouter {
             }
         }
         // Fallback to first admin
-        return userRepository.findByEmail("admin@example.com").orElse(null);
+        return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
     }
 
     // Replaced by ComplaintRoutingUtils.findSimilarComplaints()

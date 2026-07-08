@@ -38,21 +38,21 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtService.generateToken(user);
-        // ✅ AuthResponse(token, refreshToken, email, role)
+        String refreshToken = jwtService.generateRefreshToken(user);
         String role = user.getRoles().stream()
             .findFirst()
             .map(Enum::name)
             .orElse("ROLE_RESIDENT");
-        return new AuthResponse(token, null, user.getUsername(), role);
+        return new AuthResponse(token, refreshToken, user.getUsername(), role);
     }
 
     public AuthResponse login(AppUser user) {
         String token = jwtService.generateToken(user);
-        // ✅ AuthResponse(token, refreshToken, email, role)
+        String refreshToken = jwtService.generateRefreshToken(user);
         String role = user.getRoles().stream()
             .findFirst()
             .map(Enum::name)
             .orElse("UNKNOWN");
-        return new AuthResponse(token, null, user.getUsername(), role);
+        return new AuthResponse(token, refreshToken, user.getUsername(), role);
     }
 }

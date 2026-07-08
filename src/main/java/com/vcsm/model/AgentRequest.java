@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import jakarta.validation.constraints.*;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class AgentRequest {
     @NotBlank
     private String userQuery;

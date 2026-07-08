@@ -9,9 +9,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class QuantumFederatedService {
+    private static final Logger log = LoggerFactory.getLogger(QuantumFederatedService.class);
 
     private final QuantumSecureAggregation secureAggregation;
 
@@ -151,7 +154,7 @@ public class QuantumFederatedService {
      */
     @Scheduled(fixedDelay = 900000) // 15 minutes
     public void autoStartRound() {
-        System.out.println("🔬 Auto-starting quantum federated round...");
+        log.info("🔬 Auto-starting quantum federated round...");
         startRound();
     }
 
