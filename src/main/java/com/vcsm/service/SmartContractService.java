@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class SmartContractService {
+    private static final Logger log = LoggerFactory.getLogger(SmartContractService.class);
 
     private final SmartContractRepository smartContractRepository;
 
@@ -70,13 +73,13 @@ public class SmartContractService {
     private void executeContractLogic(SmartContract contract) {
         switch (contract.getConditionType()) {
             case "RESOLUTION":
-                System.out.println("✅ Auto-resolving complaint: " + contract.getComplaintId());
+                log.info("✅ Auto-resolving complaint: " + contract.getComplaintId());
                 break;
             case "PAYMENT":
-                System.out.println("💰 Processing payment of " + contract.getAmount() + " for contract: " + contract.getId());
+                log.info("💰 Processing payment of " + contract.getAmount() + " for contract: " + contract.getId());
                 break;
             case "COMPLETION":
-                System.out.println("🎉 Event completed: " + contract.getEventId());
+                log.info("🎉 Event completed: " + contract.getEventId());
                 break;
         }
     }

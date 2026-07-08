@@ -37,3 +37,7 @@ Thumbs.db
 data/
 *.mv.db
 *.trace.db
+
+# Mavis automation (do not commit)
+orchestrate.py
+.mavis/
