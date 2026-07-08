@@ -144,9 +144,7 @@ public class VoiceCloningController {
         if (request.containsKey("confidence") && request.get("confidence") != null) {
             try {
                 confidence = Double.parseDouble(String.valueOf(request.get("confidence")));
-            } catch (Exception e) {
-                // Ignore parsing errors
-            }
+            } catch (NumberFormatException e) { }
         }
 
         try {

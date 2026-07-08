@@ -10,7 +10,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/sessions")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class SessionController {
 
@@ -129,3 +128,4 @@ public class SessionController {
         return ResponseEntity.ok(Map.of("success", "true"));
     }
 }
+

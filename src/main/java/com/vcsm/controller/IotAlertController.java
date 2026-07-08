@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/iot")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class IotAlertController {
 
@@ -86,18 +85,14 @@ public class IotAlertController {
             if (sms != null) {
                 smsTriggered = true;
             }
-        } catch (Exception e) {
-            // Ignore
-        }
+        } catch (Exception ignored) { }
 
         try {
             var call = twilioService.makeCall(targetPhone, "IoT Alert Service");
             if (call != null) {
                 callTriggered = true;
             }
-        } catch (Exception e) {
-            // Ignore
-        }
+        } catch (Exception ignored) { }
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -141,3 +136,4 @@ public class IotAlertController {
         public void setResidentPhoneNumber(String residentPhoneNumber) { this.residentPhoneNumber = residentPhoneNumber; }
     }
 }
+

@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quantum-ml")
-@CrossOrigin(origins = "*")
 @lombok.RequiredArgsConstructor
 public class QuantumMLController {
 
