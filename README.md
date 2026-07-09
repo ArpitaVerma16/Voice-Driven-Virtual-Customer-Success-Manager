@@ -479,3 +479,7 @@ Thanks to all contributors ❤️
 - Enhance voice assistant accuracy and intent detection
 - Improve analytics dashboard with advanced charts and filters
 
+
+
+---
+*Update for issue #536: Enhancement: Add pagination to data export endpoints to prevent OOM*
