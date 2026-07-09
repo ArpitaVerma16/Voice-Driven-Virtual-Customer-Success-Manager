@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 @SpringBootTest
 @Transactional
 @lombok.RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class EventBookingQrCodeTest {
     private static final Logger log = LoggerFactory.getLogger(EventBookingQrCodeTest.class);
 

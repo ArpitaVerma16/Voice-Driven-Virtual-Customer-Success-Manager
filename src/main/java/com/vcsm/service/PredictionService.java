@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Profile("dev")
 @Service
+@lombok.extern.slf4j.Slf4j
 public class PredictionService {
 
     private static final Logger log = LoggerFactory.getLogger(PredictionService.class);
@@ -273,7 +274,7 @@ public class PredictionService {
                 try {
                     proactiveOutreachService.sendProactiveOutreach(user.getId(), "email");
                 } catch (Exception e) {
-                    System.err.println("❌ Failed to trigger outreach: " + e.getMessage());
+                    log.error("❌ Failed to trigger outreach: " + e.getMessage());
                 }
             }
         }

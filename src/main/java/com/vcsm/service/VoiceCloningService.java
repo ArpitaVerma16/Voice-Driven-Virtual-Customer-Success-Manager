@@ -25,6 +25,7 @@ import java.util.UUID;
 @Profile("dev")
 @Service
 @lombok.RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class VoiceCloningService {
 
     private static final Logger log = LoggerFactory.getLogger(VoiceCloningService.class);

@@ -9,6 +9,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
+@lombok.extern.slf4j.Slf4j
 public class IntentClassificationService {
     private static final Logger log = LoggerFactory.getLogger(IntentClassificationService.class);
 
@@ -65,7 +66,7 @@ public class IntentClassificationService {
 
         long processingTime = System.currentTimeMillis() - startTime;
         if (processingTime > 100) {
-            System.err.println("Warning: Intent classification took " + processingTime + "ms");
+            log.error("Warning: Intent classification took " + processingTime + "ms");
         }
 
         return new IntentResult(finalIntent, topScore.getScore(), scores);

@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class IvrService {
     private static final Logger log = LoggerFactory.getLogger(IvrService.class);
 
@@ -81,7 +82,7 @@ public class IvrService {
         try {
             return objectMapper.readValue(config.getFlowJson(), IvrNode.class);
         } catch (Exception e) {
-            System.err.println("Error parsing IVR flow JSON: " + e.getMessage());
+            log.error("Error parsing IVR flow JSON: " + e.getMessage());
             try {
                 return objectMapper.readValue(DEFAULT_FLOW, IvrNode.class);
             } catch (Exception ex) {

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class EventService {
     private static final Logger log = LoggerFactory.getLogger(EventService.class);
 
@@ -128,7 +129,7 @@ public class EventService {
         try {
             reminderScheduler.sendRegistrationConfirmation(savedEvent, user);
         } catch (Exception e) {
-            System.err.println("❌ Failed to send registration email: " + e.getMessage());
+            log.error("❌ Failed to send registration email: " + e.getMessage());
         }
 
         return savedEvent;
