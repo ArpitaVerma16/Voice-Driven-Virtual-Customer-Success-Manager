@@ -261,7 +261,7 @@ public class PredictionService {
 
     @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 0 * * SUN") // Sunday at midnight
     public void runWeeklyDissatisfactionAnalysis() {
-        System.out.println("🗓️ Running weekly customer dissatisfaction and churn prediction analysis...");
+        log.info("🗓️ Running weekly customer dissatisfaction and churn prediction analysis...");
         List<User> users = userRepository.findAll();
         for (User user : users) {
             double cdi = calculateCustomerDissatisfactionIndex(user);
@@ -269,7 +269,7 @@ public class PredictionService {
             userRepository.save(user);
 
             if (cdi >= 75.0) {
-                System.out.println("🚨 High dissatisfaction detected for resident: " + user.getEmail() + " (CDI: " + cdi + "). Triggering preemptive outreach.");
+                log.info("🚨 High dissatisfaction detected for resident: " + user.getEmail() + " (CDI: " + cdi + "). Triggering preemptive outreach.");
                 try {
                     proactiveOutreachService.sendProactiveOutreach(user.getId(), "email");
                 } catch (SpecificException e) {

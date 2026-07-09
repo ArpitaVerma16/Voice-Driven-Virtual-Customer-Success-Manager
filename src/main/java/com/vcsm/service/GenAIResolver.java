@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class GenAIResolver {
+    private static final Logger log = LoggerFactory.getLogger(GenAIResolver.class);
 
     private final SolutionMatcher solutionMatcher;
 

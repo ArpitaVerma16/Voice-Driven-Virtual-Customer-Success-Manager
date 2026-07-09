@@ -41,9 +41,9 @@ public class VoiceController {
 
     private final com.vcsm.service.EventRegistrationService eventRegistrationService;
 
+    private final com.vcsm.service.PromptExperimentService promptExperimentService;
+
     @PostMapping("/command")
-    public ResponseEntity<Map<String, Object>> command(@Valid @RequestBody VoiceCommandRequest request) {
-        String transcript = request.getTranscript();
     public ResponseEntity<?> command(@Valid @RequestBody Map<String, String> body) {
         String transcript = body.get("transcript");
         
@@ -164,5 +164,21 @@ public class VoiceController {
         }
         ivrService.saveFlow(flowJson);
         return ResponseEntity.ok(Map.of("message", "IVR Flow Configuration updated successfully", "success", true));
+    }
+
+    @GetMapping("/greeting")
+    public ResponseEntity<Map<String, String>> getGreeting() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = (auth != null && auth.getName() != null) ? auth.getName() : "anonymous";
+        String prompt = promptExperimentService.getGreeting(username);
+        return ResponseEntity.ok(Map.of(
+            "prompt", prompt, 
+            "group", promptExperimentService.assignGroup(username)
+        ));
+    }
+
+    @GetMapping("/experiment-stats")
+    public ResponseEntity<Map<String, Object>> getExperimentStats() {
+        return ResponseEntity.ok(promptExperimentService.getExperimentStats());
     }
 }
