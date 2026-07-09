@@ -43,7 +43,7 @@ public class SignatureValidator {
 
             return HexFormat.of().formatHex(hash);
 
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new RuntimeException(e);
         }
     }
