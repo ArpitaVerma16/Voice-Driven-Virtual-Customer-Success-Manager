@@ -44,7 +44,7 @@ public class WebhookNotificationService {
 
             restTemplate.postForEntity(webhookUrl, request, String.class);
             log.info("Successfully sent escalation alert to webhook for session: " + sessionId);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.severe("Failed to send escalation alert to webhook: " + e.getMessage());
         }
     }

@@ -128,7 +128,9 @@ public class InteractionController {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
             Page<InteractionDTO> interactions = interactionService.getInteractionsByDateRange(start, end, pageable);
             return ResponseEntity.ok(interactions);
-        } catch (IllegalArgumentException e) { return ResponseEntity.badRequest().build(); }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(summary = "Get interactions by customer email")
@@ -147,7 +149,7 @@ public class InteractionController {
         try {
             Interaction updated = interactionService.updateInteraction(id, interaction);
             return ResponseEntity.ok(updated);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -159,7 +161,7 @@ public class InteractionController {
         try {
             interactionService.deleteInteraction(id);
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.notFound().build();
         }
     }

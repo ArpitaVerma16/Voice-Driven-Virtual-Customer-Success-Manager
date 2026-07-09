@@ -82,7 +82,7 @@ public class JwtService {
     public Boolean validateRefreshToken(String token) {
         try {
             return !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return false;
         }
     }

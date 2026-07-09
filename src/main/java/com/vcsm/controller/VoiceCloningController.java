@@ -60,7 +60,7 @@ public class VoiceCloningController {
             
             return ResponseEntity.ok(response);
             
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "error", e.getMessage()
@@ -98,7 +98,7 @@ public class VoiceCloningController {
                 "message", "Voice profile selected successfully",
                 "profileName", profile.getName()
             ));
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "error", e.getMessage()
@@ -119,7 +119,7 @@ public class VoiceCloningController {
                 "success", true,
                 "message", "Voice profile deleted successfully"
             ));
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "error", e.getMessage()
@@ -144,7 +144,7 @@ public class VoiceCloningController {
         if (request.containsKey("confidence") && request.get("confidence") != null) {
             try {
                 confidence = Double.parseDouble(String.valueOf(request.get("confidence")));
-            } catch (NumberFormatException e) { }
+            } catch (NumberFormatException ignored) { }
         }
 
         try {
@@ -152,7 +152,7 @@ public class VoiceCloningController {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(audio);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "error", e.getMessage()

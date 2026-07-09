@@ -61,7 +61,7 @@ public class ExportService {
                 };
                 writer.writeNext(row);
             }
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.error("Failed to export complaints to CSV", e);
         }
         return new ByteArrayInputStream(out.toByteArray());
@@ -128,7 +128,7 @@ public class ExportService {
             document.add(table);
             document.close();
 
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.error("Failed to export complaints to PDF", e);
         }
 

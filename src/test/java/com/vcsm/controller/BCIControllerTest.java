@@ -32,7 +32,7 @@ class BCIControllerTest {
             java.lang.reflect.Field field = BCIController.class.getDeclaredField("bciService");
             field.setAccessible(true);
             field.set(controller, bciService);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             fail("Failed to inject BCIService: " + e.getMessage());
         }
 

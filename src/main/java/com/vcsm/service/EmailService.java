@@ -72,7 +72,7 @@ public class EmailService {
             helper.setText(message, true);
             mailSender.send(mimeMessage);
             log.info("✅ Sent simple email to: " + toEmail);
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.error("❌ Failed to send simple email to " + toEmail + ": " + e.getMessage());
             log.error("Failed to send simple email to {}: {}", toEmail, e.getMessage(), e);
         }
@@ -97,7 +97,7 @@ public class EmailService {
                     try {
                         byte[] qrBytes = qrCodeService.generateQRCodeImage(reg.getTicketToken(), 250, 250);
                         helper.addInline("qrCode", new org.springframework.core.io.ByteArrayResource(qrBytes), "image/png");
-                    } catch (Exception e) {
+                    } catch (SpecificException e) {
                         System.err.println("❌ Failed to generate QR Code for email " + email.getId() + ": " + e.getMessage());
                     }
                 }
@@ -114,7 +114,7 @@ public class EmailService {
 
             log.info("✅ Sent queued email to: " + email.getRecipientEmail());
 
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             EmailLog log = new EmailLog(email.getUser(), email.getEvent(), email.getRecipientEmail(), email.getSubject(), email.getMessage());
             log.setStatus("FAILED");
             log.setErrorMessage(e.getMessage());

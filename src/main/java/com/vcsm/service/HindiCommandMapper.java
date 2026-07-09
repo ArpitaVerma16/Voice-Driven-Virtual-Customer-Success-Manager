@@ -50,7 +50,7 @@ public class HindiCommandMapper {
             
             log.info("✅ Hindi commands loaded: " + commandMap.size() + " commands");
             
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.error("❌ Failed to load Hindi commands: " + e.getMessage());
             log.error("Failed to load Hindi commands: {}", e.getMessage(), e);
         }

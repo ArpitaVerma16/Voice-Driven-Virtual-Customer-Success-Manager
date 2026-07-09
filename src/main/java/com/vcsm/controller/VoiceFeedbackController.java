@@ -29,7 +29,7 @@ public class VoiceFeedbackController {
                 "message", "Feedback submitted successfully",
                 "feedback", result
             ));
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "message", e.getMessage()

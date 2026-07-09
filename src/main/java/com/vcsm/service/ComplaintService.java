@@ -45,10 +45,11 @@ public class ComplaintService {
     private void safelyExecute(Runnable operation, String description) {
         try {
             operation.run();
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.error("Failed: " + description, e);
         }
     }
+
 
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -106,7 +107,7 @@ public class ComplaintService {
                 userActivityService.logActivity(user, "COMPLAINT", description, saved.getId());
             }
         }, "log user activity for complaint filing");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
 
@@ -124,7 +125,7 @@ public class ComplaintService {
             }
         }, "send notification for complaint filing");
         }, "send notification for complaint filing");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to send notification: {}", e.getMessage(), e);
         }
 
@@ -245,7 +246,7 @@ public class ComplaintService {
 
                 emailService.sendSimpleEmail(user.getEmail(), subject, emailBody);
             }
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warning("Failed to send complaint status update email: " + e.getMessage());
         }
         // Log user activity
@@ -272,7 +273,7 @@ public class ComplaintService {
             }
         }, "log user activity and audit for status update");
         }, "log user activity and audit for status update");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
 
@@ -299,7 +300,7 @@ public class ComplaintService {
                 )
             );
         }, "send notifications for status update");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to send notification: {}", e.getMessage(), e);
         }
 
@@ -351,7 +352,7 @@ public class ComplaintService {
         }, "log user activity and audit for priority update");
 
         safelyExecute(() -> blockchainService.addBlock(updated, "PRIORITY_UPDATED"), "add blockchain entry for priority update");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
 
@@ -392,7 +393,7 @@ public class ComplaintService {
             }
         }, "log user activity and audit for complaint deletion");
         }, "log user activity and audit for complaint deletion");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
 
@@ -410,7 +411,7 @@ public class ComplaintService {
             }
         }, "send notification for complaint deletion");
         }, "send notification for complaint deletion");
-        } catch (Exception e) {
+        } catch (SpecificException e) {
             log.warn("Failed to send notification: {}", e.getMessage(), e);
         }
         
