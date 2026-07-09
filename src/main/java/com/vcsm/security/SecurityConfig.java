@@ -3,7 +3,6 @@ package com.vcsm.security;
 import com.vcsm.security.hmac.HmacAuthenticationFilter;
 import com.vcsm.security.jwt.JwtAuthFilter;
 import com.vcsm.security.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
