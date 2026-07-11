@@ -87,7 +87,7 @@ public class IvrService {
             try {
                 return objectMapper.readValue(DEFAULT_FLOW, IvrNode.class);
             } catch (Exception ex) {
-                throw new RuntimeException("Fallback default flow is invalid: " + ex.getMessage());
+                throw new CustomDomainException("Fallback default flow is invalid: " + ex.getMessage());
             }
         }
     }

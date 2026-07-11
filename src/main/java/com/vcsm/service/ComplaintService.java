@@ -161,7 +161,7 @@ public class ComplaintService {
     @Transactional
     public Complaint fileComplaint(Complaint complaint) {
         String username = currentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         DuplicateResult duplicateCheck = detectDuplicates(complaint);
         if (duplicateCheck.isDuplicate()) {

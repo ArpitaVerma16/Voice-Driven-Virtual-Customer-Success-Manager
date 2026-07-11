@@ -129,7 +129,7 @@ public class VoiceCloningService {
                 .orElseThrow(() -> new RuntimeException("Voice profile not found"));
         
         if (!selected.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized access");
+            throw new CustomDomainException("Unauthorized access");
         }
 
         selected.setActive(true);
@@ -144,7 +144,7 @@ public class VoiceCloningService {
                 .orElseThrow(() -> new RuntimeException("Voice profile not found"));
         
         if (!profile.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized access");
+            throw new CustomDomainException("Unauthorized access");
         }
 
         // Delete audio file

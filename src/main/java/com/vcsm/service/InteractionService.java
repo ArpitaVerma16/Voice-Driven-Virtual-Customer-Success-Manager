@@ -42,7 +42,7 @@ public class InteractionService {
     @Transactional
     public Interaction createInteraction(Interaction interaction) {
         String username = getCurrentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         interaction.setCustomerUsername(username);
         if (interaction.getStatus() == null) {
@@ -76,7 +76,7 @@ public class InteractionService {
      */
     public Page<InteractionDTO> getAllInteractions(Pageable pageable) {
         String username = getCurrentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         Page<Interaction> interactions;
         if (isAdmin()) {
@@ -94,7 +94,7 @@ public class InteractionService {
     public Page<InteractionDTO> searchInteractions(String searchTerm, String status, String sentiment,
                                                    String category, Pageable pageable) {
         String username = getCurrentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         Page<Interaction> results;
 
@@ -222,7 +222,7 @@ public class InteractionService {
     public Interaction updateInteraction(Long id, Interaction updatedInteraction) {
         Optional<Interaction> existing = interactionRepository.findById(id);
         if (existing.isEmpty()) {
-            throw new RuntimeException("Interaction not found");
+            throw new CustomDomainException("Interaction not found");
         }
 
         Interaction interaction = existing.get();
@@ -230,7 +230,7 @@ public class InteractionService {
         // Check access
         String currentUsername = getCurrentUsername();
         if (!isAdmin() && !currentUsername.equals(interaction.getCustomerUsername())) {
-            throw new RuntimeException("Unauthorized");
+            throw new CustomDomainException("Unauthorized");
         }
 
         // Update fields
@@ -264,13 +264,13 @@ public class InteractionService {
     public void deleteInteraction(Long id) {
         Optional<Interaction> interaction = interactionRepository.findById(id);
         if (interaction.isEmpty()) {
-            throw new RuntimeException("Interaction not found");
+            throw new CustomDomainException("Interaction not found");
         }
 
         // Check access
         String currentUsername = getCurrentUsername();
         if (!isAdmin() && !currentUsername.equals(interaction.get().getCustomerUsername())) {
-            throw new RuntimeException("Unauthorized");
+            throw new CustomDomainException("Unauthorized");
         }
 
         interactionRepository.deleteById(id);

@@ -38,12 +38,12 @@ public class WaitlistService {
         // Check if already on waitlist
         Optional<EventWaitlist> existing = waitlistRepository.findByEventAndUser(event, user);
         if (existing.isPresent()) {
-            throw new RuntimeException("Already on waitlist");
+            throw new CustomDomainException("Already on waitlist");
         }
         
         // Check if event is actually full
         if (event.getRegistrations() < event.getMaxCapacity()) {
-            throw new RuntimeException("Event has available slots. Please register directly.");
+            throw new CustomDomainException("Event has available slots. Please register directly.");
         }
         
         EventWaitlist waitlistEntry = new EventWaitlist(event, user);
@@ -119,24 +119,24 @@ public class WaitlistService {
         Optional<EventWaitlist> waitlistEntry = waitlistRepository.findByEventAndUser(event, user);
         
         if (waitlistEntry.isEmpty()) {
-            throw new RuntimeException("Not on waitlist");
+            throw new CustomDomainException("Not on waitlist");
         }
         
         EventWaitlist entry = waitlistEntry.get();
         
         // Check if expired
         if (entry.getExpiresAt() != null && entry.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Waitlist invitation expired");
+            throw new CustomDomainException("Waitlist invitation expired");
         }
         
         // Check if already confirmed
         if (entry.isConfirmed()) {
-            throw new RuntimeException("Already confirmed");
+            throw new CustomDomainException("Already confirmed");
         }
         
         // Check if event still has slots
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException("Event is full again");
+            throw new CustomDomainException("Event is full again");
         }
         
         // Register user for event

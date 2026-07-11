@@ -31,17 +31,17 @@ public class EventRegistrationService {
     public Event registerUserForEvent(Event event, User user) {
         // Check if event exists
         if (event == null) {
-            throw new RuntimeException("Event not found");
+            throw new CustomDomainException("Event not found");
         }
 
         // Check if event is full
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException("Event is full");
+            throw new CustomDomainException("Event is full");
         }
 
         // Check if user already registered
         if (eventRegistrationRepository.existsByUserAndEvent(user, event)) {
-            throw new RuntimeException("User already registered for this event");
+            throw new CustomDomainException("User already registered for this event");
         }
 
         // Create and save event registration. The unique (user_id, event_id)
@@ -51,7 +51,7 @@ public class EventRegistrationService {
         try {
             registration = eventRegistrationRepository.saveAndFlush(registration);
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            throw new RuntimeException("User already registered for this event");
+            throw new CustomDomainException("User already registered for this event");
         }
 
         // Generate signed ticket token
@@ -75,7 +75,7 @@ public class EventRegistrationService {
     @Transactional
     public Event cancelRegistration(Event event, User user) {
         if (event == null) {
-            throw new RuntimeException("Event not found");
+            throw new CustomDomainException("Event not found");
         }
 
         java.util.Optional<EventRegistration> registrationOpt = eventRegistrationRepository.findByUserAndEvent(user, event);
@@ -85,7 +85,7 @@ public class EventRegistrationService {
             return eventRepository.save(event);
         }
 
-        throw new RuntimeException("User not registered for this event");
+        throw new CustomDomainException("User not registered for this event");
     }
 
     /**

@@ -52,7 +52,7 @@ public class BulkComplaintService {
     @Transactional
     public Map<String, Object> bulkResolve(List<Long> complaintIds, String resolutionNotes) {
         if (!isAdmin()) {
-            throw new RuntimeException("Only admins can perform bulk operations");
+            throw new CustomDomainException("Only admins can perform bulk operations");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -112,7 +112,7 @@ public class BulkComplaintService {
     @Transactional
     public Map<String, Object> bulkUpdateStatus(List<Long> complaintIds, String newStatus) {
         if (!isAdmin()) {
-            throw new RuntimeException("Only admins can perform bulk operations");
+            throw new CustomDomainException("Only admins can perform bulk operations");
         }
 
         Complaint.ComplaintStatus targetStatus = Complaint.ComplaintStatus.valueOf(newStatus.toUpperCase());

@@ -29,7 +29,7 @@ public class DomainAdapter {
         DomainModel target = domainModels.get(targetDomain);
 
         if (source == null || target == null) {
-            throw new RuntimeException("Domain not found");
+            throw new CustomDomainException("Domain not found");
         }
 
         // Learn domain mapping
