@@ -40,6 +40,9 @@ public class OmnidimService {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private SmartLockService smartLockService;
+
     private final EventRegistrationService eventRegistrationService;
 
     private final VoiceModelRegistryService voiceModelRegistryService;
@@ -383,5 +386,44 @@ public class OmnidimService {
         } catch (Exception e) {
             return "Could not complete booking: " + e.getMessage();
         }
+    }
+
+    private String handleGuestPass(String t) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth != null ? auth.getName() : null;
+        User user = null;
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+
+        if (user == null) {
+            return "Please log in to generate a guest pass.";
+        }
+
+        String guestName = "your guest";
+        int hours = 2; // Default duration
+        
+        // Basic extraction for name (word after "for")
+        if (t.contains("for ")) {
+            String[] parts = t.split("for ");
+            if (parts.length > 1) {
+                String namePart = parts[1].split(" ")[0];
+                if (!namePart.matches("\\d+")) {
+                    guestName = namePart.substring(0, 1).toUpperCase() + namePart.substring(1);
+                }
+            }
+        }
+        
+        // Basic extraction for hours
+        if (t.contains(" hour")) {
+            for (String word : t.split("[^a-z0-9]+")) {
+                if (word.matches("\\d+")) {
+                    hours = Integer.parseInt(word);
+                    break;
+                }
+            }
+        }
+        
+        return smartLockService.generateGuestPass(user, guestName, hours);
     }
 }
