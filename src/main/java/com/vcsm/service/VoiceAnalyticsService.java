@@ -5,19 +5,17 @@ import com.vcsm.model.VoiceAnalytics;
 import com.vcsm.repository.VoiceAnalyticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
-
 import java.time.format.DateTimeFormatter;
-
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class VoiceAnalyticsService {
     
-    @Autowired
-    private VoiceAnalyticsRepository voiceAnalyticsRepository;
+    private final VoiceAnalyticsRepository voiceAnalyticsRepository;
     
     public void logCommand(User user, String commandText, String intent, boolean success, long responseTime) {
         VoiceAnalytics analytics = new VoiceAnalytics(user, commandText, intent, success, responseTime);
@@ -49,7 +47,6 @@ public class VoiceAnalyticsService {
         stats.put("uniqueUsers", uniqueUsers);
         
         // Success rate
-
         List<Object[]> successData = voiceAnalyticsRepository.countBySuccess();
         long successCount = 0;
         long failCount = 0;
@@ -61,13 +58,11 @@ public class VoiceAnalyticsService {
         }
         double successRate = totalCommands > 0 ? (successCount * 100.0 / totalCommands) : 0;
         stats.put("successRate", Math.round(successRate));
-        
 
         Double avgResponseTime = voiceAnalyticsRepository.getAverageResponseTime();
         stats.put("averageResponseTime", avgResponseTime != null ? Math.round(avgResponseTime) : 0);
-        
-        // Recent commands (last 7 days)
 
+        // Recent commands (last 7 days)
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         long recentCommands = voiceAnalyticsRepository.countRecentCommands(sevenDaysAgo);
         stats.put("recentCommands", recentCommands);

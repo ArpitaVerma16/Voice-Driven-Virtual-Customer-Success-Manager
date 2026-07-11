@@ -7,10 +7,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class SecureAggregator {
 
-    @Autowired
-    private PrivacyEngine privacyEngine;
+    private final PrivacyEngine privacyEngine;
 
     private final Map<String, LocalModel> localModels = new ConcurrentHashMap<>();
 

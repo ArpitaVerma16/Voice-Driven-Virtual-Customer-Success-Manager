@@ -15,14 +15,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/blockchain")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class BlockchainController {
 
-    @Autowired
-    private BlockchainService blockchainService;
+    private final BlockchainService blockchainService;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     @GetMapping("/verify/{id}")
     public ResponseEntity<Map<String, Object>> verifyComplaint(@PathVariable Long id) {

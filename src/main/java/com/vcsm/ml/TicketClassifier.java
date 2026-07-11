@@ -10,8 +10,15 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
+    private static final Logger log = LoggerFactory.getLogger(TicketClassifier.class);
+
 public class TicketClassifier {
+
+    private static final Logger log = LoggerFactory.getLogger(TicketClassifier.class);
 
     private DoccatModel model;
     private DocumentCategorizerME categorizer;
@@ -106,10 +113,10 @@ public class TicketClassifier {
 );
             categorizer = new DocumentCategorizerME(model);
 
-            System.out.println("✅ Ticket classifier trained with " + samples.size() + " samples");
+            log.info("✅ Ticket classifier trained with " + samples.size() + " samples");
 
         } catch (IOException e) {
-            System.err.println("❌ Failed to train classification model: " + e.getMessage());
+            log.error("❌ Failed to train classification model: " + e.getMessage());
         }
     }
 
@@ -177,3 +184,4 @@ public class TicketClassifier {
         public void close() throws IOException {}
     }
 }
+

@@ -1,5 +1,6 @@
 package com.vcsm.service;
 
+import com.vcsm.exception.EventCapacityExceededException;
 import com.vcsm.model.Event;
 import com.vcsm.model.User;
 import com.vcsm.model.EventRegistration;
@@ -15,29 +16,37 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
+@lombok.RequiredArgsConstructor
 public class EventService {
+    private static final Logger log = LoggerFactory.getLogger(EventService.class);
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EventRegistrationRepository eventRegistrationRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private EventWaitlistRepository eventWaitlistRepository;
+    private final EventWaitlistRepository eventWaitlistRepository;
 
-    @Autowired
-    private EmailLogRepository emailLogRepository;
+    private final EmailLogRepository emailLogRepository;
 
+    @Transactional
     public Event createEvent(Event event) { return eventRepository.save(event); }
 
     public List<Event> getAllEvents() { return eventRepository.findAll(); }
 
     public List<Event> getActiveEvents() { return eventRepository.findByActiveTrue(); }
+
+    /** Count of active events without materializing the rows. */
+    public long countActiveEvents() { return eventRepository.countByActiveTrue(); }
+
+    /** Count of upcoming active events without materializing the rows. */
+    public long countUpcomingEvents() {
+        return eventRepository.countByEventDateAfterAndActiveTrue(LocalDateTime.now());
+    }
 
     public List<Event> getUpcomingEvents() {
         return eventRepository.findByEventDateAfterAndActiveTrue(LocalDateTime.now());
@@ -49,6 +58,7 @@ public class EventService {
 
     public Optional<Event> getEventById(Long id) { return eventRepository.findById(id); }
 
+    @Transactional
     public Event updateEvent(Long id, Event updated) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));
@@ -61,41 +71,67 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    @Transactional
     public Event registerForEvent(Long eventId, Long userId) {
-        Event event = eventRepository.findById(eventId)
+        // Pessimistic lock: concurrent registrations for the same event are
+        // serialized here, so the duplicate and capacity checks below cannot
+        // pass simultaneously in two transactions (double-click, network
+        // retry, or parallel clients).
+        Event event = eventRepository.findWithLockById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
         // Event inactive
         if (!event.isActive()) {
-            throw new RuntimeException("Event is not active");
+            throw new CustomDomainException("Event is not active");
         }
         // Event already happened
         if (event.getEventDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Registration closed. Event already started.");
+            throw new CustomDomainException("Registration closed. Event already started.");
         }
 
         // Check if already registered
         if (eventRegistrationRepository.existsByUserAndEvent(user, event)) {
-            throw new RuntimeException("User already registered for this event");
+            throw new CustomDomainException("User already registered for this event");
         }
 
         // Capacity validation
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException(
-                "Event Full! Maximum capacity of "
-                        + event.getMaxCapacity()
-                        + " participants reached."
+            throw new EventCapacityExceededException(
+                "Event has reached its maximum capacity of "
+                    + event.getMaxCapacity()
+                    + " participants."
             );
         }
 
-        // Create and save event registration
+        // Create and save event registration. The unique (user_id, event_id)
+        // constraint on event_registrations is the last line of defense: if a
+        // duplicate slips past the check above, translate the constraint
+        // violation into the same friendly error instead of a 500.
         EventRegistration registration = new EventRegistration(user, event);
+        try {
+            registration = eventRegistrationRepository.saveAndFlush(registration);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new CustomDomainException("User already registered for this event");
+        }
+
+        // Generate signed ticket token
+        String token = jwtService.generateTicketToken(registration.getId(), user.getId(), event.getId());
+        registration.setTicketToken(token);
         eventRegistrationRepository.save(registration);
 
         event.setRegistrations(event.getRegistrations() + 1);
-        return eventRepository.save(event);
+        Event savedEvent = eventRepository.save(event);
+
+        // Send confirmation email
+        try {
+            reminderScheduler.sendRegistrationConfirmation(savedEvent, user);
+        } catch (Exception e) {
+            System.err.println("❌ Failed to send registration email: " + e.getMessage());
+        }
+
+        return savedEvent;
     }
 
     public List<Event> recommendEvents(String keyword) {

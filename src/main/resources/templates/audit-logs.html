@@ -143,14 +143,63 @@
     }
     
     function applyFilters() {
-        // TODO: Implement filter functionality
-        toast.info('Filter applied', 'Info');
+        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+        const actionType = document.getElementById('actionFilter').value;
+
+        let url = '/api/audit/logs';
+        if (actionType) {
+            url = '/api/audit/logs/action/' + encodeURIComponent(actionType);
+        }
+
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                let filtered = data;
+
+                if (searchTerm) {
+                    filtered = data.filter(log =>
+                        (log.description && log.description.toLowerCase().includes(searchTerm)) ||
+                        (log.adminEmail && log.adminEmail.toLowerCase().includes(searchTerm)) ||
+                        (log.targetType && log.targetType.toLowerCase().includes(searchTerm)) ||
+                        String(log.targetId || '').includes(searchTerm)
+                    );
+                }
+
+                const tbody = document.getElementById('logsTableBody');
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No matching audit logs found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map(log => `
+                    <tr>
+                        <td>${log.id}</td>
+                        <td>${log.adminEmail || 'System'}</td>
+                        <td><span class="badge bg-${getBadgeColor(log.actionType)}">${log.actionType}</span></td>
+                        <td>${log.description}</td>
+                        <td>${log.targetType || '-'}#${log.targetId || ''}</td>
+                        <td>${log.oldValue ? log.oldValue + ' → ' + log.newValue : '-'}</td>
+                        <td>${new Date(log.createdAt).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('totalLogs').textContent = filtered.length;
+                if (typeof toast !== 'undefined') {
+                    toast.success('Filtered to ' + filtered.length + ' results', 'Filter');
+                }
+            })
+            .catch(err => {
+                console.error('Error filtering logs:', err);
+                document.getElementById('logsTableBody').innerHTML =
+                    '<tr><td colspan="7" class="text-center text-danger py-4">Failed to filter logs</td></tr>';
+            });
     }
     
     function resetFilters() {
         document.getElementById('searchInput').value = '';
         document.getElementById('actionFilter').value = '';
         loadLogs();
+        loadStats();
     }
     
     document.addEventListener('DOMContentLoaded', function() {

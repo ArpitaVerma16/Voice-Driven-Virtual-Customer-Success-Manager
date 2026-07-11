@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ReinforcementLearningService {
 
-    @Autowired
-    private DecisionRepository decisionRepository;
+    private final DecisionRepository decisionRepository;
 
     // Q-learning table
     private final Map<String, Map<String, Double>> qTable = new HashMap<>();

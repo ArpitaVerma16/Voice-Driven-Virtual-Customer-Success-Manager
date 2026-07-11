@@ -5,22 +5,22 @@ import com.vcsm.model.ModelVersion;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.ModelVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class AutoTrainer {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private ModelVersionRepository modelVersionRepository;
+    private final ModelVersionRepository modelVersionRepository;
 
-    @Autowired
-    private DriftDetector driftDetector;
+    private final DriftDetector driftDetector;
 
     /**
      * Train new model version
@@ -31,7 +31,7 @@ public class AutoTrainer {
 
         List<Complaint> trainingData = complaintRepository.findAll();
         if (trainingData.isEmpty()) {
-            throw new RuntimeException("No training data available");
+            throw new CustomDomainException("No training data available");
         }
 
         // Simulate training

@@ -3,9 +3,13 @@ package com.vcsm.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class CommandTemplateService {
+
+    private static final Logger log = LoggerFactory.getLogger(CommandTemplateService.class);
 
     private List<Map<String, Object>> templates = new ArrayList<>();
 
@@ -37,10 +43,11 @@ public class CommandTemplateService {
                 templates.add(entry);
             }
 
-            System.out.println("✅ Command templates loaded: " + templates.size());
+            log.info("✅ Command templates loaded: " + templates.size());
 
         } catch (Exception e) {
-            System.err.println("❌ Failed to load command templates: " + e.getMessage());
+            log.error("❌ Failed to load command templates: " + e.getMessage());
+            log.error("Failed to load command templates: {}", e.getMessage(), e);
         }
     }
 
@@ -78,20 +85,20 @@ public class CommandTemplateService {
 
     public String getSuggestion(String context) {
         if (context == null || context.isEmpty()) {
-            return "Try saying: 'I have a noise complaint' or 'Show upcoming events'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'I have a noise complaint' or 'Show upcoming events'");
         }
         
         // Simple suggestion based on context
         String lower = context.toLowerCase();
         if (lower.contains("complaint") || lower.contains("noise") || lower.contains("issue")) {
-            return "Try saying: 'I have a noise complaint' or 'Report a maintenance issue'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'I have a noise complaint' or 'Report a maintenance issue'");
         } else if (lower.contains("event") || lower.contains("calendar")) {
-            return "Try saying: 'Show upcoming events' or 'Register for an event'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'Show upcoming events' or 'Register for an event'");
         } else if (lower.contains("status") || lower.contains("track")) {
-            return "Try saying: 'Check my complaint status' or 'How many complaints are open?'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'Check my complaint status' or 'How many complaints are open?'");
         } else if (lower.contains("help") || lower.contains("what")) {
-            return "Try saying: 'What can I say?' or 'I need help'";
+            return org.springframework.http.ResponseEntity.ok("Try saying: 'What can I say?' or 'I need help'");
         }
-        return "Try saying: 'I have a noise complaint', 'Show upcoming events', or 'Check my complaint status'";
+        return org.springframework.http.ResponseEntity.ok("Try saying: 'I have a noise complaint', 'Show upcoming events', or 'Check my complaint status'");
     }
 }

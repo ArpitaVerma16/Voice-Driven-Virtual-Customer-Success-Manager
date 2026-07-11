@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voice/templates")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class CommandTemplateController {
 
-    @Autowired
-    private CommandTemplateService commandTemplateService;
+    private final CommandTemplateService commandTemplateService;
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllTemplates() {
