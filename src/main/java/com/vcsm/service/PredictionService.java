@@ -270,10 +270,11 @@ public class PredictionService {
 
             if (cdi >= 75.0) {
                 log.info("🚨 High dissatisfaction detected for resident: " + user.getEmail() + " (CDI: " + cdi + "). Triggering preemptive outreach.");
+                log.info("🚨 High dissatisfaction detected for resident: {} (CDI: {}). Triggering preemptive outreach.", user.getEmail(), cdi);
                 try {
                     proactiveOutreachService.sendProactiveOutreach(user.getId(), "email");
                 } catch (Exception e) {
-                    System.err.println("❌ Failed to trigger outreach: " + e.getMessage());
+                    log.error("❌ Failed to trigger outreach: {}", e.getMessage());
                 }
             }
         }

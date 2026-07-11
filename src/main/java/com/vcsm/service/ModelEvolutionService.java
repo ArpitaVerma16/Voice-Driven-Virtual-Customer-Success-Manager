@@ -5,6 +5,8 @@ import com.vcsm.repository.ModelVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -13,6 +15,8 @@ import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class ModelEvolutionService {
+    private static final Logger log = LoggerFactory.getLogger(ModelEvolutionService.class);
+
     private static final Logger log = LoggerFactory.getLogger(ModelEvolutionService.class);
 
     private final ModelVersionRepository modelVersionRepository;
@@ -58,8 +62,9 @@ public class ModelEvolutionService {
             try {
                 ModelVersion newVersion = autoTrainer.trainNewModel(modelName);
                 log.info("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
+                log.info("✅ Model '{}' retrained. New version: {}", modelName, newVersion.getVersion());
             } catch (Exception e) {
-                System.err.println("❌ Failed to retrain model '" + modelName + "': " + e.getMessage());
+                log.error("❌ Failed to retrain model '{}': {}", modelName, e.getMessage());
             }
         }
     }

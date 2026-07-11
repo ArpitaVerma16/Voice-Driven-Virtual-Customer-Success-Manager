@@ -200,7 +200,7 @@ public class VoiceCloningService {
     }
 
     private byte[] synthesizeWithElevenLabs(String voiceId, String text, com.vcsm.model.AdaptiveVoiceSettings settings) {
-        System.out.printf("Synthesizing with ElevenLabs. VoiceId: %s, Text: '%s', Stability: %.2f, SimilarityBoost: %.2f, Style: %.2f, SpeakerBoost: %b, SpeedFactor: %.2f%n",
+        log.info("Synthesizing with ElevenLabs. VoiceId: {}, Text: '{}', Stability: {}, SimilarityBoost: {}, Style: {}, SpeakerBoost: {}, SpeedFactor: {}",
             voiceId, text, settings.getStability(), settings.getSimilarityBoost(), settings.getStyle(), settings.isUseSpeakerBoost(), settings.getSpeedFactor());
         
         String mockResponse = String.format("Audio: '%s' [voice=%s, stability=%.2f, speed=%.2f]", text, voiceId, settings.getStability(), settings.getSpeedFactor());

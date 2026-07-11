@@ -108,6 +108,13 @@ public class WaitlistService {
             } catch (Exception e) {
                 log.error("Failed to process waitlist entry {}: {}", entry.getId(), e.getMessage(), e);
             }
+            
+            log.info("✅ Notification sent to user: " + user.getEmail());
+        } catch (Exception e) {
+            log.error("❌ Failed to send notification: " + e.getMessage());
+            log.info("✅ Notification sent to user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send waitlist notification to user {}: {}", user.getEmail(), e.getMessage(), e);
         }
     }
     

@@ -6,6 +6,8 @@ import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import org.slf4j.Logger;
@@ -13,6 +15,8 @@ import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class GenAIResolver {
+    private static final Logger log = LoggerFactory.getLogger(GenAIResolver.class);
+
     private static final Logger log = LoggerFactory.getLogger(GenAIResolver.class);
 
     private final SolutionMatcher solutionMatcher;
@@ -86,7 +90,7 @@ public class GenAIResolver {
                     Complaint saved = complaintService.fileComplaint(complaint);
                     ticketId = saved.getId();
                 } catch (Exception e) {
-                    System.err.println("Failed to auto-file complaint: " + e.getMessage());
+                    log.error("Failed to auto-file complaint: {}", e.getMessage());
                 }
             }
         }

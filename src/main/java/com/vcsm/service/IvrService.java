@@ -9,6 +9,8 @@ import com.vcsm.repository.IvrSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -19,6 +21,8 @@ import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class IvrService {
+    private static final Logger log = LoggerFactory.getLogger(IvrService.class);
+
     private static final Logger log = LoggerFactory.getLogger(IvrService.class);
 
     private final IvrFlowConfigRepository configRepository;
@@ -83,7 +87,7 @@ public class IvrService {
         try {
             return objectMapper.readValue(config.getFlowJson(), IvrNode.class);
         } catch (Exception e) {
-            System.err.println("Error parsing IVR flow JSON: " + e.getMessage());
+            log.error("Error parsing IVR flow JSON: {}", e.getMessage());
             try {
                 return objectMapper.readValue(DEFAULT_FLOW, IvrNode.class);
             } catch (Exception ex) {
