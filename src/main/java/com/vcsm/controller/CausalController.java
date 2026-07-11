@@ -1,6 +1,7 @@
 package com.vcsm.controller;
 
 import com.vcsm.ai.CausalEngine;
+import com.vcsm.ai.CausalGraphBuilder;
 import com.vcsm.ai.CounterfactualSimulator;
 import com.vcsm.ai.RootCauseAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +13,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/causal")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class CausalController {
 
-    @Autowired
-    private CausalEngine causalEngine;
+    private final CausalEngine causalEngine;
 
-    @Autowired
-    private RootCauseAnalyzer rootCauseAnalyzer;
+    private final RootCauseAnalyzer rootCauseAnalyzer;
 
-    @Autowired
-    private CounterfactualSimulator counterfactualSimulator;
+    private final CounterfactualSimulator counterfactualSimulator;
+
+    private final CausalGraphBuilder causalGraphBuilder;
 
     @GetMapping("/analyze")
     public ResponseEntity<CausalEngine.CausalAnalysis> analyze(@RequestParam String issue) {
@@ -45,7 +45,7 @@ public class CausalController {
     @GetMapping("/graph")
     public ResponseEntity<Map<String, Object>> getCausalGraph() {
         Map<String, Object> response = new HashMap<>();
-        response.put("graph", new CausalGraphBuilder().getGraph());
+        response.put("graph", causalGraphBuilder.getGraph());
         response.put("status", "Causal graph available");
         return ResponseEntity.ok(response);
     }

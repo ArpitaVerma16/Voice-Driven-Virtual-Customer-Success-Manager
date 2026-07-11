@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/onboarding")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class OnboardingController {
 
-    @Autowired
-    private OnboardingService onboardingService;
+    private final OnboardingService onboardingService;
 
     @GetMapping("/steps")
     public ResponseEntity<List<Map<String, Object>>> getSteps() {

@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Set;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 @Component
 public class HmacAuthenticationFilter extends OncePerRequestFilter {
 
@@ -88,8 +92,37 @@ public class HmacAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        CachedBodyHttpServletRequestWrapper wrappedRequest =
+                new CachedBodyHttpServletRequestWrapper(request);
+
+        String computedSignature = signatureValidator.generateSignature(
+                wrappedRequest.getMethod(),
+                wrappedRequest.getRequestURI(),
+                wrappedRequest.getBody(),
+                timestamp,
+                nonce
+        );
+
+        if (!computedSignature.equals(signature)) {
+
+            response.sendError(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "Invalid signature");
+
+            return;
+        }
+
         nonceCacheService.save(nonce);
 
-        filterChain.doFilter(request, response);
+        // Set security context so downstream code sees this request as authenticated
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        "hmac-service-account",
+                        null,
+                        java.util.List.of(new SimpleGrantedAuthority("ROLE_SERVICE"))
+                );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        filterChain.doFilter(wrappedRequest, response);
     }
 }

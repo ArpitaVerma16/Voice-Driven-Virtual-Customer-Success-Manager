@@ -6,6 +6,8 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.Map;
 
 @Service
 public class OnboardingService {
+
+    private static final Logger log = LoggerFactory.getLogger(OnboardingService.class);
 
     private List<Map<String, Object>> tutorialSteps = new ArrayList<>();
 
@@ -35,10 +39,11 @@ public class OnboardingService {
                 tutorialSteps.add(stepMap);
             }
             
-            System.out.println("✅ Tutorial steps loaded: " + tutorialSteps.size() + " steps");
+            log.info("✅ Tutorial steps loaded: " + tutorialSteps.size() + " steps");
             
         } catch (Exception e) {
-            System.err.println("❌ Failed to load tutorial steps: " + e.getMessage());
+            log.error("❌ Failed to load tutorial steps: " + e.getMessage());
+            log.error("Failed to load tutorial steps: {}", e.getMessage(), e);
         }
     }
 

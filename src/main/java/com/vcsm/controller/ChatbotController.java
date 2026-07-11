@@ -10,14 +10,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chatbot")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class ChatbotController {
 
-    @Autowired
-    private ChatbotService chatbotService;
+    private final ChatbotService chatbotService;
 
     @PostMapping("/ask")
-    public ResponseEntity<Map<String, Object>> ask(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> ask(@Valid @RequestBody Map<String, String> request) {
         String message = request.get("message");
         String response = chatbotService.getResponse(message);
 

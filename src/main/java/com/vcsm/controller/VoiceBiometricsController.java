@@ -20,19 +20,20 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/voice/biometrics")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class VoiceBiometricsController {
 
-    @Autowired
-    private VoiceBiometricsService voiceBiometricsService;
+    private final VoiceBiometricsService voiceBiometricsService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @PostMapping("/enroll")
     public ResponseEntity<VoiceVerificationResponse> enrollVoice(
+            @PathVariable Long userId,
+            @Valid @RequestBody VoiceVerificationRequest request) {
+        
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody VoiceVerificationRequest request) {
+            @Valid @RequestBody VoiceVerificationRequest request) {
 
         // Security fix:
         // Never trust a client-supplied user ID.
@@ -63,7 +64,9 @@ public class VoiceBiometricsController {
 
     @PostMapping("/verify")
     public ResponseEntity<VoiceVerificationResponse> verifyVoice(
-            @RequestBody VoiceVerificationRequest request) {
+            @Valid @RequestBody VoiceVerificationRequest request) {
+        
+            @Valid @RequestBody VoiceVerificationRequest request) {
 
         if (request.getUserId() == null) {
             return ResponseEntity.badRequest()

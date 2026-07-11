@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ratelimit")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class RateLimitController {
 
-    @Autowired
-    private RateLimiterService rateLimiterService;
+    private final RateLimiterService rateLimiterService;
 
     @GetMapping("/status")
     public ResponseEntity<?> getStatus(@RequestParam String userId) {

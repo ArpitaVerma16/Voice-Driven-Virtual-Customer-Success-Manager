@@ -9,7 +9,12 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -17,10 +22,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ExportService {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private static final Logger log = LoggerFactory.getLogger(ExportService.class);
+
+    private final ComplaintRepository complaintRepository;
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
@@ -28,17 +35,21 @@ public class ExportService {
      * Export complaints as CSV
      */
     public ByteArrayInputStream exportComplaintsToCSV() {
-        List<Complaint> complaints = complaintRepository.findAll();
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(out))) {
+        int pageSize = 500;
+            int pageNum = 0;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(out))) {
             
             // Header
             String[] header = {"ID", "Resident", "Category", "Description", "Status", "Priority", "Date"};
             writer.writeNext(header);
 
-            // Data rows
-            for (Complaint c : complaints) {
+            // Data rows — paginated to avoid OOM
+            Page<Complaint> page;
+            do {
+                Pageable pageable = PageRequest.of(pageNum++, pageSize);
+                page = complaintRepository.findAll(pageable);
+                for (Complaint c : page.getContent()) {
                 String[] row = {
                     String.valueOf(c.getId()),
                     c.getResidentName(),
@@ -51,7 +62,7 @@ public class ExportService {
                 writer.writeNext(row);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to export complaints to CSV", e);
         }
         return new ByteArrayInputStream(out.toByteArray());
     }
@@ -60,10 +71,10 @@ public class ExportService {
      * Export complaints as PDF
      */
     public ByteArrayInputStream exportComplaintsToPDF() {
-        List<Complaint> complaints = complaintRepository.findAll();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        try {
+        int pageSize = 500;
+            int pageNum = 0;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
             Document document = new Document();
             PdfWriter.getInstance(document, out);
             document.open();
@@ -95,9 +106,13 @@ public class ExportService {
                 table.addCell(cell);
             }
 
-            // Data
+            // Data — paginated to avoid OOM
             Font dataFont = new Font(Font.FontFamily.HELVETICA, 10);
-            for (Complaint c : complaints) {
+            Page<Complaint> page;
+            do {
+                Pageable pageable = PageRequest.of(pageNum++, pageSize);
+                page = complaintRepository.findAll(pageable);
+                for (Complaint c : page.getContent()) {
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(c.getId()), dataFont)));
                 table.addCell(new PdfPCell(new Phrase(c.getResidentName(), dataFont)));
                 table.addCell(new PdfPCell(new Phrase(
@@ -108,13 +123,13 @@ public class ExportService {
                     c.getPriority() != null ? c.getPriority() : "MEDIUM", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(
                     c.getCreatedAt() != null ? dateFormatter.format(c.getCreatedAt()) : "", dataFont)));
-            }
+            } while (page.hasNext());
 
             document.add(table);
             document.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to export complaints to PDF", e);
         }
 
         return new ByteArrayInputStream(out.toByteArray());

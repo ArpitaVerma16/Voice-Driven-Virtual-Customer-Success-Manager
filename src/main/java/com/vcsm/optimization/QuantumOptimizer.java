@@ -223,7 +223,7 @@ public class QuantumOptimizer {
             }
 
             // Maximize coverage, minimize variance
-            double coverage = schedule.stream().filter(s -> s.getAssignedStaff() != null).count();
+            double coverage = schedule.stream().parallel().filter(s -> s.getAssignedStaff() != null).count();
             double variance = calculateVariance(shiftCount);
 
             this.fitness = coverage * 0.7 + (100 - variance) * 0.3;

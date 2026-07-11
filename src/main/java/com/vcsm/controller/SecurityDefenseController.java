@@ -12,17 +12,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/defense")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SecurityDefenseController {
 
-    @Autowired
-    private AdversarialDefense adversarialDefense;
+    private final AdversarialDefense adversarialDefense;
 
-    @Autowired
-    private AttackDetector attackDetector;
+    private final AttackDetector attackDetector;
 
-    @Autowired
-    private RobustnessVerifier robustnessVerifier;
+    private final RobustnessVerifier robustnessVerifier;
 
     @PostMapping("/detect")
     public ResponseEntity<AdversarialDefense.DefenseResult> detectAdversarial(

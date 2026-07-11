@@ -4,6 +4,7 @@ import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.UserRepository;
+import com.vcsm.security.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -11,29 +12,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class BulkComplaintService {
 
-    private static final Logger log = Logger.getLogger(BulkComplaintService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(BulkComplaintService.class);
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserActivityService userActivityService;
+    private final UserActivityService userActivityService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     private boolean isAdmin() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;
-        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.name()));
     }
 
     private String currentUsername() {
@@ -53,7 +52,7 @@ public class BulkComplaintService {
     @Transactional
     public Map<String, Object> bulkResolve(List<Long> complaintIds, String resolutionNotes) {
         if (!isAdmin()) {
-            throw new RuntimeException("Only admins can perform bulk operations");
+            throw new CustomDomainException("Only admins can perform bulk operations");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -94,7 +93,7 @@ public class BulkComplaintService {
                 }
             } catch (Exception e) {
                 failed.add(id);
-                log.warning("Failed to resolve complaint " + id + ": " + e.getMessage());
+                log.warn("Failed to resolve complaint {}: {}", id, e.getMessage(), e);
             }
         }
 
@@ -113,7 +112,7 @@ public class BulkComplaintService {
     @Transactional
     public Map<String, Object> bulkUpdateStatus(List<Long> complaintIds, String newStatus) {
         if (!isAdmin()) {
-            throw new RuntimeException("Only admins can perform bulk operations");
+            throw new CustomDomainException("Only admins can perform bulk operations");
         }
 
         Complaint.ComplaintStatus targetStatus = Complaint.ComplaintStatus.valueOf(newStatus.toUpperCase());
@@ -147,7 +146,7 @@ public class BulkComplaintService {
                 }
             } catch (Exception e) {
                 failed.add(id);
-                log.warning("Failed to update complaint " + id + ": " + e.getMessage());
+                log.warn("Failed to update complaint {}: {}", id, e.getMessage(), e);
             }
         }
 

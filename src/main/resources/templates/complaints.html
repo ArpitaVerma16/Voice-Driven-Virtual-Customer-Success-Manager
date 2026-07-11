@@ -326,6 +326,9 @@
                                 <span class="btn-spinner"></span>
                                 <span class="btn-text">Update</span>
                             </button>
+                            <button class="btn btn-sm btn-outline-primary me-1" th:onclick="'openCommentsModal(' + ${c.id} + ')'" title="Comments">
+                                <i class="fas fa-comments"></i>
+                            </button>
                             <button class="btn btn-sm btn-outline-info me-1" onclick="updatePriority(${c.id})">
                                 <span class="btn-spinner"></span>
                                 <span class="btn-text">Priority</span>
@@ -425,6 +428,34 @@
                     <span class="btn-spinner"></span>
                     <span class="btn-text">Submit Complaint</span>
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Complaint Comments Modal -->
+<div class="modal fade" id="commentsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-comments text-purple me-2"></i>Complaint Comments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="commentsBody" style="background-color: #f8f9fa; min-height: 300px;">
+                <!-- Comments will be loaded here via AJAX -->
+                <div class="text-center text-muted my-5" id="commentsLoading">
+                    <div class="spinner-border spinner-border-sm" role="status"></div> Loading...
+                </div>
+                <div id="commentsList" class="d-flex flex-column gap-3"></div>
+            </div>
+            <div class="modal-footer bg-light">
+                <input type="hidden" id="currentComplaintId">
+                <div class="input-group">
+                    <input type="text" id="newCommentInput" class="form-control" placeholder="Type a comment..." onkeypress="if(event.key === 'Enter') submitComment()">
+                    <button class="btn btn-purple" type="button" onclick="submitComment()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -800,6 +831,97 @@
             if (typeof toast !== 'undefined') {
                 toast.error('Network error. Please try again.', 'Error');
             }
+        });
+    }
+    
+    // ===== COMMENTS SYSTEM =====
+    
+    let commentsModalInstance = null;
+
+    function openCommentsModal(complaintId) {
+        document.getElementById('currentComplaintId').value = complaintId;
+        document.getElementById('commentsList').innerHTML = '';
+        document.getElementById('commentsLoading').style.display = 'block';
+        document.getElementById('newCommentInput').value = '';
+        
+        if (!commentsModalInstance) {
+            commentsModalInstance = new bootstrap.Modal(document.getElementById('commentsModal'));
+        }
+        commentsModalInstance.show();
+        
+        fetchComments(complaintId);
+    }
+    
+    function fetchComments(complaintId) {
+        fetch(`/api/complaints/${complaintId}/comments`)
+            .then(res => res.json())
+            .then(comments => {
+                document.getElementById('commentsLoading').style.display = 'none';
+                const list = document.getElementById('commentsList');
+                list.innerHTML = '';
+                
+                if (comments.length === 0) {
+                    list.innerHTML = '<div class="text-center text-muted my-4"><i class="fas fa-comment-slash fs-1 mb-2 opacity-50"></i><br>No comments yet.</div>';
+                    return;
+                }
+                
+                comments.forEach(c => {
+                    const date = new Date(c.createdAt).toLocaleString(undefined, {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    const isOwn = c.admin ? false : true; // Can be improved based on actual logged in user
+                    const alignClass = c.admin ? 'align-self-start' : 'align-self-end';
+                    const bgClass = c.admin ? 'bg-white border' : 'bg-purple text-white';
+                    const textClass = c.admin ? 'text-dark' : 'text-white';
+                    const nameColor = c.admin ? 'text-purple fw-bold' : 'text-white-50';
+                    
+                    const html = `
+                        <div class="card shadow-sm ${alignClass}" style="max-width: 85%; border-radius: 1rem;">
+                            <div class="card-body p-2 px-3 ${bgClass}" style="border-radius: inherit;">
+                                <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.75rem;">
+                                    <span class="${nameColor}">${c.authorName} ${c.admin ? '<i class="fas fa-shield-alt ms-1"></i>' : ''}</span>
+                                    <span class="ms-3 ${textClass} opacity-75">${date}</span>
+                                </div>
+                                <div class="${textClass} text-break" style="font-size: 0.9rem;">${c.content}</div>
+                            </div>
+                        </div>
+                    `;
+                    list.innerHTML += html;
+                });
+                
+                const body = document.getElementById('commentsBody');
+                body.scrollTop = body.scrollHeight;
+            })
+            .catch(err => {
+                document.getElementById('commentsLoading').style.display = 'none';
+                document.getElementById('commentsList').innerHTML = '<div class="text-danger text-center my-3">Error loading comments.</div>';
+            });
+    }
+    
+    function submitComment() {
+        const input = document.getElementById('newCommentInput');
+        const content = input.value.trim();
+        const complaintId = document.getElementById('currentComplaintId').value;
+        
+        if (!content) return;
+        
+        input.disabled = true;
+        
+        fetch(`/api/complaints/${complaintId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        })
+        .then(res => res.json())
+        .then(data => {
+            input.value = '';
+            input.disabled = false;
+            fetchComments(complaintId); // refresh
+        })
+        .catch(err => {
+            input.disabled = false;
+            if (typeof toast !== 'undefined') toast.error('Failed to post comment', 'Error');
         });
     }
 </script>

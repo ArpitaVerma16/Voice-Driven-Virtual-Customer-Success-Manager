@@ -9,10 +9,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SolutionMatcher {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     // Pre-defined solution templates
     private final Map<String, List<SolutionTemplate>> solutionTemplates = new HashMap<>();

@@ -1,0 +1,6 @@
+
+rate-limit:
+  voice:
+    anonymous: 10.0
+    authenticated: 50.0
+  window-size-seconds: 60
