@@ -14,11 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/live")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class LiveDashboardController {
 
-    @Autowired
-    private LiveDashboardService liveDashboardService;
+    private final LiveDashboardService liveDashboardService;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 

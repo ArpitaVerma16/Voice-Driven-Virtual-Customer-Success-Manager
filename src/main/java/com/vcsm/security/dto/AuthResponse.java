@@ -1,5 +1,7 @@
 package com.vcsm.security.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AuthResponse {
     private String token;
     private String refreshToken;
@@ -14,6 +16,11 @@ public class AuthResponse {
         this.refreshToken = refreshToken;
         this.email = email;
         this.role = role;
+        this.message = "Authentication successful";
+    }
+
+    public AuthResponse(String token) {
+        this.token = token;
         this.message = "Authentication successful";
     }
 

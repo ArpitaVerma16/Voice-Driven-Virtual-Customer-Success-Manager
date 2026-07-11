@@ -8,8 +8,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 public class PrivacyEngine {
 
-    private static final double DEFAULT_EPSILON = 0.5;
-    private static final double DEFAULT_DELTA = 1e-5;
+    public static final double DEFAULT_EPSILON = 0.5;
+    public static final double DEFAULT_DELTA = 1e-5;
     private static final double CLIP_BOUND = 1.0;
 
     /**

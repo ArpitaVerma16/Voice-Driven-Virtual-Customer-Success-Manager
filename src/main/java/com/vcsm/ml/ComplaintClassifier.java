@@ -10,8 +10,13 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class ComplaintClassifier {
+
+    private static final Logger log = LoggerFactory.getLogger(ComplaintClassifier.class);
 
     private DoccatModel model;
     private DocumentCategorizerME categorizer;
@@ -93,8 +98,10 @@ public class ComplaintClassifier {
     private void trainModel() {
         try {
             List<DocumentSample> samples = new ArrayList<>();
+
             for (Map.Entry<String, List<String>> entry : trainingData.entrySet()) {
                 String category = entry.getKey();
+
                 for (String text : entry.getValue()) {
                     String[] tokens = tokenizer.tokenize(text);
                     samples.add(new DocumentSample(category, tokens));
@@ -102,18 +109,20 @@ public class ComplaintClassifier {
             }
 
             TrainingParameters params = TrainingParameters.defaultParams();
+
             model = DocumentCategorizerME.train(
-    "en",
-    new CollectionObjectStream<>(samples),
-    params,
-    new DoccatFactory()
-);
+                    "en",
+                    new CollectionObjectStream<>(samples),
+                    params,
+                    new DoccatFactory()
+            );
+
             categorizer = new DocumentCategorizerME(model);
 
-            System.out.println("✅ Complaint classifier trained with " + samples.size() + " samples");
+            log.info("✅ Complaint classifier trained with " + samples.size() + " samples");
 
         } catch (IOException e) {
-            System.err.println("❌ Failed to train classification model: " + e.getMessage());
+            log.error("❌ Failed to train classification model: " + e.getMessage());
         }
     }
 
@@ -131,22 +140,22 @@ public class ComplaintClassifier {
     }
 
     public Map<String, Double> getAllScores(String text) {
-    Map<String, Double> scores = new LinkedHashMap<>();
+        Map<String, Double> scores = new LinkedHashMap<>();
 
-    if (categorizer == null || text == null || text.isEmpty()) {
+        if (categorizer == null || text == null || text.trim().isEmpty()) {
+            return scores;
+        }
+
+        String[] tokens = tokenizer.tokenize(text);
+        double[] outcomes = categorizer.categorize(tokens);
+
+        for (int i = 0; i < outcomes.length; i++) {
+            String category = categorizer.getCategory(i);
+            scores.put(category, outcomes[i]);
+        }
+
         return scores;
     }
-
-    String[] tokens = tokenizer.tokenize(text);
-    double[] outcomes = categorizer.categorize(tokens);
-
-    for (int i = 0; i < outcomes.length; i++) {
-        scores.put("CATEGORY_" + i, outcomes[i]);
-    }
-
-    return scores;
-}
-       
 
     public static class ClassificationResult {
         private final String category;
@@ -157,8 +166,13 @@ public class ComplaintClassifier {
             this.confidence = confidence;
         }
 
-        public String getCategory() { return category; }
-        public double getConfidence() { return confidence; }
+        public String getCategory() {
+            return category;
+        }
+
+        public double getConfidence() {
+            return confidence;
+        }
     }
 
     private static class CollectionObjectStream<T> implements ObjectStream<T> {
@@ -179,6 +193,7 @@ public class ComplaintClassifier {
         }
 
         @Override
-        public void close() throws IOException {}
+        public void close() throws IOException {
+        }
     }
 }

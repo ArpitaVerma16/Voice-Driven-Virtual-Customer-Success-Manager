@@ -19,17 +19,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/events/waitlist")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class WaitlistController {
 
-    @Autowired
-    private WaitlistService waitlistService;
+    private final WaitlistService waitlistService;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @PostMapping("/{eventId}/join")
     public ResponseEntity<?> joinWaitlist(

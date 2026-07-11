@@ -3,22 +3,24 @@ package com.vcsm.service;
 import com.vcsm.dto.InteractionDTO;
 import com.vcsm.model.Interaction;
 import com.vcsm.repository.InteractionRepository;
+import com.vcsm.security.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class InteractionService {
 
-    @Autowired
-    private InteractionRepository interactionRepository;
+    private final InteractionRepository interactionRepository;
 
     // Get current user from security context
     private String getCurrentUsername() {
@@ -31,15 +33,16 @@ public class InteractionService {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;
         return auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.name()));
     }
 
     /**
      * Create a new interaction
      */
+    @Transactional
     public Interaction createInteraction(Interaction interaction) {
         String username = getCurrentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         interaction.setCustomerUsername(username);
         if (interaction.getStatus() == null) {
@@ -73,7 +76,7 @@ public class InteractionService {
      */
     public Page<InteractionDTO> getAllInteractions(Pageable pageable) {
         String username = getCurrentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         Page<Interaction> interactions;
         if (isAdmin()) {
@@ -91,7 +94,7 @@ public class InteractionService {
     public Page<InteractionDTO> searchInteractions(String searchTerm, String status, String sentiment,
                                                    String category, Pageable pageable) {
         String username = getCurrentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
 
         Page<Interaction> results;
 
@@ -143,22 +146,19 @@ public class InteractionService {
         try {
             if (status != null && !status.isEmpty()) {
                 Interaction.InteractionStatus statusEnum = Interaction.InteractionStatus.valueOf(status.toUpperCase());
-                if (isAdmin()) {
-                    return interactionRepository.findByStatus(statusEnum, pageable);
-                } else {
+                Interaction.InteractionStatus statusEnum = Interaction.InteractionStatus.valueOf(status.toUpperCase());
+        // Removed dead if/else branch - both paths executed same code
                     return interactionRepository.findByStatus(statusEnum, pageable);
                 }
             } else if (sentiment != null && !sentiment.isEmpty()) {
                 Interaction.SentimentType sentimentEnum = Interaction.SentimentType.valueOf(sentiment.toUpperCase());
-                if (isAdmin()) {
-                    return interactionRepository.findBySentiment(sentimentEnum, pageable);
-                } else {
+                Interaction.SentimentType sentimentEnum = Interaction.SentimentType.valueOf(sentiment.toUpperCase());
+        // Removed dead if/else branch - both paths executed same code
                     return interactionRepository.findBySentiment(sentimentEnum, pageable);
                 }
             } else if (category != null && !category.isEmpty()) {
-                if (isAdmin()) {
-                    return interactionRepository.findByCategory(category, pageable);
-                } else {
+            } else if (category != null && !category.isEmpty()) {
+        // Removed dead if/else branch - both paths executed same code
                     return interactionRepository.findByCategory(category, pageable);
                 }
             } else {
@@ -218,10 +218,11 @@ public class InteractionService {
     /**
      * Update an interaction
      */
+    @Transactional
     public Interaction updateInteraction(Long id, Interaction updatedInteraction) {
         Optional<Interaction> existing = interactionRepository.findById(id);
         if (existing.isEmpty()) {
-            throw new RuntimeException("Interaction not found");
+            throw new CustomDomainException("Interaction not found");
         }
 
         Interaction interaction = existing.get();
@@ -229,7 +230,7 @@ public class InteractionService {
         // Check access
         String currentUsername = getCurrentUsername();
         if (!isAdmin() && !currentUsername.equals(interaction.getCustomerUsername())) {
-            throw new RuntimeException("Unauthorized");
+            throw new CustomDomainException("Unauthorized");
         }
 
         // Update fields
@@ -259,16 +260,17 @@ public class InteractionService {
     /**
      * Delete an interaction
      */
+    @Transactional
     public void deleteInteraction(Long id) {
         Optional<Interaction> interaction = interactionRepository.findById(id);
         if (interaction.isEmpty()) {
-            throw new RuntimeException("Interaction not found");
+            throw new CustomDomainException("Interaction not found");
         }
 
         // Check access
         String currentUsername = getCurrentUsername();
         if (!isAdmin() && !currentUsername.equals(interaction.get().getCustomerUsername())) {
-            throw new RuntimeException("Unauthorized");
+            throw new CustomDomainException("Unauthorized");
         }
 
         interactionRepository.deleteById(id);

@@ -6,17 +6,17 @@ import com.vcsm.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class NotificationService {
     
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
     
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
     
     public Notification createNotification(User user, String title, String message, String type) {
         Notification notification = new Notification(user, title, message, type);

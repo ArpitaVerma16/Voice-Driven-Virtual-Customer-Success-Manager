@@ -3,6 +3,7 @@ package com.vcsm.service;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -13,12 +14,13 @@ public class LanguageDetector {
     private static final Pattern HINDI_PATTERN = Pattern.compile("[\\u0900-\\u097F]");
     
     // Language codes mapping
-    private static final Map<String, String> LANGUAGE_NAMES = new HashMap<>();
-    private static final Map<String, String> LANGUAGE_CODES = new HashMap<>();
+    private static final Map<String, String> LANGUAGE_NAMES = new ConcurrentHashMap<>();
+    private static final Map<String, String> LANGUAGE_CODES = new ConcurrentHashMap<>();
     
     static {
         LANGUAGE_NAMES.put("hi", "Hindi");
         LANGUAGE_NAMES.put("en", "English");
+        LANGUAGE_NAMES.put("es", "Spanish");
         LANGUAGE_NAMES.put("ta", "Tamil");
         LANGUAGE_NAMES.put("te", "Telugu");
         LANGUAGE_NAMES.put("ml", "Malayalam");
@@ -30,6 +32,7 @@ public class LanguageDetector {
         
         LANGUAGE_CODES.put("Hindi", "hi");
         LANGUAGE_CODES.put("English", "en");
+        LANGUAGE_CODES.put("Spanish", "es");
         LANGUAGE_CODES.put("Tamil", "ta");
         LANGUAGE_CODES.put("Telugu", "te");
         LANGUAGE_CODES.put("Malayalam", "ml");
@@ -42,41 +45,50 @@ public class LanguageDetector {
 
     public String detectLanguage(String text) {
         if (text == null || text.isEmpty()) {
-            return "en";
+            return org.springframework.http.ResponseEntity.ok("en");
+        }
+
+        // Check for Spanish vocabulary/accents
+        String lower = text.toLowerCase();
+        if (lower.contains("hola") || lower.contains("gracias") || 
+            lower.contains("queja") || lower.contains("ayuda") ||
+            lower.contains("estado") || lower.contains("evento") ||
+            lower.contains("problema")) {
+            return org.springframework.http.ResponseEntity.ok("es");
         }
         
         // Check for Hindi characters
         if (HINDI_PATTERN.matcher(text).find()) {
-            return "hi";
+            return org.springframework.http.ResponseEntity.ok("hi");
         }
         
         // Check for Tamil characters (Tamil Unicode range: \u0B80-\u0BFF)
         if (Pattern.compile("[\\u0B80-\\u0BFF]").matcher(text).find()) {
-            return "ta";
+            return org.springframework.http.ResponseEntity.ok("ta");
         }
         
         // Check for Telugu characters (Telugu Unicode range: \u0C00-\u0C7F)
         if (Pattern.compile("[\\u0C00-\\u0C7F]").matcher(text).find()) {
-            return "te";
+            return org.springframework.http.ResponseEntity.ok("te");
         }
         
         // Check for Malayalam characters (Malayalam Unicode range: \u0D00-\u0D7F)
         if (Pattern.compile("[\\u0D00-\\u0D7F]").matcher(text).find()) {
-            return "ml";
+            return org.springframework.http.ResponseEntity.ok("ml");
         }
         
         // Check for Kannada characters (Kannada Unicode range: \u0C80-\u0CFF)
         if (Pattern.compile("[\\u0C80-\\u0CFF]").matcher(text).find()) {
-            return "kn";
+            return org.springframework.http.ResponseEntity.ok("kn");
         }
         
         // Check for Bengali characters (Bengali Unicode range: \u0980-\u09FF)
         if (Pattern.compile("[\\u0980-\\u09FF]").matcher(text).find()) {
-            return "bn";
+            return org.springframework.http.ResponseEntity.ok("bn");
         }
         
         // Default to English
-        return "en";
+        return org.springframework.http.ResponseEntity.ok("en");
     }
 
     public String getLanguageName(String code) {

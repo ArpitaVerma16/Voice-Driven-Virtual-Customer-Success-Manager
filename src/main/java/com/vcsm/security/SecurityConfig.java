@@ -29,14 +29,14 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@lombok.RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;
 
-    @Autowired
-    private HmacAuthenticationFilter hmacAuthenticationFilter;
-    private UserDetailsServiceImpl userDetailsService;
+    private final HmacAuthenticationFilter hmacAuthenticationFilter;
+
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public AuthenticationManager authenticationManager() {
@@ -57,20 +57,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").denyAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
-                        .requestMatchers("/api/auth/admin/seed").permitAll()
                         .requestMatchers("/api/voice/command").permitAll()
+                        .requestMatchers("/api/voice/flow-config").permitAll()
                         .requestMatchers("/api/voice/feedback/**").permitAll()
                         .requestMatchers("/api/chatbot/**").permitAll()
+                        .requestMatchers("/api/iot/alert").permitAll()
+                        .requestMatchers("/api/translation/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
-                        hmacAuthenticationFilter,
-                        JwtAuthFilter.class
-                )
-                .addFilterBefore(
                         jwtAuthFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        hmacAuthenticationFilter,
+                        JwtAuthFilter.class
                 )
                 .httpBasic(Customizer.withDefaults());
 
@@ -88,7 +90,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/complaints/**", "/events/**", "/analytics/**", "/interaction-history/**", "/voice-analytics/**").authenticated()
                         .requestMatchers("/chatbot/**", "/voice-templates/**").authenticated()
                         .requestMatchers("/profile/**", "/onboarding/**").authenticated()
-                        .requestMatchers("/audit-logs/**").hasRole("ADMIN")
+                        .requestMatchers("/audit-logs/**").hasAnyRole("ADMIN", "AUDITOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -104,7 +106,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));

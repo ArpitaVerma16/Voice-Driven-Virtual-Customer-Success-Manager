@@ -1,7 +1,10 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "voice_analytics")
@@ -19,6 +22,7 @@ public class VoiceAnalytics {
     private String intent;
     private boolean success;
 
+    @Min(0)
     private long responseTime; // in milliseconds
 
     

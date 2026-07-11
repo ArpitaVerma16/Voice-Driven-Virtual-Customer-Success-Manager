@@ -8,25 +8,20 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class MultiAgentOrchestrator {
 
-    @Autowired
-    private AgentRouter agentRouter;
+    private final AgentRouter agentRouter;
 
-    @Autowired
-    private ComplaintAgent complaintAgent;
+    private final ComplaintAgent complaintAgent;
 
-    @Autowired
-    private EventAgent eventAgent;
+    private final EventAgent eventAgent;
 
-    @Autowired
-    private AnalyticsAgent analyticsAgent;
+    private final AnalyticsAgent analyticsAgent;
 
-    @Autowired
-    private StatusAgent statusAgent;
+    private final StatusAgent statusAgent;
 
-    @Autowired
-    private HelpAgent helpAgent;
+    private final HelpAgent helpAgent;
 
     public Map<String, Object> processRequest(AgentRequest request) {
         Map<String, Object> result = new HashMap<>();
@@ -75,7 +70,7 @@ public class MultiAgentOrchestrator {
 
     private String mergeResponses(List<Map<String, Object>> responses) {
         if (responses.isEmpty()) {
-            return "I didn't understand your request. Please try again.";
+            return org.springframework.http.ResponseEntity.ok("I didn't understand your request. Please try again.");
         }
 
         if (responses.size() == 1) {

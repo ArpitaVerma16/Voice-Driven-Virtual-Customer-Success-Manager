@@ -12,11 +12,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/events")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class EventController {
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
+
+    private final com.vcsm.security.jwt.JwtService jwtService;
+
+    private final com.vcsm.repository.EventRegistrationRepository eventRegistrationRepository;
 
     @PostMapping
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
@@ -53,7 +56,7 @@ public class EventController {
 
     @PutMapping("/{id}")
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Event> update(@PathVariable Long id, @RequestBody Event event) {
+    public ResponseEntity<Event> update(@PathVariable Long id, @Valid @RequestBody Event event) {
         return ResponseEntity.ok(eventService.updateEvent(id, event));
     }
 
