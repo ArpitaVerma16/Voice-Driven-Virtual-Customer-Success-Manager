@@ -18,6 +18,8 @@ function setButtonLoading(buttonId, loading) {
 let recognition = null;
 let isRecording = false;
 let lastCommandId = null; // Store last command ID for feedback
+let recordingSeconds = 0;
+let recordingInterval = null;
 
 const STORAGE_KEY = "voiceConversationHistory";
 
@@ -89,11 +91,7 @@ function startVoice() {
 };
 
     recognition.onend = () => {
-        isRecording = false;
-        document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
-        document.getElementById('micBtn').classList.add('btn-purple');
-        document.getElementById('micIcon').className = 'fas fa-microphone';
-    };
+    isRecording = false;
 
     recognition.onerror = (e) => {
         console.error('Voice error:', e);
@@ -103,8 +101,49 @@ function startVoice() {
         }
     };
 
-    recognition.start();
-}
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+};
+
+   recognition.onerror = (e) => {
+    console.error('Voice error:', e);
+    isRecording = false;
+
+    document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
+    document.getElementById('micBtn').classList.add('btn-purple');
+    document.getElementById('micIcon').className = 'fas fa-microphone';
+
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+
+    if (typeof typingIndicator !== 'undefined') {
+        typingIndicator.hide();
+    }
+};
 
 function changePageSize(size) {
     const url = new URL(window.location.href);
