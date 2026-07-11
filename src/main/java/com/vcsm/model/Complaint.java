@@ -2,6 +2,8 @@ package com.vcsm.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Table(name = "complaints")
 public class Complaint {
 
+    public static final int MAX_DESCRIPTION_LENGTH = 1000;
     private static final String DEFAULT_PRIORITY = "MEDIUM";
 
     @Id
@@ -25,6 +28,11 @@ public class Complaint {
     private String residentName;
 
     @NotBlank(message = "Description is required")
+    @Size(
+            max = MAX_DESCRIPTION_LENGTH,
+            message = "Complaint description must not exceed 1000 characters"
+    )
+    @Column(length = MAX_DESCRIPTION_LENGTH)
     @Column(nullable = false, length = 1000)
     @Size(max = 500)
     @Column(length = 1000)
@@ -80,6 +88,8 @@ public class Complaint {
             status = ComplaintStatus.OPEN;
         }
 
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
@@ -90,6 +100,7 @@ public class Complaint {
         updatedAt = LocalDateTime.now();
     }
 
+    // ---- Getters ----
     // ---------------- Getters ----------------
 
     public Long getId() {
@@ -132,6 +143,10 @@ public class Complaint {
         return resolvedBy;
     }
 
+    public String getResolutionNotes() {
+        return resolutionNotes;
+    }
+
     public String getResidentUsername() {
         return residentUsername;
     }
@@ -152,6 +167,7 @@ public class Complaint {
         return user;
     }
 
+    // ---- Setters ----
     public List<ComplaintComment> getComments() {
         return comments;
     }
@@ -204,6 +220,39 @@ public class Complaint {
 
     public void setResolutionNotes(String resolutionNotes) {
         this.resolutionNotes = resolutionNotes;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public void setAutoAssigned(boolean autoAssigned) {
+        this.autoAssigned = autoAssigned;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    // ---- Enums ----
+
+    public enum ComplaintStatus {
+        OPEN,
+        IN_PROGRESS,
+        RESOLVED,
+        CLOSED
+    }
+
+    public enum ComplaintCategory {
+        NOISE,
+        MAINTENANCE,
+        SECURITY,
+        CLEANLINESS,
+        PARKING,
+        UTILITIES,
+        OTHER
+    }
+
     }
 
     public void setPriority(String priority) {
