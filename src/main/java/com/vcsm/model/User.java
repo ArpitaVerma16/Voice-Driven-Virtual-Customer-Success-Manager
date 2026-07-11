@@ -69,6 +69,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Complaint> complaints = new ArrayList<>();
     
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<ComplaintComment> complaintComments = new ArrayList<>();
+    
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private VoicePrint voicePrint;
     
@@ -103,6 +106,7 @@ public class User {
     public boolean isSmsNotifications() { return smsNotifications; }
     public String getPhoneNumber() { return phoneNumber; }
     public List<Complaint> getComplaints() { return complaints; }
+    public List<ComplaintComment> getComplaintComments() { return complaintComments; }
     public VoicePrint getVoicePrint() { return voicePrint; }
     
     public boolean isDeleted() { return isDeleted; }
@@ -122,6 +126,7 @@ public class User {
     public void setSmsNotifications(boolean smsNotifications) { this.smsNotifications = smsNotifications; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setComplaints(List<Complaint> complaints) { this.complaints = complaints; }
+    public void setComplaintComments(List<ComplaintComment> complaintComments) { this.complaintComments = complaintComments; }
     public void setVoicePrint(VoicePrint voicePrint) { this.voicePrint = voicePrint; }
 
     public double getDissatisfactionScore() { return dissatisfactionScore; }
