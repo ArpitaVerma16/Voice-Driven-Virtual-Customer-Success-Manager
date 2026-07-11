@@ -47,7 +47,8 @@ public class OmnidimService {
 
     private final VoiceModelRegistryService voiceModelRegistryService;
 
-    private final VoiceAnalyticsService voiceAnalyticsService;
+    @Autowired
+    private AnalyticsEventProducer analyticsEventProducer;
 
     private final UserRepository userRepository;
 
@@ -125,7 +126,7 @@ public class OmnidimService {
                 voiceAnalyticsService.logCommand(user, redactedTranscript, intent, success, responseTime);
             }
         } catch (Exception e) {
-            log.warn("Failed to log voice analytics: {}", e.getMessage(), e);
+            log.warn("Failed to queue voice analytics event: {}", e.getMessage(), e);
         }
 
         Map<String, Object> result = new java.util.HashMap<>();
