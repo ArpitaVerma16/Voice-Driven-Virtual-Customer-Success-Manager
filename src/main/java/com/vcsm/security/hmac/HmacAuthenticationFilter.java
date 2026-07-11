@@ -9,32 +9,31 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Set;
 
 @Component
 public class HmacAuthenticationFilter extends OncePerRequestFilter {
 
-    private final SignatureValidator signatureValidator;
-    private final NonceCacheService nonceCacheService;
-
-    public HmacAuthenticationFilter(
-            SignatureValidator signatureValidator,
-            NonceCacheService nonceCacheService) {
-
-        this.signatureValidator = signatureValidator;
-        this.nonceCacheService = nonceCacheService;
-    }
-
     private static final Set<String> PROTECTED_PATHS =
             Set.of("/api/voice/command");
 
-    @Override
-    protected boolean shouldNotFilter(
-            HttpServletRequest request) {
+    private final SignatureValidator signatureValidator;
+    private final NonceCacheService nonceCacheService;
+    private final HmacTimestampValidator timestampValidator;
 
-        return !PROTECTED_PATHS.contains(
-                request.getRequestURI());
+    public HmacAuthenticationFilter(
+            SignatureValidator signatureValidator,
+            NonceCacheService nonceCacheService,
+            HmacTimestampValidator timestampValidator) {
+
+        this.signatureValidator = signatureValidator;
+        this.nonceCacheService = nonceCacheService;
+        this.timestampValidator = timestampValidator;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !PROTECTED_PATHS.contains(request.getRequestURI());
     }
 
     @Override
@@ -44,47 +43,33 @@ public class HmacAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String timestamp =
-                request.getHeader("X-Timestamp");
+        String timestamp = request.getHeader("X-Timestamp");
+        String nonce = request.getHeader("X-Nonce");
+        String signature = request.getHeader("X-Signature");
 
-        String nonce =
-                request.getHeader("X-Nonce");
-
-        String signature =
-                request.getHeader("X-Signature");
-
-        if (timestamp == null ||
-                nonce == null ||
-                signature == null) {
-
+        if (timestamp == null || nonce == null || signature == null) {
             response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    "Missing authentication headers");
-
+                    "Missing authentication headers"
+            );
             return;
         }
 
-        long currentTime =
-                Instant.now().getEpochSecond();
-
-        long requestTime =
-                Long.parseLong(timestamp);
-
-        if (Math.abs(currentTime - requestTime) > 300) {
-
+        // Reject expired, excessively future, or malformed timestamps
+        // before continuing with HMAC request processing.
+        if (!timestampValidator.isValid(timestamp)) {
             response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    "Request expired");
-
+                    "Invalid or expired request timestamp"
+            );
             return;
         }
 
         if (nonceCacheService.exists(nonce)) {
-
             response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    "Replay attack detected");
-
+                    "Replay attack detected"
+            );
             return;
         }
 
