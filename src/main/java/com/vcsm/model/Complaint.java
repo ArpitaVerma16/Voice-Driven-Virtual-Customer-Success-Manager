@@ -2,11 +2,15 @@ package com.vcsm.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "complaints")
 public class Complaint {
+
+    public static final int MAX_DESCRIPTION_LENGTH = 1000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +20,11 @@ public class Complaint {
     private String residentName;
 
     @NotBlank(message = "Description is required")
-    @Column(length = 1000)
+    @Size(
+            max = MAX_DESCRIPTION_LENGTH,
+            message = "Complaint description must not exceed 1000 characters"
+    )
+    @Column(length = MAX_DESCRIPTION_LENGTH)
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -50,7 +58,10 @@ public class Complaint {
 
     @PrePersist
     protected void onCreate() {
-        if (status == null) status = ComplaintStatus.OPEN;
+        if (status == null) {
+            status = ComplaintStatus.OPEN;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -61,48 +72,152 @@ public class Complaint {
     }
 
     // ---- Getters ----
-    public Long getId() { return id; }
-    public String getResidentName() { return residentName; }
-    public String getDescription() { return description; }
-    public ComplaintStatus getStatus() { return status; }
-    public ComplaintCategory getCategory() { return category; }
-    public String getApartmentNumber() { return apartmentNumber; }
-    public String getContactEmail() { return contactEmail; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public String getResolvedBy() { return resolvedBy; }
-    public String getResolutionNotes() { return resolutionNotes; }
-    public String getResidentUsername() { return residentUsername; }
-    public String getPriority() { return priority; }
-    public boolean isAutoAssigned() { return autoAssigned; }
-    public User getUser() { return user; }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getResidentName() {
+        return residentName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public ComplaintStatus getStatus() {
+        return status;
+    }
+
+    public ComplaintCategory getCategory() {
+        return category;
+    }
+
+    public String getApartmentNumber() {
+        return apartmentNumber;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getResolvedBy() {
+        return resolvedBy;
+    }
+
+    public String getResolutionNotes() {
+        return resolutionNotes;
+    }
+
+    public String getResidentUsername() {
+        return residentUsername;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public boolean isAutoAssigned() {
+        return autoAssigned;
+    }
+
+    public User getUser() {
+        return user;
+    }
 
     // ---- Setters ----
-    public void setId(Long id) { this.id = id; }
-    public void setResidentName(String residentName) { this.residentName = residentName; }
-    public void setDescription(String description) { this.description = description; }
-    public void setStatus(ComplaintStatus status) { this.status = status; }
-    public void setCategory(ComplaintCategory category) { this.category = category; }
-    public void setApartmentNumber(String apartmentNumber) { this.apartmentNumber = apartmentNumber; }
-    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-    public void setResolvedBy(String resolvedBy) { this.resolvedBy = resolvedBy; }
-    public void setResidentUsername(String residentUsername) { this.residentUsername = residentUsername; }
-    public void setResolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; }
-    public void setPriority(String priority) { this.priority = priority; }
-    public void setAutoAssigned(boolean autoAssigned) { this.autoAssigned = autoAssigned; }
-    public void setUser(User user) { this.user = user; }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setResidentName(String residentName) {
+        this.residentName = residentName;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStatus(ComplaintStatus status) {
+        this.status = status;
+    }
+
+    public void setCategory(ComplaintCategory category) {
+        this.category = category;
+    }
+
+    public void setApartmentNumber(String apartmentNumber) {
+        this.apartmentNumber = apartmentNumber;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setResolvedBy(String resolvedBy) {
+        this.resolvedBy = resolvedBy;
+    }
+
+    public void setResidentUsername(String residentUsername) {
+        this.residentUsername = residentUsername;
+    }
+
+    public void setResolutionNotes(String resolutionNotes) {
+        this.resolutionNotes = resolutionNotes;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public void setAutoAssigned(boolean autoAssigned) {
+        this.autoAssigned = autoAssigned;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     // ---- Enums ----
-    public enum ComplaintStatus { 
-        OPEN, IN_PROGRESS, RESOLVED, CLOSED 
+
+    public enum ComplaintStatus {
+        OPEN,
+        IN_PROGRESS,
+        RESOLVED,
+        CLOSED
     }
-    
-    public enum ComplaintCategory { 
-        NOISE, MAINTENANCE, SECURITY, CLEANLINESS, PARKING, UTILITIES, OTHER 
+
+    public enum ComplaintCategory {
+        NOISE,
+        MAINTENANCE,
+        SECURITY,
+        CLEANLINESS,
+        PARKING,
+        UTILITIES,
+        OTHER
     }
+
     public enum PriorityLevel {
-    CRITICAL, HIGH, MEDIUM, LOW
-}
+        CRITICAL,
+        HIGH,
+        MEDIUM,
+        LOW
+    }
 }
