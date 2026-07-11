@@ -1,7 +1,56 @@
+// ===== UTILITY: Disable button during request =====
+function setButtonLoading(buttonId, loading) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    if (loading) {
+        btn.disabled = true;
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Processing...';
+    } else {
+        btn.disabled = false;
+        if (btn.dataset.originalHtml) {
+            btn.innerHTML = btn.dataset.originalHtml;
+        }
+    }
+}
+
 // ===== VOICE ASSISTANT =====
 let recognition = null;
 let isRecording = false;
 let lastCommandId = null; // Store last command ID for feedback
+let recordingSeconds = 0;
+let recordingInterval = null;
+
+const STORAGE_KEY = "voiceConversationHistory";
+
+let conversationHistory =
+    JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    function saveConversation() {
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(conversationHistory)
+    );
+}
+
+function renderConversation() {
+    const container = document.getElementById("conversationHistory");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    conversationHistory.forEach(item => {
+        container.innerHTML += `
+            <div class="card mb-2">
+                <div class="card-body py-2">
+                    <strong>You:</strong> ${item.user}<br>
+                    <strong>Assistant:</strong> ${item.bot}
+                </div>
+            </div>
+        `;
+    });
+}
 
 function startVoice() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -25,28 +74,76 @@ function startVoice() {
         document.getElementById('micBtn').classList.add('btn-danger', 'recording');
         document.getElementById('micBtn').classList.remove('btn-purple');
         document.getElementById('micIcon').className = 'fas fa-stop';
+        if (typeof typingIndicator !== 'undefined') {
+    typingIndicator.showListening();
+}
     };
 
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('voiceInput').value = transcript;
-        sendCommand();
-    };
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('voiceInput').value = transcript;
+
+    if (typeof typingIndicator !== 'undefined') {
+        typingIndicator.showProcessing();
+    }
+
+    sendCommand();
+};
 
     recognition.onend = () => {
-        isRecording = false;
-        document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
-        document.getElementById('micBtn').classList.add('btn-purple');
-        document.getElementById('micIcon').className = 'fas fa-microphone';
-    };
+    isRecording = false;
 
     recognition.onerror = (e) => {
         console.error('Voice error:', e);
         isRecording = false;
+        if (typeof typingIndicator !== 'undefined') {
+            typingIndicator.hide();
+        }
     };
 
-    recognition.start();
-}
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+};
+
+   recognition.onerror = (e) => {
+    console.error('Voice error:', e);
+    isRecording = false;
+
+    document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
+    document.getElementById('micBtn').classList.add('btn-purple');
+    document.getElementById('micIcon').className = 'fas fa-microphone';
+
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+
+    if (typeof typingIndicator !== 'undefined') {
+        typingIndicator.hide();
+    }
+};
 
 function changePageSize(size) {
     const url = new URL(window.location.href);
@@ -65,6 +162,8 @@ async function sendCommand() {
         typingIndicator.showProcessing();
     }
 
+    setButtonLoading('sendBtn', true);
+
     try {
         const res = await fetch('/api/voice/command', {
             method: 'POST',
@@ -76,8 +175,28 @@ async function sendCommand() {
         const responseDiv = document.getElementById('voiceResponse');
         const responseText = document.getElementById('responseText');
         responseText.textContent = data.response || 'Command processed successfully!';
+        conversationHistory.push({
+    user: transcript,
+    bot: data.response || 'Command processed successfully!'
+});
+
+saveConversation();
+renderConversation();
         responseDiv.classList.remove('d-none');
         
+        // Handle offline local navigation matching
+        if (data.action) {
+            if (data.action === "nav_complaints") {
+                setTimeout(() => window.location.href = "/complaints", 1500);
+            } else if (data.action === "nav_events") {
+                setTimeout(() => window.location.href = "/events", 1500);
+            } else if (data.action === "nav_dashboard") {
+                setTimeout(() => window.location.href = "/", 1500);
+            } else if (data.action === "nav_profile") {
+                setTimeout(() => window.location.href = "/profile", 1500);
+            }
+        }
+
         // Store command ID for feedback
         if (data.id) {
             lastCommandId = data.id;
@@ -113,90 +232,10 @@ async function sendCommand() {
         if (typeof toast !== 'undefined') {
             toast.error('Error processing command', 'Error');
         }
-
-
+    } finally {
+        setButtonLoading('sendBtn', false);
     }
 }
-
-// Submit feedback for voice command
-function submitFeedback(type) {
-    if (!lastCommandId) {
-        if (typeof toast !== 'undefined') {
-            toast.error('No command to rate. Try a voice command first.', 'Error');
-        }
-        return;
-
-
-    }
-
-    const userId = localStorage.getItem('userId') || 1;
-
-    fetch(`/api/voice/feedback?commandId=${lastCommandId}&userId=${userId}&feedback=${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (typeof toast !== 'undefined') {
-                toast.success('Thank you for your feedback!', 'Feedback');
-            }
-            const feedbackDiv = document.getElementById('feedbackButtons');
-            if (feedbackDiv) {
-                feedbackDiv.innerHTML = '<span class="text-muted">✅ Feedback submitted</span>';
-            }
-        } else {
-            if (typeof toast !== 'undefined') {
-                toast.error('Error submitting feedback', 'Error');
-            }
-        }
-    })
-    .catch(err => {
-        if (typeof toast !== 'undefined') {
-            toast.error('Network error. Please try again.', 'Error');
-        }
-    });
-}
-
-// Submit feedback for voice command
-function submitFeedback(type) {
-    if (!lastCommandId) {
-        if (typeof toast !== 'undefined') {
-            toast.error('No command to rate. Try a voice command first.', 'Error');
-        }
-        return;
-
-    }
-
-    const userId = localStorage.getItem('userId') || 1;
-
-    fetch(`/api/voice/feedback?commandId=${lastCommandId}&userId=${userId}&feedback=${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (typeof toast !== 'undefined') {
-                toast.success('Thank you for your feedback!', 'Feedback');
-            }
-            const feedbackDiv = document.getElementById('feedbackButtons');
-            if (feedbackDiv) {
-                feedbackDiv.innerHTML = '<span class="text-muted">✅ Feedback submitted</span>';
-            }
-        } else {
-            if (typeof toast !== 'undefined') {
-                toast.error('Error submitting feedback', 'Error');
-            }
-        }
-    })
-    .catch(err => {
-        if (typeof toast !== 'undefined') {
-            toast.error('Network error. Please try again.', 'Error');
-        }
-    });
-}
-
 // Submit feedback for voice command
 function submitFeedback(type) {
     if (!lastCommandId) {
@@ -243,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') sendCommand();
         });
     }
+    renderConversation();
 });
 
 // ===== QUICK COMPLAINT (Dashboard) =====
@@ -263,9 +303,13 @@ async function quickFileComplaint() {
     const desc = document.getElementById('qDesc')?.value?.trim();
 
     if (!name || !desc) {
-        alert('Please fill in required fields (Name and Description).');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Please fill in required fields (Name and Description).', 'Validation');
+        }
         return;
     }
+
+    setButtonLoading('quickSubmitBtn', true);
 
     const complaint = {
         residentName: name,
@@ -292,6 +336,11 @@ async function quickFileComplaint() {
         }
     } catch (err) {
         console.error('Error filing complaint:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to file complaint. Please try again.', 'Error');
+        }
+    } finally {
+        setButtonLoading('quickSubmitBtn', false);
     }
 }
 
@@ -306,9 +355,13 @@ async function submitComplaint() {
     };
 
     if (!complaint.residentName || !complaint.description) {
-        alert('Please fill in required fields.');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Please fill in required fields.', 'Validation');
+        }
         return;
     }
+
+    setButtonLoading('submitComplaintBtn', true);
 
     try {
         const res = await fetch('/api/complaints', {
@@ -321,17 +374,30 @@ async function submitComplaint() {
         }
     } catch (err) {
         console.error('Error:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to submit complaint. Please try again.', 'Error');
+        }
+    } finally {
+        setButtonLoading('submitComplaintBtn', false);
     }
 }
 
 async function updateComplaintStatus(id) {
     const status = prompt('Enter new status (OPEN, IN_PROGRESS, RESOLVED, CLOSED):');
-    if (!status) return;
+    if (!status) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Status update cancelled.', 'Info');
+        }
+        return;
+    }
     try {
         await fetch(`/api/complaints/${id}/status?status=${status.toUpperCase()}`, { method: 'PUT', headers: withAuthHeaders() });
         location.reload();
     } catch (err) {
         console.error('Error updating status:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to update status. Please try again.', 'Error');
+        }
     }
 }
 
@@ -349,9 +415,13 @@ async function submitEvent() {
     };
 
     if (!event.name) {
-        alert('Event name is required.');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Event name is required.', 'Validation');
+        }
         return;
     }
+
+    setButtonLoading('submitEventBtn', true);
 
     try {
         const res = await fetch('/api/events', {
@@ -362,28 +432,37 @@ async function submitEvent() {
         if (res.ok) location.reload();
     } catch (err) {
         console.error('Error creating event:', err);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to create event. Please try again.', 'Error');
+        }
+    } finally {
+        setButtonLoading('submitEventBtn', false);
     }
 }
 
 async function registerEvent(id) {
+    setButtonLoading('registerBtn', true);
     try {
         const res = await fetch(`/api/events/${id}/register`, { method: 'POST', headers: withAuthHeaders() });
         if (res.ok) {
-            alert('Successfully registered for the event!');
+            if (typeof toast !== 'undefined') {
+                toast.success('Successfully registered for the event!', 'Registration');
+            }
             location.reload();
         } else {
             const msg = await res.text();
-            alert('Registration failed: ' + msg);
+            if (typeof toast !== 'undefined') {
+                toast.error('Registration failed: ' + msg, 'Error');
+            }
         }
     } catch (err) {
         console.error('Error registering:', err);
+    } finally {
+        setButtonLoading('registerBtn', false);
     }
-
-
-
 }
 
-}
+
 
 // ===== BULK OPERATIONS =====
 let selectedIds = [];
@@ -431,6 +510,8 @@ function bulkUpdateStatus() {
         return;
     }
 
+    setButtonLoading('bulkUpdateBtn', true);
+
     fetch('/api/complaints/bulk/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -456,7 +537,8 @@ function bulkUpdateStatus() {
         if (typeof toast !== 'undefined') {
             toast.error('Network error', 'Error');
         }
-    });
+    })
+    .finally(() => setButtonLoading('bulkUpdateBtn', false));
 }
 
 function bulkResolve() {
@@ -470,6 +552,8 @@ function bulkResolve() {
     if (!confirm('Are you sure you want to resolve ' + selectedIds.length + ' complaints?')) {
         return;
     }
+
+    setButtonLoading('bulkResolveBtn', true);
 
     fetch('/api/complaints/bulk/resolve', {
         method: 'POST',
@@ -496,7 +580,8 @@ function bulkResolve() {
         if (typeof toast !== 'undefined') {
             toast.error('Network error', 'Error');
         }
-    });
+    })
+    .finally(() => setButtonLoading('bulkResolveBtn', false));
 }
 
 // Event listeners for checkboxes
@@ -509,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-});
+
 
 // ===== WEBSOCKET NOTIFICATIONS =====
 let stompClient = null;
@@ -666,16 +751,13 @@ document.addEventListener('click', function(event) {
 
 // Connect WebSocket on page load (if not already connected)
 document.addEventListener('DOMContentLoaded', function() {
-    // Connect WebSocket after a small delay
     setTimeout(function() {
         connectWebSocket();
         updateNotificationCount();
     }, 500);
-
-
 });
 
 
-});
+
 
 

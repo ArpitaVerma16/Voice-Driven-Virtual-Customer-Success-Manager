@@ -21,7 +21,20 @@
 
     <properties>
         <java.version>17</java.version>
+        <spring-ai.version>0.8.1</spring-ai.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 
@@ -66,47 +79,15 @@
     <version>2.3.0</version>
 </dependency>
 
-<!-- Kafka for event processing -->
-<dependency>
-    <groupId>org.springframework.kafka</groupId>
-    <artifactId>spring-kafka</artifactId>
-</dependency>
-
-<!-- Web3j for Ethereum integration -->
-<dependency>
-    <groupId>org.web3j</groupId>
-    <artifactId>core</artifactId>
-    <version>4.9.5</version>
-</dependency>
-
-<!-- Smart contract support -->
-<dependency>
-    <groupId>org.web3j</groupId>
-    <artifactId>contract</artifactId>
-    <version>4.9.5</version>
-</dependency>
-
-<!-- MLflow for model tracking -->
-<dependency>
-    <groupId>org.mlflow</groupId>
-    <artifactId>mlflow-client</artifactId>
-    <version>2.9.0</version>
-
-</dependency>
 
 
-<!-- Bouncy Castle for hashing -->
-<dependency>
-    <groupId>org.bouncycastle</groupId>
-    <artifactId>bcprov-jdk15on</artifactId>
-    <version>1.70</version>
-</dependency>
-<!-- Google Cloud Translation -->
-<dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-translate</artifactId>
-    <version>2.6.0</version>
-</dependency>
+
+
+
+
+
+
+
 
 
 <!-- JSON processing -->
@@ -169,11 +150,11 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- JSON processing -->
+        <!-- PostgreSQL Database Driver -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- OpenAPI/Swagger Documentation -->
@@ -257,12 +238,7 @@
             <version>1.1.1</version>
         </dependency>
 
-        <!-- Google Authenticator for 2FA -->
-        <dependency>
-            <groupId>com.warrenstrange</groupId>
-            <artifactId>googleauth</artifactId>
-            <version>1.5.0</version>
-        </dependency>
+        
 
         <!-- QR Code Generation -->
         <dependency>
@@ -281,6 +257,31 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- Resilience4j Circuit Breaker -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <!-- Spring AI -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-pdf-document-reader</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
 

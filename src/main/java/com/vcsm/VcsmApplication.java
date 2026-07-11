@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
+@lombok.RequiredArgsConstructor
 public class VcsmApplication {
 
     @Autowired(required = false)

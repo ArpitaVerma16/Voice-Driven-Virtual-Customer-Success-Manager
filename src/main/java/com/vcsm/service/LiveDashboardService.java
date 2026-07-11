@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.model.Event;
@@ -13,25 +15,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class LiveDashboardService {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     // Active user tracking
     private final Map<String, Long> activeUsers = new ConcurrentHashMap<>();
     private final AtomicInteger totalActiveUsers = new AtomicInteger(0);
 
     // Live stats cache
-    private Map<String, Object> cachedStats = new HashMap<>();
+    private Map<String, Object> cachedStats = new ConcurrentHashMap<>();
     private long lastUpdateTime = 0;
 
     public Map<String, Object> getLiveStats() {
         // Refresh cache every 5 seconds
-        if (System.currentTimeMillis() - lastUpdateTime > 5000) {
+        if (System.currentTimeMillis() - lastUpdateTime > AppConstants.CACHE_REFRESH_MS) {
             refreshStats();
         }
         return cachedStats;

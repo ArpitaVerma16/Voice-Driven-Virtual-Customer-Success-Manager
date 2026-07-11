@@ -14,10 +14,10 @@ import java.io.ByteArrayInputStream;
 
 @RestController
 @RequestMapping("/api/export")
+@lombok.RequiredArgsConstructor
 public class ExportController {
 
-    @Autowired
-    private ExportService exportService;
+    private final ExportService exportService;
 
     @GetMapping("/complaints/csv")
     public ResponseEntity<InputStreamResource> exportComplaintsCSV() {

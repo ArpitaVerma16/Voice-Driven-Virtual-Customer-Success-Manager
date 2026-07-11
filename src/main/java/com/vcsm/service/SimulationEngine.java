@@ -6,20 +6,21 @@ import com.vcsm.model.Event;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class SimulationEngine {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     /**
      * Run simulation on digital twin
@@ -30,8 +31,8 @@ public class SimulationEngine {
         List<Event> prodEvents = eventRepository.findAll();
 
         // Apply scenario to twin data
-        List<Complaint> twinComplaints = applyScenario(prodComplaints, scenario);
-        List<Event> twinEvents = applyScenario(prodEvents, scenario);
+        List<Complaint> twinComplaints = applyScenarioToComplaints(prodComplaints, scenario);
+        List<Event> twinEvents = applyScenarioToEvents(prodEvents, scenario);
 
         // Run simulation
         long startTime = System.currentTimeMillis();
@@ -46,7 +47,7 @@ public class SimulationEngine {
         return result;
     }
 
-    private List<Complaint> applyScenario(List<Complaint> complaints, SimulationScenario scenario) {
+    private List<Complaint> applyScenarioToComplaints(List<Complaint> complaints, SimulationScenario scenario) {
         List<Complaint> simulated = complaints.stream()
             .map(c -> copyComplaint(c))
             .collect(Collectors.toList());
@@ -85,7 +86,7 @@ public class SimulationEngine {
         return simulated;
     }
 
-    private List<Event> applyScenario(List<Event> events, SimulationScenario scenario) {
+    private List<Event> applyScenarioToEvents(List<Event> events, SimulationScenario scenario) {
         List<Event> simulated = events.stream()
             .map(e -> copyEvent(e))
             .collect(Collectors.toList());
@@ -136,7 +137,7 @@ public class SimulationEngine {
             .count();
 
         long totalEvents = events.size();
-        long activeEvents = events.stream().filter(Event::isActive).count();
+        long activeEvents = events.stream().parallel().filter(Event::isActive).count();
 
         result.setTotalComplaints(totalComplaints);
         result.setResolvedComplaints(resolvedComplaints);

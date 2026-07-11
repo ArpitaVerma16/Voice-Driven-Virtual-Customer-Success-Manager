@@ -5,21 +5,23 @@ import com.vcsm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ProactiveOutreachService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(ProactiveOutreachService.class);
 
-    @Autowired
-    private UserBehaviorMonitor behaviorMonitor;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EmailService emailService;
+    private final UserBehaviorMonitor behaviorMonitor;
+
+    private final EmailService emailService;
 
     /**
      * Send proactive outreach to at-risk users
@@ -83,11 +85,11 @@ public class ProactiveOutreachService {
 
     private String getSubjectForRisk(int riskScore) {
         if (riskScore >= 70) {
-            return "🔴 We're Here to Help - Urgent Support Needed";
+            return org.springframework.http.ResponseEntity.ok("🔴 We're Here to Help - Urgent Support Needed");
         } else if (riskScore >= 40) {
-            return "🟡 We Noticed Your Recent Interactions - Let's Help";
+            return org.springframework.http.ResponseEntity.ok("🟡 We Noticed Your Recent Interactions - Let's Help");
         } else {
-            return "ℹ️ Check-in: How Are Things Going?";
+            return org.springframework.http.ResponseEntity.ok("ℹ️ Check-in: How Are Things Going?");
         }
     }
 
@@ -96,14 +98,15 @@ public class ProactiveOutreachService {
             emailService.sendSimpleEmail(user.getEmail(), subject, message);
             return true;
         } catch (Exception e) {
-            System.err.println("Failed to send email: " + e.getMessage());
+            log.error("Failed to send email: " + e.getMessage());
+            log.error("Failed to send email to {}: {}", user.getEmail(), e.getMessage(), e);
             return false;
         }
     }
 
     private boolean sendSms(User user, String message) {
         // SMS implementation placeholder
-        System.out.println("📱 SMS to " + user.getPhone() + ": " + message);
+        log.info("📱 SMS to " + user.getPhone() + ": " + message);
         return true;
     }
 
