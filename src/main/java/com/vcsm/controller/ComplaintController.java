@@ -112,7 +112,11 @@ public class ComplaintController {
         );
     }
 
-    @Operation(summary = "Get complaints by priority")
+    @Operation(summary = "Get complaints by priority", description = "Returns all complaints filtered by priority level (CRITICAL, HIGH, MEDIUM, LOW)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Complaints retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied for non-admin users")
+    })
     @GetMapping("/priority/{priority}")
     public ResponseEntity<List<Complaint>> getByPriority(@PathVariable String priority) {
         return ResponseEntity.ok(complaintService.getComplaintsByPriority(priority.toUpperCase()));
@@ -130,7 +134,11 @@ public class ComplaintController {
         );
     }
 
-    @Operation(summary = "Update complaint priority manually")
+    @Operation(summary = "Update complaint priority manually", description = "Allows admin to manually override the auto-assigned priority of a complaint")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Priority updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Complaint not found")
+    })
     @PutMapping("/{id}/priority")
     public ResponseEntity<Complaint> updatePriority(
             @PathVariable Long id,
