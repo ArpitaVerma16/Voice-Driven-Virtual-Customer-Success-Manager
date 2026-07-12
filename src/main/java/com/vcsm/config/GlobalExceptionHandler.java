@@ -3,8 +3,6 @@ package com.vcsm.config;
 import com.vcsm.dto.ErrorResponse;
 import com.vcsm.dto.ValidationErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,8 +22,6 @@ import java.util.Map;
 @RestControllerAdvice
 @lombok.extern.slf4j.Slf4j
 public class GlobalExceptionHandler {
-
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Resource Not Found (404)
     @ExceptionHandler({
@@ -198,16 +192,8 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        // Log the error for debugging
-        log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-        log.error("An unexpected error occurred", ex);
-
-        log.error("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(), ex);
-        
-            Exception ex, HttpServletRequest request) {
-        
         log.error("Unhandled exception {} at {}: {}", ex.getClass().getSimpleName(), request.getRequestURI(), ex.getMessage(), ex);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", false);
         response.put("error", "Internal Server Error");

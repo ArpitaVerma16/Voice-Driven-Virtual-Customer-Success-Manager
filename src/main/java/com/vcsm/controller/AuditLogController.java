@@ -3,6 +3,7 @@ package com.vcsm.controller;
 import com.vcsm.model.AuditLog;
 import com.vcsm.model.User;
 import com.vcsm.repository.UserRepository;
+import com.vcsm.security.model.UserRole;
 import com.vcsm.service.AuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -132,6 +133,8 @@ public class AuditLogController {
     private boolean isAdmin() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;
-        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return auth.getAuthorities().stream().anyMatch(a -> 
+            a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_AUDITOR"));
+        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.name()));
     }
 }

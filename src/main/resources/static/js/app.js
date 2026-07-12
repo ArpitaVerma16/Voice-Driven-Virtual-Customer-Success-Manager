@@ -1,7 +1,25 @@
+// ===== UTILITY: Disable button during request =====
+function setButtonLoading(buttonId, loading) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    if (loading) {
+        btn.disabled = true;
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Processing...';
+    } else {
+        btn.disabled = false;
+        if (btn.dataset.originalHtml) {
+            btn.innerHTML = btn.dataset.originalHtml;
+        }
+    }
+}
+
 // ===== VOICE ASSISTANT =====
 let recognition = null;
 let isRecording = false;
 let lastCommandId = null; // Store last command ID for feedback
+let recordingSeconds = 0;
+let recordingInterval = null;
 
 const STORAGE_KEY = "voiceConversationHistory";
 
@@ -73,11 +91,7 @@ function startVoice() {
 };
 
     recognition.onend = () => {
-        isRecording = false;
-        document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
-        document.getElementById('micBtn').classList.add('btn-purple');
-        document.getElementById('micIcon').className = 'fas fa-microphone';
-    };
+    isRecording = false;
 
     recognition.onerror = (e) => {
         console.error('Voice error:', e);
@@ -87,8 +101,49 @@ function startVoice() {
         }
     };
 
-    recognition.start();
-}
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+};
+
+   recognition.onerror = (e) => {
+    console.error('Voice error:', e);
+    isRecording = false;
+
+    document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
+    document.getElementById('micBtn').classList.add('btn-purple');
+    document.getElementById('micIcon').className = 'fas fa-microphone';
+
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+    }
+
+    recordingSeconds = 0;
+
+    const timer = document.getElementById('recordingTimer');
+    const time = document.getElementById('recordingTime');
+
+    if (timer && time) {
+        timer.style.display = 'none';
+        time.textContent = '00:00';
+    }
+
+    if (typeof typingIndicator !== 'undefined') {
+        typingIndicator.hide();
+    }
+};
 
 function changePageSize(size) {
     const url = new URL(window.location.href);
@@ -115,6 +170,8 @@ if (sendBtnText) {
     if (typeof typingIndicator !== 'undefined') {
         typingIndicator.showProcessing();
     }
+
+    setButtonLoading('sendBtn', true);
 
     try {
         const res = await fetch('/api/voice/command', {
@@ -183,17 +240,15 @@ if (sendBtnText) {
         input.value = '';
 
     } catch (err) {
-    console.error('Error sending command:', err);
-
-    if (typeof typingIndicator !== 'undefined') {
-        typingIndicator.hide();
-    }
-
-    sendBtn.disabled = false;
-    sendBtn.classList.remove('disabled');
-
-    if (sendBtnText) {
-        sendBtnText.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+        console.error('Error sending command:', err);
+        if (typeof typingIndicator !== 'undefined') {
+            typingIndicator.hide();
+        }
+        if (typeof toast !== 'undefined') {
+            toast.error('Error processing command', 'Error');
+        }
+    } finally {
+        setButtonLoading('sendBtn', false);
     }
 }
 // Submit feedback for voice command
@@ -269,6 +324,8 @@ async function quickFileComplaint() {
         return;
     }
 
+    setButtonLoading('quickSubmitBtn', true);
+
     const complaint = {
         residentName: name,
         apartmentNumber: apt || null,
@@ -297,6 +354,8 @@ async function quickFileComplaint() {
         if (typeof toast !== 'undefined') {
             toast.error('Failed to file complaint. Please try again.', 'Error');
         }
+    } finally {
+        setButtonLoading('quickSubmitBtn', false);
     }
 }
 
@@ -317,6 +376,8 @@ async function submitComplaint() {
         return;
     }
 
+    setButtonLoading('submitComplaintBtn', true);
+
     try {
         const res = await fetch('/api/complaints', {
             method: 'POST',
@@ -331,6 +392,8 @@ async function submitComplaint() {
         if (typeof toast !== 'undefined') {
             toast.error('Failed to submit complaint. Please try again.', 'Error');
         }
+    } finally {
+        setButtonLoading('submitComplaintBtn', false);
     }
 }
 
@@ -373,6 +436,8 @@ async function submitEvent() {
         return;
     }
 
+    setButtonLoading('submitEventBtn', true);
+
     try {
         const res = await fetch('/api/events', {
             method: 'POST',
@@ -385,10 +450,13 @@ async function submitEvent() {
         if (typeof toast !== 'undefined') {
             toast.error('Failed to create event. Please try again.', 'Error');
         }
+    } finally {
+        setButtonLoading('submitEventBtn', false);
     }
 }
 
 async function registerEvent(id) {
+    setButtonLoading('registerBtn', true);
     try {
         const res = await fetch(`/api/events/${id}/register`, { method: 'POST', headers: withAuthHeaders() });
         if (res.ok) {
@@ -404,10 +472,9 @@ async function registerEvent(id) {
         }
     } catch (err) {
         console.error('Error registering:', err);
+    } finally {
+        setButtonLoading('registerBtn', false);
     }
-
-
-
 }
 
 
@@ -458,6 +525,8 @@ function bulkUpdateStatus() {
         return;
     }
 
+    setButtonLoading('bulkUpdateBtn', true);
+
     fetch('/api/complaints/bulk/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -483,7 +552,8 @@ function bulkUpdateStatus() {
         if (typeof toast !== 'undefined') {
             toast.error('Network error', 'Error');
         }
-    });
+    })
+    .finally(() => setButtonLoading('bulkUpdateBtn', false));
 }
 
 function bulkResolve() {
@@ -497,6 +567,8 @@ function bulkResolve() {
     if (!confirm('Are you sure you want to resolve ' + selectedIds.length + ' complaints?')) {
         return;
     }
+
+    setButtonLoading('bulkResolveBtn', true);
 
     fetch('/api/complaints/bulk/resolve', {
         method: 'POST',
@@ -523,7 +595,8 @@ function bulkResolve() {
         if (typeof toast !== 'undefined') {
             toast.error('Network error', 'Error');
         }
-    });
+    })
+    .finally(() => setButtonLoading('bulkResolveBtn', false));
 }
 
 // Event listeners for checkboxes
@@ -693,15 +766,11 @@ document.addEventListener('click', function(event) {
 
 // Connect WebSocket on page load (if not already connected)
 document.addEventListener('DOMContentLoaded', function() {
-    // Connect WebSocket after a small delay
     setTimeout(function() {
         connectWebSocket();
         updateNotificationCount();
     }, 500);
-
-
-})};
-
+});
 
 
 

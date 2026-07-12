@@ -1,8 +1,10 @@
 package com.vcsm.controller;
 
 import com.vcsm.dto.ErrorResponse;
+import com.vcsm.dto.ComplaintCommentDTO;
 import com.vcsm.model.Complaint;
 import com.vcsm.service.ComplaintService;
+import com.vcsm.service.ComplaintCommentService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +32,7 @@ import java.util.Map;
 public class ComplaintController {
 
     private final ComplaintService complaintService;
+    private final ComplaintCommentService complaintCommentService;
 
     @Operation(summary = "File a new complaint", description = "Creates a new complaint")
     @ApiResponses(value = {
@@ -109,7 +112,11 @@ public class ComplaintController {
         );
     }
 
-    @Operation(summary = "Get complaints by priority")
+    @Operation(summary = "Get complaints by priority", description = "Returns all complaints filtered by priority level (CRITICAL, HIGH, MEDIUM, LOW)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Complaints retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied for non-admin users")
+    })
     @GetMapping("/priority/{priority}")
     public ResponseEntity<List<Complaint>> getByPriority(@PathVariable String priority) {
         return ResponseEntity.ok(complaintService.getComplaintsByPriority(priority.toUpperCase()));
@@ -127,7 +134,11 @@ public class ComplaintController {
         );
     }
 
-    @Operation(summary = "Update complaint priority manually")
+    @Operation(summary = "Update complaint priority manually", description = "Allows admin to manually override the auto-assigned priority of a complaint")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Priority updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Complaint not found")
+    })
     @PutMapping("/{id}/priority")
     public ResponseEntity<Complaint> updatePriority(
             @PathVariable Long id,
@@ -158,6 +169,22 @@ public class ComplaintController {
     @GetMapping("/stats/priority")
     public ResponseEntity<Map<String, Long>> getPriorityStats() {
         return ResponseEntity.ok(complaintService.getPriorityStats());
+    }
+
+    // ===== COMMENTS ENDPOINTS =====
+    @Operation(summary = "Get comments for a complaint")
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<ComplaintCommentDTO>> getComments(@PathVariable Long id) {
+        return ResponseEntity.ok(complaintCommentService.getCommentsForComplaint(id));
+    }
+
+    @Operation(summary = "Add a comment to a complaint")
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<ComplaintCommentDTO> addComment(
+            @PathVariable Long id, 
+            @RequestBody Map<String, String> payload) {
+        String content = payload.get("content");
+        return ResponseEntity.ok(complaintCommentService.addComment(id, content));
     }
 
     @ExceptionHandler(IllegalStateException.class)

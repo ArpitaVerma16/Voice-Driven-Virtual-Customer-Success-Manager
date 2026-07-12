@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class FederatedTransferService {
+    private static final Logger log = LoggerFactory.getLogger(FederatedTransferService.class);
 
     private final DomainAdapter domainAdapter;
 
@@ -37,7 +40,7 @@ public class FederatedTransferService {
         FederatedNode target = nodes.get(targetNodeId);
 
         if (source == null || target == null) {
-            throw new RuntimeException("Node not found");
+            throw new CustomDomainException("Node not found");
         }
 
         roundNumber++;
@@ -75,7 +78,7 @@ public class FederatedTransferService {
         FederatedNode target = nodes.get(targetNodeId);
 
         if (source == null || target == null) {
-            throw new RuntimeException("Node not found");
+            throw new CustomDomainException("Node not found");
         }
 
         double similarity = domainAdapter.getDomainSimilarity(source.getDomain(), target.getDomain());
@@ -126,7 +129,7 @@ public class FederatedTransferService {
      */
     @Scheduled(fixedDelay = 300000) // 5 minutes
     public void autoTransfer() {
-        System.out.println("🔄 Auto-triggering federated transfer learning...");
+        log.info("🔄 Auto-triggering federated transfer learning...");
         List<FederatedNode> nodeList = getAllNodes();
         if (nodeList.size() >= 2) {
             // Transfer from first node to second

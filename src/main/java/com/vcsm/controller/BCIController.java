@@ -1,6 +1,7 @@
 package com.vcsm.controller;
 
 import com.vcsm.bci.BCIService;
+import com.vcsm.security.model.UserRole;
 import com.vcsm.security.service.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class BCIController {
             return false;
         }
         boolean isAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.name()));
         if (isAdmin) {
             return true;
         }

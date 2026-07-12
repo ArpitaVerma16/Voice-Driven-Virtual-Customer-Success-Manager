@@ -14,15 +14,20 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class IvrService {
+    private static final Logger log = LoggerFactory.getLogger(IvrService.class);
 
     private final IvrFlowConfigRepository configRepository;
 
     private final IvrSessionRepository sessionRepository;
 
     private final ObjectMapper objectMapper;
+
+    private final ConversationContextCache contextCache;
 
     private static final String DEFAULT_FLOW = "{\n" +
             "  \"id\": \"root\",\n" +
@@ -82,7 +87,7 @@ public class IvrService {
             try {
                 return objectMapper.readValue(DEFAULT_FLOW, IvrNode.class);
             } catch (Exception ex) {
-                throw new RuntimeException("Fallback default flow is invalid: " + ex.getMessage());
+                throw new CustomDomainException("Fallback default flow is invalid: " + ex.getMessage());
             }
         }
     }
@@ -107,6 +112,7 @@ public class IvrService {
         // 1. Reset check
         if (lower.equals("reset") || lower.equals("restart") || lower.equals("menu") || lower.equals("hello") || lower.equals("hi")) {
             sessionRepository.deleteByUserEmail(userEmail);
+            contextCache.clearContext(userEmail); // Reset conversational memory
             IvrSession session = new IvrSession(userEmail, rootNode.getId());
             sessionRepository.save(session);
 
@@ -132,18 +138,22 @@ public class IvrService {
             sessionRepository.save(session);
         }
 
-        // 3. Match transcript against children (options)
+        // Add current turn to conversation context cache and get combined context
+        contextCache.addContext(userEmail, lower);
+        String combinedContext = contextCache.getContext(userEmail);
+
+        // 3. Match transcript against children (options) using multi-turn context
         IvrNode matchedChild = null;
         if (currentNode.getOptions() != null) {
             for (IvrNode child : currentNode.getOptions()) {
                 String patternStr = "(?i).*(" + child.getPattern() + ").*";
                 try {
-                    if (Pattern.matches(patternStr, lower)) {
+                    if (Pattern.matches(patternStr, combinedContext)) {
                         matchedChild = child;
                         break;
                     }
                 } catch (Exception e) {
-                    if (lower.contains(child.getPattern().toLowerCase())) {
+                    if (combinedContext.contains(child.getPattern().toLowerCase())) {
                         matchedChild = child;
                         break;
                     }
@@ -165,6 +175,7 @@ public class IvrService {
 
             if (matchedChild.getAction() != null || matchedChild.getOptions() == null || matchedChild.getOptions().isEmpty()) {
                 sessionRepository.deleteByUserEmail(userEmail);
+                contextCache.clearContext(userEmail);
             }
         } else {
             response.put("prompt", "Sorry, I didn't catch that. " + currentNode.getPrompt());

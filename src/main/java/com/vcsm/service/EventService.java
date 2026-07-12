@@ -16,9 +16,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @lombok.RequiredArgsConstructor
 public class EventService {
+    private static final Logger log = LoggerFactory.getLogger(EventService.class);
 
     private final EventRepository eventRepository;
 
@@ -81,16 +84,16 @@ public class EventService {
 
         // Event inactive
         if (!event.isActive()) {
-            throw new RuntimeException("Event is not active");
+            throw new CustomDomainException("Event is not active");
         }
         // Event already happened
         if (event.getEventDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Registration closed. Event already started.");
+            throw new CustomDomainException("Registration closed. Event already started.");
         }
 
         // Check if already registered
         if (eventRegistrationRepository.existsByUserAndEvent(user, event)) {
-            throw new RuntimeException("User already registered for this event");
+            throw new CustomDomainException("User already registered for this event");
         }
 
         // Capacity validation
@@ -110,7 +113,7 @@ public class EventService {
         try {
             registration = eventRegistrationRepository.saveAndFlush(registration);
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            throw new RuntimeException("User already registered for this event");
+            throw new CustomDomainException("User already registered for this event");
         }
 
         // Generate signed ticket token

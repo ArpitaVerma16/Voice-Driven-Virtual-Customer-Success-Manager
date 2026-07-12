@@ -36,6 +36,16 @@ public class WebController {
 
     private final com.vcsm.repository.UserRepository userRepository;
 
+    @org.springframework.web.bind.annotation.ModelAttribute("userRole")
+    public String getUserRole(org.springframework.security.core.Authentication auth) {
+        if (auth == null) return "ROLE_USER";
+        return auth.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .filter(role -> role.equals("ROLE_ADMIN") || role.equals("ROLE_AUDITOR"))
+                .findFirst()
+                .orElse("ROLE_USER");
+    }
+
     @GetMapping("/landing")
     public String landing() {
         return org.springframework.http.ResponseEntity.ok("landing");

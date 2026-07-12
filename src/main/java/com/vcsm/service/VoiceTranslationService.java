@@ -93,7 +93,7 @@ public class VoiceTranslationService {
             }
             
         } catch (Exception e) {
-            throw new RuntimeException("Translation API call failed", e);
+            throw new CustomDomainException("Translation API call failed", e);
         }
     }
 

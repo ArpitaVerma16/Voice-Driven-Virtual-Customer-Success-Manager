@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -68,6 +70,9 @@ public class Complaint {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "complaint", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ComplaintComment> comments = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -147,6 +152,10 @@ public class Complaint {
         return user;
     }
 
+    public List<ComplaintComment> getComments() {
+        return comments;
+    }
+
     // ---------------- Setters ----------------
 
     public void setId(Long id) {
@@ -207,6 +216,10 @@ public class Complaint {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setComments(List<ComplaintComment> comments) {
+        this.comments = comments;
     }
 
     // ---------------- Helper Methods ----------------

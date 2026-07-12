@@ -118,7 +118,7 @@ public class SchedulingOptimizer {
      */
     public VenueReservation bookVenue(String venueName, User user, LocalDateTime start, LocalDateTime end) {
         if (hasConflict(venueName, start, end)) {
-            throw new RuntimeException("Conflict detected for venue " + venueName);
+            throw new CustomDomainException("Conflict detected for venue " + venueName);
         }
         VenueReservation res = new VenueReservation(venueName, user, start, end);
         return venueReservationRepository.save(res);

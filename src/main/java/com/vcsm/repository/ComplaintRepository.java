@@ -123,3 +123,5 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>,
             @Param("cutoff") LocalDateTime cutoff
     );
 }
+
+    }

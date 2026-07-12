@@ -4,6 +4,7 @@ import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.UserRepository;
+import com.vcsm.security.model.UserRole;
 import com.vcsm.specification.ComplaintSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,24 @@ import org.slf4j.LoggerFactory;
 public class ComplaintService {
 
     private static final Logger log = LoggerFactory.getLogger(ComplaintService.class);
+
+    private static final double SIMILARITY_THRESHOLD = 0.65;
+
+    public static class DuplicateResult {
+        private final boolean isDuplicate;
+        private final List<Complaint> similarComplaints;
+        private final double highestSimilarity;
+
+        public DuplicateResult(boolean isDuplicate, List<Complaint> similarComplaints, double highestSimilarity) {
+            this.isDuplicate = isDuplicate;
+            this.similarComplaints = similarComplaints;
+            this.highestSimilarity = highestSimilarity;
+        }
+
+        public boolean isDuplicate() { return isDuplicate; }
+        public List<Complaint> getSimilarComplaints() { return similarComplaints; }
+        public double getHighestSimilarity() { return highestSimilarity; }
+    }
 
     private final ComplaintRepository complaintRepository;
 
@@ -50,18 +69,10 @@ public class ComplaintService {
         }
     }
 
-    private void safelyExecute(Runnable operation, String description) {
-        try {
-            operation.run();
-        } catch (Exception e) {
-            log.log(Level.SEVERE, "Failed: " + description, e);
-        }
-    }
-
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;
-        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.name()));
     }
 
     private String currentUsername() {
@@ -84,10 +95,79 @@ public class ComplaintService {
         return userRepository.findByEmail(username).orElse(null);
     }
 
+    private Map<String, Integer> buildWordFrequency(String text) {
+        Map<String, Integer> freq = new HashMap<>();
+        if (text == null || text.isBlank()) return freq;
+        String[] words = text.toLowerCase()
+            .replaceAll("[^a-zA-Z0-9\\s]", "")
+            .split("\\s+");
+        for (String word : words) {
+            if (word.length() > 2) {
+                freq.put(word, freq.getOrDefault(word, 0) + 1);
+            }
+        }
+        return freq;
+    }
+
+    private double cosineSimilarity(Map<String, Integer> vec1, Map<String, Integer> vec2) {
+        if (vec1.isEmpty() || vec2.isEmpty()) return 0.0;
+        Set<String> allWords = new HashSet<>(vec1.keySet());
+        allWords.addAll(vec2.keySet());
+        double dotProduct = 0.0, mag1 = 0.0, mag2 = 0.0;
+        for (String word : allWords) {
+            int w1 = vec1.getOrDefault(word, 0);
+            int w2 = vec2.getOrDefault(word, 0);
+            dotProduct += w1 * w2;
+            mag1 += w1 * w1;
+            mag2 += w2 * w2;
+        }
+        double magnitude = Math.sqrt(mag1) * Math.sqrt(mag2);
+        return magnitude == 0.0 ? 0.0 : dotProduct / magnitude;
+    }
+
+    public DuplicateResult detectDuplicates(Complaint complaint) {
+        String newDesc = complaint.getDescription();
+        String newCategory = complaint.getCategory() != null ? complaint.getCategory().name() : null;
+        Map<String, Integer> newVec = buildWordFrequency(newDesc);
+
+        List<Complaint> similarComplaints = new ArrayList<>();
+        double highestSimilarity = 0.0;
+
+        List<Complaint> existingComplaints = complaintRepository.findByStatus(Complaint.ComplaintStatus.OPEN);
+        if (newCategory != null) {
+            existingComplaints.addAll(complaintRepository.findByCategory(complaint.getCategory()));
+        }
+
+        Set<Long> seenIds = new HashSet<>();
+        for (Complaint existing : existingComplaints) {
+            if (existing.getId() != null && !seenIds.add(existing.getId())) continue;
+            if (existing.getId().equals(complaint.getId())) continue;
+
+            Map<String, Integer> existingVec = buildWordFrequency(existing.getDescription());
+            double similarity = cosineSimilarity(newVec, existingVec);
+
+            if (similarity >= SIMILARITY_THRESHOLD) {
+                similarComplaints.add(existing);
+            }
+            if (similarity > highestSimilarity) {
+                highestSimilarity = similarity;
+            }
+        }
+
+        boolean isDuplicate = !similarComplaints.isEmpty() && highestSimilarity >= SIMILARITY_THRESHOLD;
+        return new DuplicateResult(isDuplicate, similarComplaints, highestSimilarity);
+    }
+
     @Transactional
     public Complaint fileComplaint(Complaint complaint) {
         String username = currentUsername();
-        if (username == null) throw new RuntimeException("Unauthorized");
+        if (username == null) throw new CustomDomainException("Unauthorized");
+
+        DuplicateResult duplicateCheck = detectDuplicates(complaint);
+        if (duplicateCheck.isDuplicate()) {
+            log.warn("Potential duplicate complaint detected for user: {}. Similarity: {}",
+                username, String.format("%.2f", duplicateCheck.getHighestSimilarity()));
+        }
 
         complaint.setResidentUsername(username);
         

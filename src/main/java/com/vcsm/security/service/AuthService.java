@@ -29,7 +29,7 @@ public class AuthService {
 
     public AuthResponse signupResident(AuthRequest req) {
         if (userRepository.existsByUsername(req.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new CustomDomainException("Username already exists");
         }
         AppUser user = new AppUser();
         user.setUsername(req.getUsername());
@@ -44,6 +44,8 @@ public class AuthService {
             .map(Enum::name)
             .orElse("ROLE_RESIDENT");
         return new AuthResponse(token, refreshToken, user.getUsername(), role);
+            .orElse(UserRole.ROLE_RESIDENT.name());
+        return new AuthResponse(token, null, user.getUsername(), role);
     }
 
     public AuthResponse login(AppUser user) {

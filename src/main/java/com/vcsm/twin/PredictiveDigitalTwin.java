@@ -49,7 +49,7 @@ public class PredictiveDigitalTwin {
     public PredictionResult predictFuture(String twinId, int timeHorizon) {
         TwinInstance twin = twins.get(twinId);
         if (twin == null) {
-            throw new RuntimeException("Twin not found");
+            throw new CustomDomainException("Twin not found");
         }
 
         List<HistoricalData> hist = history.get(twinId);
@@ -125,7 +125,7 @@ public class PredictiveDigitalTwin {
     public AnomalyPrediction predictAnomalies(String twinId) {
         TwinInstance twin = twins.get(twinId);
         if (twin == null) {
-            throw new RuntimeException("Twin not found");
+            throw new CustomDomainException("Twin not found");
         }
 
         List<HistoricalData> hist = history.get(twinId);
@@ -176,7 +176,7 @@ public class PredictiveDigitalTwin {
     public ResourceForecast forecastResources(String twinId, int days) {
         TwinInstance twin = twins.get(twinId);
         if (twin == null) {
-            throw new RuntimeException("Twin not found");
+            throw new CustomDomainException("Twin not found");
         }
 
         List<HistoricalData> hist = history.get(twinId);

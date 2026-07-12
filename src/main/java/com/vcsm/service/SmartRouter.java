@@ -7,7 +7,7 @@ import com.vcsm.model.User;
 import com.vcsm.ml.TicketClassifier;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,8 +23,8 @@ public class SmartRouter {
 
     private final UserRepository userRepository;
 
-    // Admin expertise mapping
-    private static final Map<String, List<String>> ADMIN_EXPERTISE = new HashMap<>();
+    @Value("#{${router.admin.expertise:{'admin@example.com':['NOISE','MAINTENANCE','SECURITY'],'security@example.com':['SECURITY','PARKING'],'maintenance@example.com':['MAINTENANCE','UTILITIES']}}}")
+    private Map<String, List<String>> adminExpertise;
 
     static {
         ADMIN_EXPERTISE.put(AppConstants.ADMIN_EMAIL, Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
@@ -86,40 +86,57 @@ public class SmartRouter {
         if (containsAny(lower, "water", "leak", "flood", "power", "outage")) urgency += 15;
         if (containsAny(lower, "again", "repeat", "still", "not fixed")) urgency += 10;
 
-        return Math.min(100, urgency);
+return Math.min(100, urgency);
     }
 
-    // Replaced by ComplaintRoutingUtils.containsAny()
+    private boolean containsAny(String text, String... keywords) {
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) return true;
+        }
         return false;
     }
 
     private User findBestAdmin(String category) {
-        // Find admin with matching expertise
-        for (Map.Entry<String, List<String>> entry : ADMIN_EXPERTISE.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : adminExpertise.entrySet()) {
             if (entry.getValue().contains(category)) {
                 return userRepository.findByEmail(entry.getKey()).orElse(null);
             }
         }
         // Fallback to first admin
         return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
+        String firstAdmin = adminExpertise.keySet().iterator().next();
+        return userRepository.findByEmail(firstAdmin).orElse(null);
     }
 
-    // Replaced by ComplaintRoutingUtils.findSimilarComplaints()
-                return matches >= 2;
-            })
-            .limit(5)
-            .collect(Collectors.toList());
+    private List<Complaint> findDuplicates(Complaint complaint) {
+        return complaintRepository.findByCategory(complaint.getCategory()).stream()
+                .filter(c -> !c.getId().equals(complaint.getId()))
+                .filter(c -> c.getDescription() != null && complaint.getDescription() != null
+                        && similarity(c.getDescription(), complaint.getDescription()) >= 0.7)
+                .limit(5)
+                .collect(Collectors.toList());
+    }
+
+    private double similarity(String a, String b) {
+        if (a == null || b == null) return 0.0;
+        Set<String> wordsA = new HashSet<>(Arrays.asList(a.toLowerCase().split("\\s+")));
+        Set<String> wordsB = new HashSet<>(Arrays.asList(b.toLowerCase().split("\\s+")));
+        Set<String> intersection = new HashSet<>(wordsA);
+        intersection.retainAll(wordsB);
+        Set<String> union = new HashSet<>(wordsA);
+        union.addAll(wordsB);
+        return union.isEmpty() ? 0.0 : (double) intersection.size() / union.size();
     }
 
     private String generateRecommendation(String category, int urgency) {
         if (urgency >= 80) {
-            return org.springframework.http.ResponseEntity.ok("⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.");
+            return "⚠️ CRITICAL: Immediate action required. Escalate to admin and notify resident.";
         } else if (urgency >= 60) {
-            return org.springframework.http.ResponseEntity.ok("🔴 HIGH: Priority action needed within 4 hours.");
+            return "🔴 HIGH: Priority action needed within 4 hours.";
         } else if (urgency >= 40) {
-            return org.springframework.http.ResponseEntity.ok("🟡 MEDIUM: Normal priority. Handle within 24 hours.");
+            return "🟡 MEDIUM: Normal priority. Handle within 24 hours.";
         } else {
-            return org.springframework.http.ResponseEntity.ok("🟢 LOW: Standard priority. Handle within 48 hours.");
+            return "🟢 LOW: Standard priority. Handle within 48 hours.";
         }
     }
 
