@@ -1,5 +1,6 @@
 package com.vcsm.security;
 
+import org.springframework.core.env.Environment;
 import com.vcsm.security.hmac.HmacAuthenticationFilter;
 import com.vcsm.security.jwt.JwtAuthFilter;
 import com.vcsm.security.service.UserDetailsServiceImpl;
@@ -31,6 +32,8 @@ import java.util.Arrays;
 @EnableMethodSecurity
 @lombok.RequiredArgsConstructor
 public class SecurityConfig {
+    @Autowired
+    private Environment environment;
 
     private final JwtAuthFilter jwtAuthFilter;
 
@@ -82,6 +85,10 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+        boolean isDevProfile = Arrays.asList(
+                environment.getActiveProfiles()
+        ).contains("dev");
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -103,7 +110,12 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
-        return http.build();
+    if (isDevProfile) {
+        http.headers(headers ->
+                headers.frameOptions(frameOptions ->
+                        frameOptions.sameOrigin()
+                )
+        );
     }
 
     public CorsConfigurationSource corsConfigurationSource() {
