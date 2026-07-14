@@ -1,5 +1,6 @@
 package com.vcsm.security;
 
+import org.springframework.core.env.Environment;
 import com.vcsm.security.hmac.HmacAuthenticationFilter;
 import com.vcsm.security.jwt.JwtAuthFilter;
 import com.vcsm.security.service.UserDetailsServiceImpl;
@@ -31,6 +32,8 @@ import java.util.Arrays;
 @EnableMethodSecurity
 @lombok.RequiredArgsConstructor
 public class SecurityConfig {
+    @Autowired
+    private Environment environment;
 
     private final JwtAuthFilter jwtAuthFilter;
 
@@ -82,30 +85,71 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+        boolean isDevProfile = Arrays.asList(
+                environment.getActiveProfiles()
+        ).contains("dev");
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/landing", "/login", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/", "/complaints/**", "/events/**", "/analytics/**", "/interaction-history/**", "/voice-analytics/**").authenticated()
-                        .requestMatchers("/chatbot/**", "/voice-templates/**").authenticated()
-                        .requestMatchers("/profile/**", "/onboarding/**").authenticated()
-                        .requestMatchers("/audit-logs/**").hasAnyRole("ADMIN", "AUDITOR")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/landing")
-                        .permitAll()
-                );
+                .authorizeHttpRequests(auth -> {
+                     if (isDevProfile) {
+                         auth.requestMatchers("/h2-console/**").permitAll();
+                     } else {
+                        auth.requestMatchers("/h2-console/**").denyAll();
+                     }
 
-        return http.build();
+                     auth
+                              .requestMatchers(
+                          "/landing",
+                                      "/login",
+                                      "/signup",
+                                      "/css/**",
+                                      "/js/**",
+                                      "/images/**",
+                                      "/favicon.ico"
+                                ).permitAll()
+                                .requestMatchers(
+                                "/",
+                                "/complaints/**",
+                                "/events/**",
+                                "/analytics/**",
+                                "/interaction-history/**",
+                                "/voice-analytics/**"
+                        ).authenticated()
+                        .requestMatchers(
+                                "/chatbot/**",
+                                "/voice-templates/**"
+                        ).authenticated()
+                        .requestMatchers(
+                                "/profile/**",
+                                "/onboarding/**"
+                        ).authenticated()
+                        .requestMatchers("/audit-logs/**").hasRole("ADMIN")
+                        .anyRequest().authenticated();
+            })
+            .formLogin(form -> form
+                    .loginPage("/login")
+                    .defaultSuccessUrl("/", true)
+                    .permitAll()
+            )
+            .logout(logout -> logout
+                    .logoutSuccessUrl("/landing")
+                    .permitAll()
+            );
+
+    if (isDevProfile) {
+        http.headers(headers ->
+                headers.frameOptions(frameOptions ->
+                        frameOptions.sameOrigin()
+                )
+        );
     }
 
+    return http.build();
+}
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
