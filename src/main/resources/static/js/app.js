@@ -156,6 +156,15 @@ async function sendCommand() {
     const input = document.getElementById('voiceInput');
     const transcript = input.value.trim();
     if (!transcript) return;
+    const sendBtn = document.getElementById('sendBtn');
+const sendBtnText = sendBtn?.querySelector('.btn-text');
+
+sendBtn.disabled = true;
+sendBtn.classList.add('disabled');
+
+if (sendBtnText) {
+    sendBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+}
 
     // Show typing indicator if available
     if (typeof typingIndicator !== 'undefined') {
@@ -221,6 +230,12 @@ renderConversation();
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
         }
+        sendBtn.disabled = false;
+sendBtn.classList.remove('disabled');
+
+if (sendBtnText) {
+    sendBtnText.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+}
 
         input.value = '';
 
