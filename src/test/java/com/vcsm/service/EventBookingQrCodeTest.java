@@ -55,7 +55,6 @@ public class EventBookingQrCodeTest {
         testUser = new User();
         testUser.setName("John Doe");
         testUser.setEmail("john.doe@example.com");
-        testUser.setPassword("hashedpassword");
         testUser.setEmailNotifications(true);
         testUser = userRepository.saveAndFlush(testUser);
 
@@ -103,7 +102,7 @@ public class EventBookingQrCodeTest {
         com.vcsm.security.service.CustomUserDetails principal = new com.vcsm.security.service.CustomUserDetails(
             testUser.getId(),
             testUser.getEmail(),
-            testUser.getPassword(),
+            "dummy-placeholder",
             java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))
         );
         org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(

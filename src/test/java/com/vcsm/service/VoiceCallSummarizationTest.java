@@ -64,7 +64,6 @@ public class VoiceCallSummarizationTest {
             User u = new User();
             u.setName("Resident Call Owner");
             u.setEmail("resident.call@example.com");
-            u.setPassword("password");
             return userRepository.save(u);
         });
 

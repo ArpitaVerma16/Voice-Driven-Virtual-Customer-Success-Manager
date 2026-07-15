@@ -64,7 +64,6 @@ public class PredictiveDissatisfactionTest {
         testUser = new User();
         testUser.setName("John Churn");
         testUser.setEmail("john.churn@example.com");
-        testUser.setPassword("password123");
         testUser.setVoiceEnrolled(true);
         testUser = userRepository.save(testUser);
     }

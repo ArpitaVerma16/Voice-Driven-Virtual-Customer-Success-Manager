@@ -59,7 +59,6 @@ public class IvrFlowBuilderTest {
             User u = new User();
             u.setName("Admin IVR Owner");
             u.setEmail("admin.ivr@example.com");
-            u.setPassword("password");
             return userRepository.save(u);
         });
 
