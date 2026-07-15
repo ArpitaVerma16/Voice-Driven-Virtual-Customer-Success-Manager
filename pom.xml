@@ -191,7 +191,19 @@
     <artifactId>opennlp-tools</artifactId>
     <version>2.3.0</version>
 </dependency>
+<!-- Sentence Embeddings -->
+<dependency>
+    <groupId>org.tensorflow</groupId>
+    <artifactId>tensorflow</artifactId>
+    <version>1.15.0</version>
+</dependency>
 
+<!-- For Cosine Similarity -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-math3</artifactId>
+    <version>3.6.1</version>
+</dependency>
 <!-- JSON processing -->
 <dependency>
     <groupId>com.google.code.gson</groupId>
