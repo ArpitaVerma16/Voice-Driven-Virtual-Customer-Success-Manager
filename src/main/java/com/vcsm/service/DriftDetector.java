@@ -3,17 +3,19 @@ package com.vcsm.service;
 import com.vcsm.model.Complaint;
 import com.vcsm.repository.ComplaintRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class DriftDetector {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     private Map<String, List<Double>> featureDistributions = new HashMap<>();
 

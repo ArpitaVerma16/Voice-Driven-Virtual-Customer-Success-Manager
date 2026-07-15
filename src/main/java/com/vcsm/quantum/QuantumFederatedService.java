@@ -9,14 +9,16 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
+@lombok.RequiredArgsConstructor
 public class QuantumFederatedService {
+    private static final Logger log = LoggerFactory.getLogger(QuantumFederatedService.class);
 
-    @Autowired
-    private QuantumSecureAggregation secureAggregation;
+    private final QuantumSecureAggregation secureAggregation;
 
-    @Autowired
-    private QuantumCircuitBuilder circuitBuilder;
+    private final QuantumCircuitBuilder circuitBuilder;
 
     private final Map<String, FederatedRound> rounds = new ConcurrentHashMap<>();
     private final Map<String, QuantumClientStatus> clientStatus = new ConcurrentHashMap<>();
@@ -152,7 +154,7 @@ public class QuantumFederatedService {
      */
     @Scheduled(fixedDelay = 900000) // 15 minutes
     public void autoStartRound() {
-        System.out.println("🔬 Auto-starting quantum federated round...");
+        log.info("🔬 Auto-starting quantum federated round...");
         startRound();
     }
 
@@ -183,7 +185,7 @@ public class QuantumFederatedService {
     public Map<String, Object> getStats() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalRounds", roundNumber);
-        stats.put("activeRounds", rounds.values().stream().filter(r -> "ACTIVE".equals(r.getStatus())).count());
+        stats.put("activeRounds", rounds.values().stream().parallel().filter(r -> "ACTIVE".equals(r.getStatus())).count());
         stats.put("totalClients", clientStatus.size());
         stats.put("numQubits", NUM_QUBITS);
         stats.put("numLayers", NUM_LAYERS);

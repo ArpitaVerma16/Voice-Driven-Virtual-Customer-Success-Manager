@@ -9,4 +9,10 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
+
+    /**
+     * High-risk residents for the dashboard. Filtering in the database
+     * replaces loading the whole users table and filtering in memory.
+     */
+    java.util.List<User> findByDissatisfactionScoreGreaterThanEqual(double threshold);
 }

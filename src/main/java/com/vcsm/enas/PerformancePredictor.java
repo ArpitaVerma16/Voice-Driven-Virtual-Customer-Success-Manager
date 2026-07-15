@@ -7,8 +7,8 @@ import java.util.*;
 @Component
 public class PerformancePredictor {
 
-    private final Map<String, Double> layerSizePerformance = new HashMap<>();
-    private final Map<String, Double> activationPerformance = new HashMap<>();
+    private final Map<String, Double> layerSizePerformance = new ConcurrentHashMap<>();
+    private final Map<String, Double> activationPerformance = new ConcurrentHashMap<>();
 
     public PerformancePredictor() {
         initializePerformanceData();

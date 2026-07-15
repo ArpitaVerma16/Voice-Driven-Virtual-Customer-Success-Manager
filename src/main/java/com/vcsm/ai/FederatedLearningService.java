@@ -6,19 +6,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
+@lombok.RequiredArgsConstructor
 public class FederatedLearningService {
+    private static final Logger log = LoggerFactory.getLogger(FederatedLearningService.class);
 
-    @Autowired
-    private LocalModelTrainer localModelTrainer;
+    private final LocalModelTrainer localModelTrainer;
 
-    @Autowired
-    private SecureAggregator secureAggregator;
+    private final SecureAggregator secureAggregator;
 
-    @Autowired
-    private PrivacyEngine privacyEngine;
+    private final PrivacyEngine privacyEngine;
 
-    private final Map<String, FederatedRound> rounds = new HashMap<>();
+    private final Map<String, FederatedRound> rounds = new ConcurrentHashMap<>();
     private int roundNumber = 0;
 
     /**
@@ -100,7 +101,7 @@ public class FederatedLearningService {
      */
     @Scheduled(fixedDelay = 600000) // 10 minutes
     public void autoStartRound() {
-        System.out.println("🧬 Auto-starting federated learning round...");
+        log.info("🧬 Auto-starting federated learning round...");
         startRound();
     }
 

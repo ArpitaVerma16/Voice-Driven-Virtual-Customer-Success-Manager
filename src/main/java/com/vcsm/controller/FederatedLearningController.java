@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/federated")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class FederatedLearningController {
 
-    @Autowired
-    private FederatedLearningService federatedLearningService;
+    private final FederatedLearningService federatedLearningService;
 
     @PostMapping("/start")
     public ResponseEntity<FederatedLearningService.FederatedRound> startRound() {
@@ -26,7 +25,7 @@ public class FederatedLearningController {
     public ResponseEntity<FederatedLearningService.ClientParticipation> participate(
             @RequestParam String roundId,
             @RequestParam String clientId,
-            @RequestBody FederatedData data) {
+            @Valid @RequestBody FederatedData data) {
         return ResponseEntity.ok(federatedLearningService.participate(
             roundId, clientId, data.getFeatures(), data.getLabels()
         ));

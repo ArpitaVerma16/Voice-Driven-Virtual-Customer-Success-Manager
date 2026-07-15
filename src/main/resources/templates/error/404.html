@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 { color: #6d28d9; margin-bottom: 8px; font-size: 48px; }
+        p.subtitle { color: #666; margin-bottom: 28px; font-size: 16px; font-weight: bold; }
+        p.description { color: #374151; font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 20px;
+        }
+        button:hover { background: #6d28d9; }
+        .footer { font-size: 13px; color: #666; }
+        .footer a { color: #8b5cf6; text-decoration: none; }
+        .icon { font-size: 48px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">🔍</div>
+        <h1>404</h1>
+        <p class="subtitle">Page Not Found</p>
+        <p class="description">Oops! The page you are looking for doesn't exist or has been moved.</p>
+        <button onclick="window.location.href='/'">Go to Homepage</button>
+        <div class="footer">
+            <a href="javascript:history.back()">← Go Back</a>
+        </div>
+    </div>
+</body>
+</html>

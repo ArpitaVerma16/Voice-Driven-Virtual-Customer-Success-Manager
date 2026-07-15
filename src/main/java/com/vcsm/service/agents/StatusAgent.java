@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class StatusAgent {
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
 
     public Map<String, Object> process(String query, Long userId) {
         Map<String, Object> response = new HashMap<>();

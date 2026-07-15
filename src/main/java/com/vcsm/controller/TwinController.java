@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/twin")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class TwinController {
 
-    @Autowired
-    private PredictiveDigitalTwin predictiveDigitalTwin;
+    private final PredictiveDigitalTwin predictiveDigitalTwin;
 
     @PostMapping("/create")
     public ResponseEntity<PredictiveDigitalTwin.TwinInstance> createTwin(
@@ -27,7 +26,7 @@ public class TwinController {
     @PostMapping("/sync")
     public ResponseEntity<Map<String, String>> syncData(
             @RequestParam String twinId,
-            @RequestBody SyncRequest request) {
+            @Valid @RequestBody SyncRequest request) {
         predictiveDigitalTwin.syncData(twinId, request.getMetrics(), request.getState());
         return ResponseEntity.ok(Map.of("status", "success", "message", "Data synced"));
     }

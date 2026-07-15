@@ -1,6 +1,7 @@
 package com.vcsm.service;
 
 import com.vcsm.model.Complaint;
+import com.vcsm.model.SmartContract;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class OracleService {
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     /**
      * Fetch data from external sources (oracle)

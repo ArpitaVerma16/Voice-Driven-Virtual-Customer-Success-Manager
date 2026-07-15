@@ -32,7 +32,7 @@ public class HomomorphicEncryptionService {
     public EncryptedData encrypt(String userId, double[] data) {
         EncryptionKey key = keyStore.get(userId);
         if (key == null) {
-            throw new RuntimeException("No encryption key found for user: " + userId);
+            throw new CustomDomainException("No encryption key found for user: " + userId);
         }
 
         // Simulate homomorphic encryption
@@ -50,7 +50,7 @@ public class HomomorphicEncryptionService {
     public double[] decrypt(String userId, EncryptedData encryptedData) {
         EncryptionKey key = keyStore.get(userId);
         if (key == null) {
-            throw new RuntimeException("No encryption key found for user: " + userId);
+            throw new CustomDomainException("No encryption key found for user: " + userId);
         }
 
         double[] decrypted = encryptedData.getData().clone();

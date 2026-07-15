@@ -14,20 +14,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/decision")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class DecisionController {
 
-    @Autowired
-    private DecisionEngine decisionEngine;
+    private final DecisionEngine decisionEngine;
 
-    @Autowired
-    private ExplainabilityService explainabilityService;
+    private final ExplainabilityService explainabilityService;
 
-    @Autowired
-    private ReinforcementLearningService rlService;
+    private final ReinforcementLearningService rlService;
 
     @PostMapping("/make")
-    public ResponseEntity<Decision> makeDecision(@RequestBody Complaint complaint) {
+    public ResponseEntity<Decision> makeDecision(@Valid @RequestBody Complaint complaint) {
         Decision decision = decisionEngine.makeDecision(complaint);
         return ResponseEntity.ok(decision);
     }

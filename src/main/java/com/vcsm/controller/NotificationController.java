@@ -17,14 +17,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notifications")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class NotificationController {
     
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     private User getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();

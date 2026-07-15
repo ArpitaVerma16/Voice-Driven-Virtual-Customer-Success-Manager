@@ -1,0 +1,27 @@
+## Problem
+
+ComplaintService has **11 catch blocks** that all follow the exact same pattern — catching generic Exception and logging a warning:
+
+`java
+try {
+    userActivityService.logActivity(admin, ...);
+    auditLogService.logAction(admin, ...);
+} catch (Exception e) {
+    log.warning("Failed to log user activity: " + e.getMessage());
+}
+`
+
+This is problematic because:
+1. **Massive code duplication** — same pattern repeated 11 times
+2. **Lost exception context** — log.warning(msg) without passing the exception means stack trace is lost
+3. **Inconsistent granularity** — some try blocks cover multiple independent operations, so one failure aborts the others
+4. **Hidden failures** — secondary operations (blockchain, notifications, audit) fail silently
+
+## Changes
+
+1. **Added safelyExecute helper method** — wraps the try-catch in one place
+2. **Replaced 11 individual try-catch blocks** with concise lambda calls
+3. **Improved error messages** — each description is specific to the operation being wrapped
+4. **Preserved stack traces** — exception object is passed to the logger
+
+**Result: +1 helper method, 11 catch blocks consolidated, proper error logging**

@@ -14,20 +14,17 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/language")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class LanguageController {
     
-    @Autowired
-    private LanguageDetectionService languageDetectionService;
+    private final LanguageDetectionService languageDetectionService;
     
-    @Autowired
-    private HindiCommandMapper hindiCommandMapper;
+    private final HindiCommandMapper hindiCommandMapper;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     @PostMapping("/detect")
-    public ResponseEntity<Map<String, Object>> detectLanguage(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> detectLanguage(@Valid @RequestBody Map<String, String> request) {
         String text = request.get("text");
         String language = languageDetectionService.detectLanguage(text);
         
@@ -41,7 +38,7 @@ public class LanguageController {
     @PostMapping("/set/{userId}")
     public ResponseEntity<Map<String, Object>> setLanguagePreference(
             @PathVariable Long userId,
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         
         String language = request.get("language");
         Optional<User> userOpt = userRepository.findById(userId);
@@ -64,7 +61,7 @@ public class LanguageController {
     }
     
     @PostMapping("/process-hindi")
-    public ResponseEntity<Map<String, Object>> processHindiCommand(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> processHindiCommand(@Valid @RequestBody Map<String, String> request) {
         String hindiText = request.get("text");
         String action = hindiCommandMapper.mapCommand(hindiText);
         

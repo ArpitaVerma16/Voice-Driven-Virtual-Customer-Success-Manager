@@ -10,14 +10,18 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics/voice")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class VoiceAnalyticsController {
     
-    @Autowired
-    private VoiceAnalyticsService voiceAnalyticsService;
+    private final VoiceAnalyticsService voiceAnalyticsService;
     
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Object>> getSummary() {
+        return ResponseEntity.ok(voiceAnalyticsService.getSummary());
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<Map<String, Object>> getAnalytics() {
         return ResponseEntity.ok(voiceAnalyticsService.getAnalytics());
     }
     

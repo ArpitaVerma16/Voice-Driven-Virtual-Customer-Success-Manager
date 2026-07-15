@@ -12,14 +12,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contracts")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SmartContractController {
 
-    @Autowired
-    private SmartContractService smartContractService;
+    private final SmartContractService smartContractService;
 
     @PostMapping
-    public ResponseEntity<SmartContract> createContract(@RequestBody SmartContract contract) {
+    public ResponseEntity<SmartContract> createContract(@Valid @RequestBody SmartContract contract) {
         return ResponseEntity.ok(smartContractService.createContract(contract));
     }
 
@@ -53,9 +52,9 @@ public class SmartContractController {
     public ResponseEntity<Map<String, Object>> getStats() {
         Map<String, Object> stats = new HashMap<>();
         List<SmartContract> all = smartContractService.getAllContracts();
-        long pending = all.stream().filter(c -> "PENDING".equals(c.getExecutionStatus())).count();
-        long executed = all.stream().filter(c -> "EXECUTED".equals(c.getExecutionStatus())).count();
-        long failed = all.stream().filter(c -> "FAILED".equals(c.getExecutionStatus())).count();
+        long pending = all.stream().parallel().filter(c -> "PENDING".equals(c.getExecutionStatus())).count();
+        long executed = all.stream().parallel().filter(c -> "EXECUTED".equals(c.getExecutionStatus())).count();
+        long failed = all.stream().parallel().filter(c -> "FAILED".equals(c.getExecutionStatus())).count();
 
         stats.put("total", all.size());
         stats.put("pending", pending);

@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class EventAgent {
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
     public Map<String, Object> process(String query, Long userId) {
         Map<String, Object> response = new HashMap<>();

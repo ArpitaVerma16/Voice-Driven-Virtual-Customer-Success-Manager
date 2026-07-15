@@ -13,14 +13,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/evolution")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class ModelEvolutionController {
 
-    @Autowired
-    private ModelEvolutionService modelEvolutionService;
+    private final ModelEvolutionService modelEvolutionService;
 
-    @Autowired
-    private DriftDetector driftDetector;
+    private final DriftDetector driftDetector;
 
     @PostMapping("/train")
     public ResponseEntity<ModelVersion> trainModel(@RequestParam String modelName) {
