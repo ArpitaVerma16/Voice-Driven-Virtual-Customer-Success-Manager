@@ -10,10 +10,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class FeatureAnalyzer {
 
-    @Autowired
-    private FeatureUsageRepository featureUsageRepository;
+    private final FeatureUsageRepository featureUsageRepository;
 
     /**
      * Analyze feature usage and generate recommendations
@@ -35,9 +35,9 @@ public class FeatureAnalyzer {
      * Identify features to evolve (enable/disable)
      */
     public List<String> getEvolutionRecommendations() {
-        FeatureAnalysis analysis = analyzeFeatures();
-        return analysis.getEvolutionRecommendations();
-    }
+    FeatureAnalysis analysis = analyzeFeatures();
+    return analysis.getRecommendations(); 
+}
 
     /**
      * Calculate feature health score
@@ -49,7 +49,7 @@ public class FeatureAnalyzer {
         double avgUsage = usages.stream().mapToInt(FeatureUsage::getUsageCount).average().orElse(0);
         double avgSuccess = usages.stream().mapToDouble(FeatureUsage::getSuccessRate).average().orElse(0);
         double avgRating = usages.stream().mapToDouble(FeatureUsage::getUserRating).average().orElse(0);
-        long activeUsers = usages.stream().filter(FeatureUsage::isActive).count();
+        long activeUsers = usages.stream().parallel().filter(FeatureUsage::isActive).count();
 
         // Weighted score
         double score = (avgUsage * 0.3) + (avgSuccess * 0.3) + (avgRating * 0.3) + (activeUsers * 0.1);

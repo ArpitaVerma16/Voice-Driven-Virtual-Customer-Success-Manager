@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Onboarding - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/ui.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Onboarding Overlay -->
+<div id="onboardingOverlay" class="onboarding-overlay">
+    <div class="onboarding-container">
+        <!-- Progress Bar -->
+        <div class="onboarding-progress">
+            <div class="progress-bar" id="progressBar" style="width: 16.6%;"></div>
+        </div>
+        
+        <!-- Step Content -->
+        <div class="onboarding-content">
+            <div class="onboarding-icon" id="stepIcon">👋</div>
+            <h2 id="stepTitle">Welcome to VCSM!</h2>
+            <p id="stepMessage">Welcome to the Voice-Driven Virtual Customer Success Manager!</p>
+            <div class="onboarding-voice">
+                <i class="fas fa-volume-up me-2"></i>
+                <span id="voiceText">Welcome to VCSM. Let's take a quick tour.</span>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="onboarding-controls">
+            <button class="btn btn-outline-secondary" id="skipBtn">Skip</button>
+            <div>
+                <span id="stepCounter">1 / 6</span>
+                <button class="btn btn-purple" id="nextBtn">Next →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Highlight Target (for step highlights) -->
+<div id="highlightTarget"></div>
+
+<script>
+    let currentStep = 0;
+    let steps = [];
+
+    // Load steps from API
+    async function loadSteps() {
+        try {
+            const response = await fetch('/api/onboarding/steps');
+            steps = await response.json();
+            showStep(0);
+        } catch (error) {
+            console.error('Error loading steps:', error);
+        }
+    }
+
+    function showStep(index) {
+        if (index >= steps.length) {
+            completeOnboarding();
+            return;
+        }
+
+        currentStep = index;
+        const step = steps[index];
+        
+        // Update content
+        document.getElementById('stepIcon').textContent = step.title.split(' ')[0] || '📌';
+        document.getElementById('stepTitle').textContent = step.title;
+        document.getElementById('stepMessage').textContent = step.message;
+        document.getElementById('voiceText').textContent = step.voiceText;
+        
+        // Update progress
+        const progress = ((index + 1) / steps.length) * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+        
+        // Update counter
+        document.getElementById('stepCounter').textContent = `${index + 1} / ${steps.length}`;
+        
+        // Update button text
+        if (index === steps.length - 1) {
+            document.getElementById('nextBtn').textContent = '🎉 Finish';
+        } else {
+            document.getElementById('nextBtn').textContent = 'Next →';
+        }
+        
+        // Highlight element
+        highlightElement(step.highlight);
+        
+        // Speak voice text
+        speakText(step.voiceText);
+    }
+
+    function highlightElement(selector) {
+        // Remove previous highlights
+        document.querySelectorAll('.onboarding-highlight').forEach(el => {
+            el.classList.remove('onboarding-highlight');
+        });
+        
+        if (selector && selector !== 'null') {
+            const target = document.querySelector(selector);
+            if (target) {
+                target.classList.add('onboarding-highlight');
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        }
+    }
+
+    function nextStep() {
+        showStep(currentStep + 1);
+    }
+
+    function completeOnboarding() {
+        fetch('/api/onboarding/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('onboardingOverlay').style.display = 'none';
+            window.location.href = '/';
+        })
+        .catch(error => {
+            console.error('Error completing onboarding:', error);
+            document.getElementById('onboardingOverlay').style.display = 'none';
+            window.location.href = '/';
+        });
+    }
+
+    function skipOnboarding() {
+        if (confirm('Are you sure you want to skip the tutorial?')) {
+            completeOnboarding();
+        }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSteps();
+        document.getElementById('nextBtn').addEventListener('click', nextStep);
+        document.getElementById('skipBtn').addEventListener('click', skipOnboarding);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                nextStep();
+            }
+        });
+    });
+</script>
+
+<style>
+    .onboarding-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .onboarding-container {
+        background: white;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 90%;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.5s ease;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .onboarding-progress {
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .onboarding-progress .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+        transition: width 0.5s ease;
+        border-radius: 2px;
+    }
+    
+    .onboarding-content {
+        text-align: center;
+    }
+    
+    .onboarding-icon {
+        font-size: 60px;
+        margin-bottom: 16px;
+    }
+    
+    .onboarding-content h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 12px;
+    }
+    
+    .onboarding-content p {
+        color: #6b7280;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .onboarding-voice {
+        background: #f3f4f6;
+        padding: 12px 20px;
+        border-radius: 30px;
+        font-size: 14px;
+        color: #4b5563;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .onboarding-voice i {
+        color: #8b5cf6;
+    }
+    
+    .onboarding-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .onboarding-controls #stepCounter {
+        color: #9ca3af;
+        font-size: 14px;
+        margin-right: 16px;
+    }
+    
+    .onboarding-highlight {
+        position: relative;
+        z-index: 99998;
+        box-shadow: 0 0 0 4px #8b5cf6, 0 0 0 8px rgba(139, 92, 246, 0.3);
+        border-radius: 8px;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 4px #8b5cf6, 0 0 0 8px rgba(139, 92, 246, 0.3); }
+        50% { box-shadow: 0 0 0 6px #8b5cf6, 0 0 0 12px rgba(139, 92, 246, 0.2); }
+    }
+</style>
+
+</body>
+</html>

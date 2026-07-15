@@ -6,13 +6,12 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class CounterfactualSimulator {
 
-    @Autowired
-    private CausalGraphBuilder causalGraphBuilder;
+    private final CausalGraphBuilder causalGraphBuilder;
 
-    @Autowired
-    private RootCauseAnalyzer rootCauseAnalyzer;
+    private final RootCauseAnalyzer rootCauseAnalyzer;
 
     /**
      * Simulate what-if scenarios

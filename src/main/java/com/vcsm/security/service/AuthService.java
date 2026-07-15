@@ -8,6 +8,7 @@ import com.vcsm.security.model.UserRole;
 import com.vcsm.security.repo.AppUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -17,29 +18,43 @@ public class AuthService {
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final com.vcsm.repository.UserRepository profileUserRepository;
 
     public AuthService(AppUserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.profileUserRepository = profileUserRepository;
     }
 
     public AuthResponse signupResident(AuthRequest req) {
         if (userRepository.existsByUsername(req.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new CustomDomainException("Username already exists");
         }
-
         AppUser user = new AppUser();
         user.setUsername(req.getUsername());
         user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
         user.setRoles(Set.of(UserRole.ROLE_RESIDENT));
         userRepository.save(user);
 
-        return new AuthResponse(jwtService.generateToken(user));
+        String token = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        String role = user.getRoles().stream()
+            .findFirst()
+            .map(Enum::name)
+            .orElse("ROLE_RESIDENT");
+        return new AuthResponse(token, refreshToken, user.getUsername(), role);
+            .orElse(UserRole.ROLE_RESIDENT.name());
+        return new AuthResponse(token, null, user.getUsername(), role);
     }
 
     public AuthResponse login(AppUser user) {
-        return new AuthResponse(jwtService.generateToken(user));
+        String token = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        String role = user.getRoles().stream()
+            .findFirst()
+            .map(Enum::name)
+            .orElse("UNKNOWN");
+        return new AuthResponse(token, refreshToken, user.getUsername(), role);
     }
 }
-

@@ -49,7 +49,7 @@ public class PredictiveDigitalTwin {
     public PredictionResult predictFuture(String twinId, int timeHorizon) {
         TwinInstance twin = twins.get(twinId);
         if (twin == null) {
-            throw new RuntimeException("Twin not found");
+            throw new CustomDomainException("Twin not found");
         }
 
         List<HistoricalData> hist = history.get(twinId);
@@ -113,10 +113,10 @@ public class PredictiveDigitalTwin {
 
     private String classifyState(double[] state) {
         double avg = Arrays.stream(state).average().orElse(0);
-        if (avg > 0.7) return "HIGH_LOAD";
-        if (avg > 0.4) return "NORMAL";
-        if (avg > 0.2) return "LOW_LOAD";
-        return "IDLE";
+        if (avg > 0.7) return org.springframework.http.ResponseEntity.ok("HIGH_LOAD");
+        if (avg > 0.4) return org.springframework.http.ResponseEntity.ok("NORMAL");
+        if (avg > 0.2) return org.springframework.http.ResponseEntity.ok("LOW_LOAD");
+        return org.springframework.http.ResponseEntity.ok("IDLE");
     }
 
     /**
@@ -125,7 +125,7 @@ public class PredictiveDigitalTwin {
     public AnomalyPrediction predictAnomalies(String twinId) {
         TwinInstance twin = twins.get(twinId);
         if (twin == null) {
-            throw new RuntimeException("Twin not found");
+            throw new CustomDomainException("Twin not found");
         }
 
         List<HistoricalData> hist = history.get(twinId);
@@ -176,7 +176,7 @@ public class PredictiveDigitalTwin {
     public ResourceForecast forecastResources(String twinId, int days) {
         TwinInstance twin = twins.get(twinId);
         if (twin == null) {
-            throw new RuntimeException("Twin not found");
+            throw new CustomDomainException("Twin not found");
         }
 
         List<HistoricalData> hist = history.get(twinId);

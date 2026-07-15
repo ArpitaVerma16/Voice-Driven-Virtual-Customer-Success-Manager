@@ -1,5 +1,7 @@
 package com.vcsm.healing;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -7,13 +9,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SelfHealingEngine {
 
-    @Autowired
-    private AnomalyDetector anomalyDetector;
+    private static final Logger log = LoggerFactory.getLogger(SelfHealingEngine.class);
 
-    @Autowired
-    private AutoRecoveryService autoRecoveryService;
+    private final AnomalyDetector anomalyDetector;
+
+    private final AutoRecoveryService autoRecoveryService;
 
     private final List<HealingReport> healingReports = new ArrayList<>();
     private int healingCount = 0;
@@ -23,7 +26,7 @@ public class SelfHealingEngine {
      */
     @Scheduled(fixedDelay = 300000) // 5 minutes
     public void runHealingCycle() {
-        System.out.println("🔍 Running self-healing cycle...");
+        log.info("🔍 Running self-healing cycle...");
 
         // Collect system metrics
         Map<String, Double> metrics = collectMetrics();
@@ -32,15 +35,15 @@ public class SelfHealingEngine {
         AnomalyDetector.AnomalyResult result = anomalyDetector.detectAnomalies(metrics);
 
         if (!result.isHasAnomalies()) {
-            System.out.println("✅ No anomalies detected. System is healthy.");
+            log.info("✅ No anomalies detected. System is healthy.");
             return;
         }
 
-        System.out.println("⚠️ " + result.getAnomalies().size() + " anomalies detected!");
+        log.info("⚠️ " + result.getAnomalies().size() + " anomalies detected!");
 
         // Handle each anomaly
         for (AnomalyDetector.Anomaly anomaly : result.getAnomalies()) {
-            System.out.println("🔄 Executing recovery for: " + anomaly.getMetricName());
+            log.info("🔄 Executing recovery for: " + anomaly.getMetricName());
             AutoRecoveryService.RecoveryResult recovery = autoRecoveryService.executeRecovery(anomaly);
 
             healingCount++;
@@ -53,7 +56,7 @@ public class SelfHealingEngine {
             );
             healingReports.add(report);
 
-            System.out.println("✅ Recovery " + recovery.getStatus() + ": " + recovery.getMessage());
+            log.info("✅ Recovery " + recovery.getStatus() + ": " + recovery.getMessage());
         }
     }
 

@@ -7,43 +7,56 @@ import com.vcsm.repository.EventRepository;
 import com.vcsm.repository.EventRegistrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class EventRegistrationService {
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private EventRegistrationRepository eventRegistrationRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
-    @Autowired
-    private ReminderScheduler reminderScheduler;
+    private final ReminderScheduler reminderScheduler;
+
+    private final com.vcsm.security.jwt.JwtService jwtService;
 
     /**
      * Register a user for an event
      */
+    @Transactional
     public Event registerUserForEvent(Event event, User user) {
         // Check if event exists
         if (event == null) {
-            throw new RuntimeException("Event not found");
+            throw new CustomDomainException("Event not found");
         }
 
         // Check if event is full
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException("Event is full");
+            throw new CustomDomainException("Event is full");
         }
 
         // Check if user already registered
         if (eventRegistrationRepository.existsByUserAndEvent(user, event)) {
-            throw new RuntimeException("User already registered for this event");
+            throw new CustomDomainException("User already registered for this event");
         }
 
-        // Create and save event registration
+        // Create and save event registration. The unique (user_id, event_id)
+        // constraint is the last line of defense against concurrent duplicate
+        // requests that both pass the existence check above.
         EventRegistration registration = new EventRegistration(user, event);
+        try {
+            registration = eventRegistrationRepository.saveAndFlush(registration);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new CustomDomainException("User already registered for this event");
+        }
+
+        // Generate signed ticket token
+        String token = jwtService.generateTicketToken(registration.getId(), user.getId(), event.getId());
+        registration.setTicketToken(token);
         eventRegistrationRepository.save(registration);
 
         event.setRegistrations(event.getRegistrations() + 1);
@@ -59,9 +72,10 @@ public class EventRegistrationService {
     /**
      * Cancel registration for an event
      */
+    @Transactional
     public Event cancelRegistration(Event event, User user) {
         if (event == null) {
-            throw new RuntimeException("Event not found");
+            throw new CustomDomainException("Event not found");
         }
 
         java.util.Optional<EventRegistration> registrationOpt = eventRegistrationRepository.findByUserAndEvent(user, event);
@@ -71,7 +85,7 @@ public class EventRegistrationService {
             return eventRepository.save(event);
         }
 
-        throw new RuntimeException("User not registered for this event");
+        throw new CustomDomainException("User not registered for this event");
     }
 
     /**

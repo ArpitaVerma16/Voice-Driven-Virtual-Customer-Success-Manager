@@ -106,4 +106,28 @@ class SentimentAnalysisServiceTest {
         assertEquals("POSITIVE", result.getSentiment());
         verify(sentimentRepository, times(1)).save(any(SentimentAnalysis.class));
     }
+
+    @Test
+    void testGetSentimentTrends() {
+        java.util.List<Object[]> mockRawTrends = new java.util.ArrayList<>();
+        mockRawTrends.add(new Object[]{"2026-06-15", 10L, 2L, 5L});
+        mockRawTrends.add(new Object[]{"2026-06-16", 12L, 1L, 6L});
+        
+        when(sentimentRepository.findDailySentimentTrends(any(java.time.LocalDateTime.class)))
+            .thenReturn(mockRawTrends);
+            
+        java.util.List<java.util.Map<String, Object>> trends = sentimentService.getSentimentTrends(7);
+        
+        assertNotNull(trends);
+        assertEquals(2, trends.size());
+        assertEquals("2026-06-15", trends.get(0).get("date"));
+        assertEquals(10L, trends.get(0).get("positive"));
+        assertEquals(2L, trends.get(0).get("negative"));
+        assertEquals(5L, trends.get(0).get("neutral"));
+        
+        assertEquals("2026-06-16", trends.get(1).get("date"));
+        assertEquals(12L, trends.get(1).get("positive"));
+        assertEquals(1L, trends.get(1).get("negative"));
+        assertEquals(6L, trends.get(1).get("neutral"));
+    }
 }

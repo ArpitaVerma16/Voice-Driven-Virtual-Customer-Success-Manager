@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/">VCSM</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Dashboard</a>
+            <a class="nav-link" href="/complaints">Complaints</a>
+            <a class="nav-link" href="/events">Events</a>
+            <a class="nav-link" href="/analytics">Analytics</a>
+            <a class="nav-link active" href="/chatbot">Chatbot</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4><i class="fas fa-robot text-purple me-2"></i>AI FAQ Chatbot</h4>
+    <p class="text-muted">Ask me anything about VCSM! I'm here to help 24/7.</p>
+
+    <div class="card shadow-sm">
+        <div class="card-body" id="chatMessages" style="height: 400px; overflow-y: auto;">
+            <div class="text-center text-muted py-4" id="welcomeMessage">
+                <i class="fas fa-robot fa-3x mb-3"></i>
+                <p>👋 Hello! I'm your VCSM Assistant.</p>
+                <p class="small">Ask me about complaints, events, voice commands, and more!</p>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="input-group">
+                <input type="text" id="chatInput" class="form-control" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button class="btn btn-purple" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestion('How do I file a complaint?')">📝 Complaints</button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestion('How do I check complaint status?')">📊 Status</button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestion('How do I register for an event?')">📅 Events</button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestion('How do I use voice commands?')">🎤 Voice</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        input.value = '';
+
+        fetch('/api/chatbot/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        })
+        .then(r => r.json())
+        .then(data => {
+            addMessage(data.answer, 'bot');
+            document.getElementById('welcomeMessage')?.remove();
+        })
+        .catch(err => {
+            addMessage('Sorry, something went wrong. Please try again.', 'bot');
+        });
+    }
+
+    function addMessage(text, sender) {
+        const container = document.getElementById('chatMessages');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `d-flex ${sender === 'user' ? 'justify-content-end' : 'justify-content-start'} mb-2`;
+
+        const bubble = document.createElement('div');
+        bubble.className = `p-3 rounded ${sender === 'user' ? 'bg-purple text-white' : 'bg-light'}`;
+        bubble.style.maxWidth = '70%';
+        bubble.textContent = text;
+
+        if (sender === 'bot') {
+            const icon = document.createElement('span');
+            icon.className = 'me-2';
+            icon.innerHTML = '🤖';
+            bubble.prepend(icon);
+        }
+
+        msgDiv.appendChild(bubble);
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function askQuickQuestion(question) {
+        document.getElementById('chatInput').value = question;
+        sendMessage();
+    }
+</script>
+
+</body>
+</html>

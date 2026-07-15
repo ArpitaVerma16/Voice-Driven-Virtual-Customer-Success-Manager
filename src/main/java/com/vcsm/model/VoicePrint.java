@@ -3,6 +3,8 @@ package com.vcsm.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
 @Table(name = "voice_prints")
 public class VoicePrint {
@@ -22,6 +24,9 @@ public class VoicePrint {
     @Column(name = "sample_duration")
     private double sampleDuration;
 
+    @Column(name = "language")
+    private String language;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -33,6 +38,14 @@ public class VoicePrint {
         this.user = user;
         this.voiceFeatures = voiceFeatures;
         this.sampleDuration = sampleDuration;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public VoicePrint(User user, String voiceFeatures, double sampleDuration, String language) {
+        this.user = user;
+        this.voiceFeatures = voiceFeatures;
+        this.sampleDuration = sampleDuration;
+        this.language = language;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -48,6 +61,9 @@ public class VoicePrint {
 
     public double getSampleDuration() { return sampleDuration; }
     public void setSampleDuration(double sampleDuration) { this.sampleDuration = sampleDuration; }
+
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

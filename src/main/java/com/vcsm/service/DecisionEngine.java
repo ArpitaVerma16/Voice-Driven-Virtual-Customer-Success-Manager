@@ -6,25 +6,23 @@ import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.DecisionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class DecisionEngine {
 
-    @Autowired
-    private DecisionRepository decisionRepository;
+    private final DecisionRepository decisionRepository;
 
-    @Autowired
-    private ExplainabilityService explainabilityService;
+    private final ExplainabilityService explainabilityService;
 
-    @Autowired
-    private ReinforcementLearningService rlService;
+    private final ReinforcementLearningService rlService;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
     /**
      * Make autonomous decision for a complaint
@@ -104,10 +102,10 @@ public class DecisionEngine {
         int recurrence = (int) factors.getOrDefault("recurrence", 0);
         boolean frustrated = (boolean) factors.getOrDefault("frustrated", false);
 
-        if (urgency > 70 && frustrated) return "ESCALATE";
-        if (urgency > 60) return "PRIORITIZE";
-        if (recurrence > 3) return "ASSIGN";
-        return "RESOLVE";
+        if (urgency > 70 && frustrated) return org.springframework.http.ResponseEntity.ok("ESCALATE");
+        if (urgency > 60) return org.springframework.http.ResponseEntity.ok("PRIORITIZE");
+        if (recurrence > 3) return org.springframework.http.ResponseEntity.ok("ASSIGN");
+        return org.springframework.http.ResponseEntity.ok("RESOLVE");
     }
 
     private List<String> getAvailableActions(String decisionType) {
@@ -130,9 +128,9 @@ public class DecisionEngine {
             case "ESCALATE":
                 return "Frustration detected | Urgency: " + factors.get("urgency");
             case "ASSIGN":
-                return "Recurrence: " + factors.get("recurrence") + " times";
+                return org.springframework.http.ResponseEntity.ok("Recurrence: " + factors.get("recurrence") + " times");
             default:
-                return "Standard handling";
+                return org.springframework.http.ResponseEntity.ok("Standard handling");
         }
     }
 

@@ -6,13 +6,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class PersonalizationEngine {
 
-    @Autowired
-    private UserProfileBuilder userProfileBuilder;
+    private final UserProfileBuilder userProfileBuilder;
 
-    @Autowired
-    private RecommendationService recommendationService;
+    private final RecommendationService recommendationService;
 
     /**
      * Get complete personalized experience for user

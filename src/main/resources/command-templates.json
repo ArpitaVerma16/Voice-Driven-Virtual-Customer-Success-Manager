@@ -1,0 +1,84 @@
+{
+  "templates": [
+    {
+      "id": 1,
+      "category": "COMPLAINT",
+      "icon": "fa-exclamation-triangle",
+      "title": "File a Noise Complaint",
+      "command": "I have a noise complaint",
+      "description": "Report noise from neighbors or construction"
+    },
+    {
+      "id": 2,
+      "category": "COMPLAINT",
+      "icon": "fa-wrench",
+      "title": "Report Maintenance Issue",
+      "command": "I have a maintenance issue",
+      "description": "Report broken equipment or repair needs"
+    },
+    {
+      "id": 3,
+      "category": "COMPLAINT",
+      "icon": "fa-shield",
+      "title": "Security Concern",
+      "command": "I have a security concern",
+      "description": "Report suspicious activity or safety issues"
+    },
+    {
+      "id": 4,
+      "category": "COMPLAINT",
+      "icon": "fa-parking",
+      "title": "Parking Issue",
+      "command": "I have a parking issue",
+      "description": "Report unauthorized parking or blocking"
+    },
+    {
+      "id": 5,
+      "category": "EVENT",
+      "icon": "fa-calendar-alt",
+      "title": "Show Upcoming Events",
+      "command": "Show upcoming events",
+      "description": "View all upcoming community events"
+    },
+    {
+      "id": 6,
+      "category": "EVENT",
+      "icon": "fa-calendar-plus",
+      "title": "Register for an Event",
+      "command": "Register me for the next event",
+      "description": "Register for upcoming community events"
+    },
+    {
+      "id": 7,
+      "category": "STATUS",
+      "icon": "fa-clipboard-list",
+      "title": "Check Complaint Status",
+      "command": "Check my complaint status",
+      "description": "Track your open complaints"
+    },
+    {
+      "id": 8,
+      "category": "STATUS",
+      "icon": "fa-chart-bar",
+      "title": "Get Analytics Summary",
+      "command": "Show me analytics summary",
+      "description": "View community statistics"
+    },
+    {
+      "id": 9,
+      "category": "HELP",
+      "icon": "fa-question-circle",
+      "title": "Get Help",
+      "command": "I need help",
+      "description": "Get assistance with VCSM features"
+    },
+    {
+      "id": 10,
+      "category": "HELP",
+      "icon": "fa-info-circle",
+      "title": "Show All Commands",
+      "command": "What can I say?",
+      "description": "See all available voice commands"
+    }
+  ]
+}

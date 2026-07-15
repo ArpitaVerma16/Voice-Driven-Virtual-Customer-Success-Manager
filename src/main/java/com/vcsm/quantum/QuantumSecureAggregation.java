@@ -27,7 +27,7 @@ public class QuantumSecureAggregation {
     public double[] quantumEncrypt(double[] weights, String clientId) {
         String key = quantumKeys.get(clientId);
         if (key == null) {
-            throw new RuntimeException("No quantum key found for client: " + clientId);
+            throw new CustomDomainException("No quantum key found for client: " + clientId);
         }
 
         double[] encrypted = weights.clone();
@@ -44,7 +44,7 @@ public class QuantumSecureAggregation {
     public double[] quantumDecrypt(double[] encryptedWeights, String clientId) {
         String key = quantumKeys.get(clientId);
         if (key == null) {
-            throw new RuntimeException("No quantum key found for client: " + clientId);
+            throw new CustomDomainException("No quantum key found for client: " + clientId);
         }
 
         double[] decrypted = encryptedWeights.clone();

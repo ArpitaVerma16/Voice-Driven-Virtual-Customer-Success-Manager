@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface EventRegistrationRepository extends JpaRepository<EventRegistration, Long> {
     boolean existsByUserAndEvent(User user, Event event);
     Optional<EventRegistration> findByUserAndEvent(User user, Event event);
+    Optional<EventRegistration> findByTicketToken(String ticketToken);
     List<EventRegistration> findByEvent(Event event);
     List<EventRegistration> findByUser(User user);
     void deleteByEvent(Event event);

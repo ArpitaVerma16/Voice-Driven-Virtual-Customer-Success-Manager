@@ -10,11 +10,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voice/feedback")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class VoiceFeedbackController {
     
-    @Autowired
-    private VoiceFeedbackService voiceFeedbackService;
+    private final VoiceFeedbackService voiceFeedbackService;
     
     @PostMapping
     public ResponseEntity<?> submitFeedback(

@@ -6,13 +6,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class NeuroSymbolicEngine {
 
-    @Autowired
-    private RuleExtractor ruleExtractor;
+    private final RuleExtractor ruleExtractor;
 
-    @Autowired
-    private InferenceEngine inferenceEngine;
+    private final InferenceEngine inferenceEngine;
 
     /**
      * Process input using neuro-symbolic approach
