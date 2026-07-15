@@ -11,18 +11,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/translation")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class TranslationController {
 
-    @Autowired
-    private VoiceTranslationService translationService;
+    private final VoiceTranslationService translationService;
 
-    @Autowired
-    private LanguageDetector languageDetector;
+    private final LanguageDetector languageDetector;
 
     @PostMapping("/translate")
     public ResponseEntity<Map<String, Object>> translate(
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         
         String text = request.get("text");
         String targetLang = request.get("targetLang");
@@ -59,7 +57,7 @@ public class TranslationController {
 
     @PostMapping("/detect")
     public ResponseEntity<Map<String, String>> detectLanguage(
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody Map<String, String> request) {
         
         String text = request.get("text");
         if (text == null || text.isEmpty()) {

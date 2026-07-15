@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Templates - VCSM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/ui.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/">VCSM</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Dashboard</a>
+            <a class="nav-link" href="/complaints">Complaints</a>
+            <a class="nav-link" href="/events">Events</a>
+            <a class="nav-link" href="/analytics">Analytics</a>
+            <a class="nav-link active" href="/voice-templates">Voice Commands</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4><i class="fas fa-microphone text-purple me-2"></i>Voice Command Templates</h4>
+    <p class="text-muted">Click any command to use it with the voice assistant!</p>
+
+    <!-- Filter Buttons -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <button class="btn btn-sm btn-purple" onclick="filterTemplates('ALL')">All</button>
+        <button class="btn btn-sm btn-outline-purple" onclick="filterTemplates('COMPLAINT')">📝 Complaints</button>
+        <button class="btn btn-sm btn-outline-purple" onclick="filterTemplates('EVENT')">📅 Events</button>
+        <button class="btn btn-sm btn-outline-purple" onclick="filterTemplates('STATUS')">📊 Status</button>
+        <button class="btn btn-sm btn-outline-purple" onclick="filterTemplates('HELP')">❓ Help</button>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="row g-3" id="templatesGrid">
+        <div class="col-12 text-center text-muted py-4">
+            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+            <p>Loading templates...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allTemplates = [];
+
+    function loadTemplates() {
+        fetch('/api/voice/templates')
+            .then(r => r.json())
+            .then(data => {
+                allTemplates = data;
+                renderTemplates(data);
+            })
+            .catch(err => {
+                console.error('Error loading templates:', err);
+                document.getElementById('templatesGrid').innerHTML = `
+                    <div class="col-12 text-center text-danger py-4">
+                        <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                        <p>Failed to load templates. Please refresh.</p>
+                    </div>
+                `;
+            });
+    }
+
+    function renderTemplates(templates) {
+        const grid = document.getElementById('templatesGrid');
+        if (templates.length === 0) {
+            grid.innerHTML = `
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="fas fa-microphone-slash fa-2x mb-2"></i>
+                    <p>No templates found.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = templates.map(t => `
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100 template-card" onclick="useTemplate('${t.command}')">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="template-icon bg-purple-soft text-purple me-2">
+                                <i class="fas ${t.icon}"></i>
+                            </div>
+                            <span class="badge bg-${t.category === 'COMPLAINT' ? 'danger' : 
+                                                    t.category === 'EVENT' ? 'success' : 
+                                                    t.category === 'STATUS' ? 'info' : 'secondary'}">
+                                ${t.category}
+                            </span>
+                        </div>
+                        <h6 class="fw-bold">${t.title}</h6>
+                        <p class="text-muted small mb-2">${t.description}</p>
+                        <div class="command-preview bg-light p-2 rounded">
+                            <code class="small">"${t.command}"</code>
+                        </div>
+                        <button class="btn btn-sm btn-purple w-100 mt-2" onclick="event.stopPropagation(); useTemplate('${t.command}')">
+                            <i class="fas fa-play me-1"></i> Use Command
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterTemplates(category) {
+        if (category === 'ALL') {
+            renderTemplates(allTemplates);
+        } else {
+            fetch(`/api/voice/templates/category/${category}`)
+                .then(r => r.json())
+                .then(data => renderTemplates(data))
+                .catch(err => console.error('Error filtering templates:', err));
+        }
+
+        // Update active button
+        document.querySelectorAll('.btn-purple, .btn-outline-purple').forEach(btn => {
+            btn.classList.remove('btn-purple');
+            btn.classList.add('btn-outline-purple');
+        });
+        event.target.classList.remove('btn-outline-purple');
+        event.target.classList.add('btn-purple');
+    }
+
+    function useTemplate(command) {
+        // Redirect to dashboard with command
+        window.location.href = `/?command=${encodeURIComponent(command)}`;
+    }
+
+    function getSuggestion() {
+        const context = document.getElementById('contextInput')?.value || '';
+        fetch(`/api/voice/templates/suggestion?context=${encodeURIComponent(context)}`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('suggestionResult').innerHTML = `
+                    <div class="alert alert-info mt-2">
+                        <i class="fas fa-lightbulb me-2"></i> ${data.suggestion}
+                    </div>
+                `;
+            })
+            .catch(err => console.error('Error getting suggestion:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTemplates();
+    });
+</script>
+
+<style>
+    .template-card {
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .template-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    .command-preview {
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+    }
+    .command-preview code {
+        color: #6b7280;
+        font-size: 12px;
+    }
+</style>
+</body>
+</html>

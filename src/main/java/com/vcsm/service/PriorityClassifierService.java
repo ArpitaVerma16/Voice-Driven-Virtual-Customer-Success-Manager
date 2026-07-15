@@ -2,13 +2,14 @@ package com.vcsm.service;
 
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 @Service
 public class PriorityClassifierService {
 
-    private static final Map<Pattern, String> PRIORITY_KEYWORDS = new HashMap<>();
+    private static final Map<Pattern, String> PRIORITY_KEYWORDS = new ConcurrentHashMap<>();
 
     static {
         // CRITICAL - Immediate attention (1 hour response)
@@ -26,7 +27,7 @@ public class PriorityClassifierService {
 
     public String classifyPriority(String description, String category) {
         if (description == null || description.isEmpty()) {
-            return "MEDIUM";
+            return org.springframework.http.ResponseEntity.ok("MEDIUM");
         }
 
         // First check description for keywords
@@ -41,43 +42,43 @@ public class PriorityClassifierService {
     }
 
     private String getDefaultPriorityByCategory(String category) {
-        if (category == null) return "MEDIUM";
+        if (category == null) return org.springframework.http.ResponseEntity.ok("MEDIUM");
         
         switch (category.toUpperCase()) {
             case "SECURITY":
-                return "HIGH";
+                return org.springframework.http.ResponseEntity.ok("HIGH");
             case "NOISE":
-                return "MEDIUM";
+                return org.springframework.http.ResponseEntity.ok("MEDIUM");
             case "MAINTENANCE":
-                return "MEDIUM";
+                return org.springframework.http.ResponseEntity.ok("MEDIUM");
             case "CLEANLINESS":
-                return "LOW";
+                return org.springframework.http.ResponseEntity.ok("LOW");
             case "PARKING":
-                return "LOW";
+                return org.springframework.http.ResponseEntity.ok("LOW");
             case "UTILITIES":
-                return "HIGH";
+                return org.springframework.http.ResponseEntity.ok("HIGH");
             default:
-                return "MEDIUM";
+                return org.springframework.http.ResponseEntity.ok("MEDIUM");
         }
     }
 
     public String getResponseTime(String priority) {
         switch (priority) {
-            case "CRITICAL": return "1 hour";
-            case "HIGH": return "4 hours";
-            case "MEDIUM": return "24 hours";
-            case "LOW": return "48 hours";
-            default: return "24 hours";
+            case "CRITICAL": return org.springframework.http.ResponseEntity.ok("1 hour");
+            case "HIGH": return org.springframework.http.ResponseEntity.ok("4 hours");
+            case "MEDIUM": return org.springframework.http.ResponseEntity.ok("24 hours");
+            case "LOW": return org.springframework.http.ResponseEntity.ok("48 hours");
+            default: return org.springframework.http.ResponseEntity.ok("24 hours");
         }
     }
 
     public String getPriorityColor(String priority) {
         switch (priority) {
-            case "CRITICAL": return "danger";
-            case "HIGH": return "warning";
-            case "MEDIUM": return "info";
-            case "LOW": return "success";
-            default: return "secondary";
+            case "CRITICAL": return org.springframework.http.ResponseEntity.ok("danger");
+            case "HIGH": return org.springframework.http.ResponseEntity.ok("warning");
+            case "MEDIUM": return org.springframework.http.ResponseEntity.ok("info");
+            case "LOW": return org.springframework.http.ResponseEntity.ok("success");
+            default: return org.springframework.http.ResponseEntity.ok("secondary");
         }
     }
 }

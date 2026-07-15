@@ -37,11 +37,11 @@ public class RobustnessVerifier {
 
     private String generateRecommendation(double score) {
         if (score > 85) {
-            return "✅ Model is robust. No action needed.";
+            return org.springframework.http.ResponseEntity.ok("✅ Model is robust. No action needed.");
         } else if (score > 70) {
-            return "⚠️ Model needs improvement. Consider adversarial training.";
+            return org.springframework.http.ResponseEntity.ok("⚠️ Model needs improvement. Consider adversarial training.");
         } else {
-            return "🔴 Model is vulnerable. Immediate retraining recommended.";
+            return org.springframework.http.ResponseEntity.ok("🔴 Model is vulnerable. Immediate retraining recommended.");
         }
     }
 

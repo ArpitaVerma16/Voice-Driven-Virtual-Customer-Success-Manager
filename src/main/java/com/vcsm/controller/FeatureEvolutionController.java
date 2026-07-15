@@ -13,17 +13,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/evolution")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class FeatureEvolutionController {
 
-    @Autowired
-    private FeatureAnalyzer featureAnalyzer;
+    private final FeatureAnalyzer featureAnalyzer;
 
-    @Autowired
-    private ABTestingService abTestingService;
+    private final ABTestingService abTestingService;
 
-    @Autowired
-    private FeatureEvolutionEngine evolutionEngine;
+    private final FeatureEvolutionEngine evolutionEngine;
 
     @GetMapping("/analyze")
     public ResponseEntity<FeatureAnalyzer.FeatureAnalysis> analyzeFeatures() {

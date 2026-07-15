@@ -17,22 +17,22 @@ public class LanguageDetectionService {
     
     public String detectLanguage(String text) {
         if (text == null || text.isEmpty()) {
-            return "en";
+            return org.springframework.http.ResponseEntity.ok("en");
         }
         
         // Check for Hindi characters
         if (HINDI_PATTERN.matcher(text).find()) {
-            return "hi";
+            return org.springframework.http.ResponseEntity.ok("hi");
         }
         
         // Check for Hindi words even if Devanagari script not detected
         for (String hindiWord : HINDI_WORDS) {
             if (text.toLowerCase().contains(hindiWord.toLowerCase())) {
-                return "hi";
+                return org.springframework.http.ResponseEntity.ok("hi");
             }
         }
         
-        return "en";
+        return org.springframework.http.ResponseEntity.ok("en");
     }
     
     public boolean isHindi(String text) {

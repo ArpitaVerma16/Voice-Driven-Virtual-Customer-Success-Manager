@@ -1,25 +1,49 @@
 package com.vcsm.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vcsm.model.Interaction;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class InteractionDTO {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("customerName")
+    @NotBlank(message = "Customer name is required")
     private String customerName;
+    @JsonProperty("interactionType")
+    @NotBlank(message = "Interaction type is required")
     private String interactionType;
+    @JsonProperty("summary")
+    @NotBlank(message = "Summary is required")
     private String summary;
+    @JsonProperty("details")
     private String details;
+    @JsonProperty("status")
     private String status;
+    @JsonProperty("sentiment")
     private String sentiment;
+    @JsonProperty("duration")
     private String duration;
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
+    @JsonProperty("updatedAt")
     private LocalDateTime updatedAt;
+    @JsonProperty("customerEmail")
     private String customerEmail;
+    @JsonProperty("customerPhone")
     private String customerPhone;
+    @JsonProperty("agentName")
     private String agentName;
+    @JsonProperty("category")
     private String category;
+    @JsonProperty("outcome")
     private String outcome;
+    @JsonProperty("followUpRequired")
     private boolean followUpRequired;
 
     // Constructors

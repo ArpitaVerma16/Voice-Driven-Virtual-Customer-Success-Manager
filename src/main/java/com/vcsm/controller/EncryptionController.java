@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/encryption")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class EncryptionController {
 
-    @Autowired
-    private HomomorphicEncryptionService encryptionService;
+    private final HomomorphicEncryptionService encryptionService;
 
     @PostMapping("/keys/generate")
     public ResponseEntity<HomomorphicEncryptionService.KeyPair> generateKeys(@RequestParam String userId) {
@@ -25,52 +24,52 @@ public class EncryptionController {
     @PostMapping("/encrypt")
     public ResponseEntity<HomomorphicEncryptionService.EncryptedData> encrypt(
             @RequestParam String userId,
-            @RequestBody double[] data) {
+            @Valid @RequestBody double[] data) {
         return ResponseEntity.ok(encryptionService.encrypt(userId, data));
     }
 
     @PostMapping("/decrypt")
     public ResponseEntity<double[]> decrypt(
             @RequestParam String userId,
-            @RequestBody HomomorphicEncryptionService.EncryptedData encryptedData) {
+            @Valid @RequestBody HomomorphicEncryptionService.EncryptedData encryptedData) {
         return ResponseEntity.ok(encryptionService.decrypt(userId, encryptedData));
     }
 
     @PostMapping("/add")
     public ResponseEntity<HomomorphicEncryptionService.EncryptedData> add(
-            @RequestBody AddRequest request) {
+            @Valid @RequestBody AddRequest request) {
         return ResponseEntity.ok(encryptionService.encryptedAdd(request.getA(), request.getB()));
     }
 
     @PostMapping("/multiply")
     public ResponseEntity<HomomorphicEncryptionService.EncryptedData> multiply(
-            @RequestBody AddRequest request) {
+            @Valid @RequestBody AddRequest request) {
         return ResponseEntity.ok(encryptionService.encryptedMultiply(request.getA(), request.getB()));
     }
 
     @PostMapping("/predict")
     public ResponseEntity<HomomorphicEncryptionService.EncryptedPrediction> predict(
             @RequestParam String userId,
-            @RequestBody PredictRequest request) {
+            @Valid @RequestBody PredictRequest request) {
         return ResponseEntity.ok(encryptionService.encryptedPredict(userId, request.getInput(), request.getModel()));
     }
 
     @PostMapping("/zk-proof")
     public ResponseEntity<HomomorphicEncryptionService.ZeroKnowledgeProof> generateZKProof(
             @RequestParam String userId,
-            @RequestBody double[] data) {
+            @Valid @RequestBody double[] data) {
         return ResponseEntity.ok(encryptionService.generateZKProof(userId, data));
     }
 
     @PostMapping("/zk-verify")
     public ResponseEntity<Map<String, Boolean>> verifyZKProof(
-            @RequestBody HomomorphicEncryptionService.ZeroKnowledgeProof proof) {
+            @Valid @RequestBody HomomorphicEncryptionService.ZeroKnowledgeProof proof) {
         return ResponseEntity.ok(Map.of("verified", encryptionService.verifyZKProof(proof)));
     }
 
     @PostMapping("/aggregate")
     public ResponseEntity<HomomorphicEncryptionService.EncryptedData> aggregate(
-            @RequestBody List<HomomorphicEncryptionService.EncryptedData> encryptedDataList) {
+            @Valid @RequestBody List<HomomorphicEncryptionService.EncryptedData> encryptedDataList) {
         return ResponseEntity.ok(encryptionService.secureAggregate(encryptedDataList));
     }
 

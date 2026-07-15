@@ -1,8 +1,43 @@
 
 
-
-
-
+# Maven build output
 target/
+*.class
+*.jar
+*.war
 
+# Eclipse IDE files
+.classpath
+.factorypath
+.project
+.settings/
 
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+
+# VS Code files
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Environment / Secrets
+application-prod.properties
+.env
+*.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# H2 file database (local persistence)
+data/
+*.mv.db
+*.trace.db
+
+# Mavis automation (do not commit)
+orchestrate.py
+.mavis/

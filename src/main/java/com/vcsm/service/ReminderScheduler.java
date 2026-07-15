@@ -1,4 +1,6 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.EmailQueue;
 import com.vcsm.model.Event;
@@ -14,27 +16,25 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class ReminderScheduler {
     
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
     
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
     
     @Autowired
     @org.springframework.context.annotation.Lazy
     private EventRegistrationService eventRegistrationService;
 
-    @Autowired
-    private EmailQueueRepository emailQueueRepository;
+    private final EmailQueueRepository emailQueueRepository;
     
     /**
      * Runs every hour to check for events
      */
     @Scheduled(cron = "0 0 * * * *") // Every hour
     public void sendEventReminders() {
-        System.out.println("⏰ Checking for event reminders...");
+        log.info("⏰ Checking for event reminders...");
         
         LocalDateTime now = LocalDateTime.now();
         List<Event> upcomingEvents = eventRepository.findByEventDateAfter(now);
@@ -74,7 +74,7 @@ public class ReminderScheduler {
     /**
      * Polls the email queue and processes pending emails that are due
      */
-    @Scheduled(fixedDelay = 10000) // Every 10 seconds
+    @Scheduled(fixedDelay = AppConstants.SCHEDULER_POLL_MS) // Every 10 seconds
     public void processEmailQueue() {
         LocalDateTime now = LocalDateTime.now();
         List<EmailQueue> pendingEmails = emailQueueRepository.findByStatusAndNextAttemptAtBefore("PENDING", now);
