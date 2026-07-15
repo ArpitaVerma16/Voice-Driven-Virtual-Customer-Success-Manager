@@ -149,6 +149,32 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- OpenNLP for Sentiment Analysis -->
+<dependency>
+    <groupId>org.apache.opennlp</groupId>
+    <artifactId>opennlp-tools</artifactId>
+    <version>2.3.0</version>
+</dependency>
+<!-- Sentence Embeddings -->
+<dependency>
+    <groupId>org.tensorflow</groupId>
+    <artifactId>tensorflow</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
+<!-- For Cosine Similarity -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-math3</artifactId>
+    <version>3.6.1</version>
+</dependency>
+<!-- JSON processing -->
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.10.1</version>
+</dependency>
+
 
         <!-- PostgreSQL Database Driver -->
         <dependency>
@@ -156,6 +182,7 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
 
         <!-- OpenAPI/Swagger Documentation -->
         <dependency>
