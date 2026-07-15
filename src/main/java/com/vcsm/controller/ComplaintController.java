@@ -19,7 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.vcsm.model.User;
+import com.vcsm.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +37,7 @@ public class ComplaintController {
 
     private final ComplaintService complaintService;
     private final ComplaintCommentService complaintCommentService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "File a new complaint", description = "Creates a new complaint")
     @ApiResponses(value = {
@@ -98,7 +103,13 @@ public class ComplaintController {
     @GetMapping("/{id}")
     public ResponseEntity<Complaint> getById(@PathVariable Long id) {
         return complaintService.getComplaintById(id)
-                .map(ResponseEntity::ok)
+                .map(complaint -> {
+                    if (isComplaintOwner(complaint) || isAdmin()) {
+                        return ResponseEntity.ok(complaint);
+                    } else {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body((Complaint) null);
+                    }
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -175,16 +186,32 @@ public class ComplaintController {
     @Operation(summary = "Get comments for a complaint")
     @GetMapping("/{id}/comments")
     public ResponseEntity<List<ComplaintCommentDTO>> getComments(@PathVariable Long id) {
-        return ResponseEntity.ok(complaintCommentService.getCommentsForComplaint(id));
+        return complaintService.getComplaintById(id)
+                .map(complaint -> {
+                    if (isComplaintOwner(complaint) || isAdmin()) {
+                        return ResponseEntity.ok(complaintCommentService.getCommentsForComplaint(id));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body((List<ComplaintCommentDTO>) null);
+                    }
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Add a comment to a complaint")
     @PostMapping("/{id}/comments")
     public ResponseEntity<ComplaintCommentDTO> addComment(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestBody Map<String, String> payload) {
-        String content = payload.get("content");
-        return ResponseEntity.ok(complaintCommentService.addComment(id, content));
+        return complaintService.getComplaintById(id)
+                .map(complaint -> {
+                    if (isComplaintOwner(complaint) || isAdmin()) {
+                        String content = payload.get("content");
+                        return ResponseEntity.ok(complaintCommentService.addComment(id, content));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body((ComplaintCommentDTO) null);
+                    }
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -213,5 +240,25 @@ public class ComplaintController {
             request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    private boolean isComplaintOwner(Complaint complaint) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            return false;
+        }
+
+        User currentUser = userRepository.findByEmail(auth.getName()).orElse(null);
+        if (currentUser == null) {
+            return false;
+        }
+
+        return complaint.getUser() != null && complaint.getUser().getId().equals(currentUser.getId());
+    }
+
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
     }
 }
