@@ -1,10 +1,12 @@
 package com.vcsm.quantum;
 
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Profile("dev")
 @Component
 public class QuantumCircuitBuilder {
 

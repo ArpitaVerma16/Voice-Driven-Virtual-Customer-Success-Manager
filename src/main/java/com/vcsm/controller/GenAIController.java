@@ -11,15 +11,27 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/genai")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class GenAIController {
 
-    @Autowired
-    private GenAIResolver genAIResolver;
+    private final GenAIResolver genAIResolver;
 
     @PostMapping("/resolve")
-    public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@RequestBody Complaint complaint) {
+    public ResponseEntity<GenAIResolver.ResolutionResult> resolveComplaint(@Valid @RequestBody Complaint complaint) {
         GenAIResolver.ResolutionResult result = genAIResolver.resolveComplaint(complaint);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/summarize")
+    public ResponseEntity<GenAIResolver.CallSummaryResult> summarizeCallSession(@Valid @RequestBody Map<String, String> request) {
+        String transcript = request.get("transcript");
+        String residentEmail = request.get("residentEmail");
+        
+        if (transcript == null || transcript.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        GenAIResolver.CallSummaryResult result = genAIResolver.summarizeCallSession(transcript, residentEmail);
         return ResponseEntity.ok(result);
     }
 

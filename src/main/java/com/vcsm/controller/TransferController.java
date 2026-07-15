@@ -13,23 +13,20 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transfer")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class TransferController {
 
-    @Autowired
-    private FederatedTransferService federatedTransferService;
+    private final FederatedTransferService federatedTransferService;
 
-    @Autowired
-    private DomainAdapter domainAdapter;
+    private final DomainAdapter domainAdapter;
 
-    @Autowired
-    private KnowledgeTransfer knowledgeTransfer;
+    private final KnowledgeTransfer knowledgeTransfer;
 
     @PostMapping("/node/register")
     public ResponseEntity<FederatedTransferService.FederatedNode> registerNode(
             @RequestParam String nodeId,
             @RequestParam String domain,
-            @RequestBody double[] domainFeatures) {
+            @Valid @RequestBody double[] domainFeatures) {
         return ResponseEntity.ok(federatedTransferService.registerNode(nodeId, domain, domainFeatures));
     }
 
@@ -79,7 +76,7 @@ public class TransferController {
     @PostMapping("/knowledge/create")
     public ResponseEntity<KnowledgeTransfer.KnowledgeBase> createKnowledgeBase(
             @RequestParam String domain,
-            @RequestBody KnowledgeRequest request) {
+            @Valid @RequestBody KnowledgeRequest request) {
         return ResponseEntity.ok(knowledgeTransfer.createKnowledgeBase(
             domain, request.getData(), request.getLabels()
         ));

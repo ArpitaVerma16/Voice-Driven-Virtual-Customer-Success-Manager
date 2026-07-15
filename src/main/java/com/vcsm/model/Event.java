@@ -1,10 +1,12 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "events")
@@ -17,19 +19,27 @@ public class Event {
     @NotBlank(message = "Event name is required")
     private String name;
 
+    @Size(max = 2000)
     @Column(length = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)
     private EventCategory category;
 
+    @Size(max = 500)
     private String location;
+    @NotNull
     private LocalDateTime eventDate;
+    @Min(1)
+    @Max(10000)
     private int maxCapacity;
     private int registrations = 0;
     private boolean active = true;
     private String organizer;
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<EventRegistration> registrationList = new ArrayList<>();
 
 
 

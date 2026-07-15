@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,19 +17,18 @@ import java.util.Optional;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class WaitlistService {
+
+    private static final Logger log = LoggerFactory.getLogger(WaitlistService.class);
     
-    @Autowired
-    private EventWaitlistRepository waitlistRepository;
+    private final EventWaitlistRepository waitlistRepository;
     
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
     
-    @Autowired
-    private EventRegistrationService eventRegistrationService;
+    private final EventRegistrationService eventRegistrationService;
     
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
     
     /**
      * Add user to waitlist
@@ -37,12 +38,12 @@ public class WaitlistService {
         // Check if already on waitlist
         Optional<EventWaitlist> existing = waitlistRepository.findByEventAndUser(event, user);
         if (existing.isPresent()) {
-            throw new RuntimeException("Already on waitlist");
+            throw new CustomDomainException("Already on waitlist");
         }
         
         // Check if event is actually full
         if (event.getRegistrations() < event.getMaxCapacity()) {
-            throw new RuntimeException("Event has available slots. Please register directly.");
+            throw new CustomDomainException("Event has available slots. Please register directly.");
         }
         
         EventWaitlist waitlistEntry = new EventWaitlist(event, user);
@@ -83,32 +84,47 @@ public class WaitlistService {
      */
     @Transactional
     public void processWaitlist(Event event) {
-        // Check if there are available slots
-        if (event.getRegistrations() >= event.getMaxCapacity()) {
-            return; // No slots available
-        }
+        long pendingUnexpired = waitlistRepository.countByEventAndConfirmedFalseAndExpiresAtAfter(event, LocalDateTime.now());
+        long availableSlots = event.getMaxCapacity() - event.getRegistrations() - pendingUnexpired;
         
-        // Get first waiting user (FIFO)
-        Optional<EventWaitlist> firstWaitlist = waitlistRepository
-            .findFirstByEventAndConfirmedFalseOrderByJoinedAtAsc(event);
-        
-        if (firstWaitlist.isEmpty()) {
+        if (availableSlots <= 0) {
             return;
         }
         
-        EventWaitlist waitlistEntry = firstWaitlist.get();
-        User user = waitlistEntry.getUser();
-        
-        // Notify the user
-        try {
-            emailService.sendEventSlotAvailable(event, user);
-            waitlistEntry.setNotifiedAt(LocalDateTime.now());
-            waitlistEntry.setExpiresAt(LocalDateTime.now().plusHours(24));
-            waitlistRepository.save(waitlistEntry);
+        for (int i = 0; i < availableSlots; i++) {
+            Optional<EventWaitlist> nextOpt = waitlistRepository
+                .findFirstByEventAndConfirmedFalseAndNotifiedAtIsNullOrderByJoinedAtAsc(event);
+            if (nextOpt.isEmpty()) {
+                break;
+            }
+            EventWaitlist entry = nextOpt.get();
+            try {
+                User user = entry.getUser();
+                entry.setNotifiedAt(LocalDateTime.now());
+                entry.setExpiresAt(LocalDateTime.now().plusHours(24));
+                waitlistRepository.save(entry);
+                emailService.sendEventSlotAvailable(event, user);
+                log.info("Waitlist notification sent to user: {}", user.getEmail());
+            } catch (Exception e) {
+                log.error("Failed to process waitlist entry {}: {}", entry.getId(), e.getMessage(), e);
+            }
             
-            System.out.println("✅ Notification sent to user: " + user.getEmail());
-        } catch (Exception e) {
-            System.err.println("❌ Failed to send notification: " + e.getMessage());
+            if (firstWaitlist.isEmpty()) {
+                break;
+            }
+            
+            EventWaitlist entry = firstWaitlist.get();
+            User user = entry.getUser();
+            
+            try {
+                emailService.sendEventSlotAvailable(event, user);
+                entry.setNotifiedAt(LocalDateTime.now());
+                entry.setExpiresAt(LocalDateTime.now().plusHours(24));
+                waitlistRepository.save(entry);
+                log.info("✅ Waitlist notification sent to user: {}", user.getEmail());
+            } catch (Exception e) {
+                log.error("Failed to send waitlist notification to user {}: {}", user.getEmail(), e.getMessage(), e);
+            }
         }
     }
     
@@ -120,24 +136,24 @@ public class WaitlistService {
         Optional<EventWaitlist> waitlistEntry = waitlistRepository.findByEventAndUser(event, user);
         
         if (waitlistEntry.isEmpty()) {
-            throw new RuntimeException("Not on waitlist");
+            throw new CustomDomainException("Not on waitlist");
         }
         
         EventWaitlist entry = waitlistEntry.get();
         
         // Check if expired
         if (entry.getExpiresAt() != null && entry.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Waitlist invitation expired");
+            throw new CustomDomainException("Waitlist invitation expired");
         }
         
         // Check if already confirmed
         if (entry.isConfirmed()) {
-            throw new RuntimeException("Already confirmed");
+            throw new CustomDomainException("Already confirmed");
         }
         
         // Check if event still has slots
         if (event.getRegistrations() >= event.getMaxCapacity()) {
-            throw new RuntimeException("Event is full again");
+            throw new CustomDomainException("Event is full again");
         }
         
         // Register user for event
@@ -165,7 +181,7 @@ public class WaitlistService {
         for (EventWaitlist entry : expired) {
             Event event = entry.getEvent();
             waitlistRepository.delete(entry);
-            System.out.println("🗑️ Removed expired waitlist entry: " + entry.getId());
+            log.info("🗑️ Removed expired waitlist entry: " + entry.getId());
             processWaitlist(event);
         }
     }

@@ -7,7 +7,7 @@ import java.util.*;
 @Component
 public class InferenceEngine {
 
-    private final Map<String, Object> knowledgeBase = new HashMap<>();
+    private final Map<String, Object> knowledgeBase = new ConcurrentHashMap<>();
 
     public InferenceEngine() {
         initializeKnowledgeBase();

@@ -7,15 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class UserActivityService {
     
-    @Autowired
-    private UserActivityRepository userActivityRepository;
+    private final UserActivityRepository userActivityRepository;
     
     public void logActivity(User user, String actionType, String description, Long referenceId) {
         UserActivity activity = new UserActivity(user, actionType, description, referenceId);
@@ -35,6 +36,10 @@ public class UserActivityService {
     
     public List<UserActivity> getUserActivitiesByType(User user, String actionType) {
         return userActivityRepository.findByUserAndActionTypeOrderByCreatedAtDesc(user, actionType);
+    }
+
+    public Page<UserActivity> getUserActivitiesByType(User user, String actionType, Pageable pageable) {
+        return userActivityRepository.findByUserAndActionType(user, actionType, pageable);
     }
     
     public long getActivityCount(User user) {

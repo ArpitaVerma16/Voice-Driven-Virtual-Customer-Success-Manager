@@ -3,6 +3,7 @@ package com.vcsm.controller;
 import com.vcsm.security.DeepfakeDetector;
 import com.vcsm.security.FraudAlertService;
 import com.vcsm.security.VoiceLivenessService;
+import com.vcsm.service.VoiceOtpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,22 +13,21 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/security")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SecurityController {
 
-    @Autowired
-    private DeepfakeDetector deepfakeDetector;
+    private final DeepfakeDetector deepfakeDetector;
 
-    @Autowired
-    private VoiceLivenessService livenessService;
+    private final VoiceLivenessService livenessService;
 
-    @Autowired
-    private FraudAlertService fraudAlertService;
+    private final FraudAlertService fraudAlertService;
+
+    private final VoiceOtpService voiceOtpService;
 
     @PostMapping("/detect-deepfake")
     public ResponseEntity<DeepfakeDetector.DeepfakeAnalysis> detectDeepfake(
             @RequestParam String userId,
-            @RequestBody byte[] audioData) {
+            @Valid @RequestBody byte[] audioData) {
         
         DeepfakeDetector.DeepfakeAnalysis analysis = deepfakeDetector.analyze(audioData, userId);
         
@@ -62,6 +62,37 @@ public class SecurityController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/otp/challenge")
+    public ResponseEntity<VoiceOtpService.VoiceOtpSession> createOtpChallenge(
+            @RequestParam Long userId) {
+        VoiceOtpService.VoiceOtpSession session = voiceOtpService.generateChallenge(userId);
+        return ResponseEntity.ok(session);
+    }
+
+    @PostMapping("/otp/verify")
+    public ResponseEntity<MfaVerificationResult> verifyOtp(
+            @RequestParam String sessionId,
+            @RequestParam String voiceSample) {
+        VoiceOtpService.VoiceOtpSessionVerificationResult result = voiceOtpService.verifyOtp(sessionId, voiceSample);
+        
+        if (!result.isVerified() && result.getUserId() != null) {
+            fraudAlertService.raiseAlert(
+                String.valueOf(result.getUserId()),
+                "Voice MFA OTP verification failed",
+                "HIGH"
+            );
+        }
+        
+        MfaVerificationResult response = new MfaVerificationResult(
+            result.isVerified(),
+            result.getMessage(),
+            result.getTranscript(),
+            result.getBiometricsScore()
+        );
+        
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/fraud/alerts")
     public ResponseEntity<?> getAlerts(@RequestParam(required = false) String userId) {
         if (userId != null) {
@@ -93,5 +124,24 @@ public class SecurityController {
         status.put("fraudAlertSystem", "active");
         status.put("totalAlerts", fraudAlertService.getAllAlerts().size());
         return ResponseEntity.ok(status);
+    }
+
+    public static class MfaVerificationResult {
+        private final boolean verified;
+        private final String message;
+        private final String transcript;
+        private final double biometricsScore;
+
+        public MfaVerificationResult(boolean verified, String message, String transcript, double biometricsScore) {
+            this.verified = verified;
+            this.message = message;
+            this.transcript = transcript;
+            this.biometricsScore = biometricsScore;
+        }
+
+        public boolean isVerified() { return verified; }
+        public String getMessage() { return message; }
+        public String getTranscript() { return transcript; }
+        public double getBiometricsScore() { return biometricsScore; }
     }
 }

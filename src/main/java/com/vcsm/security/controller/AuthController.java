@@ -15,14 +15,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AppUserRepository userRepository;
     private final AuthService authService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(AppUserRepository userRepository, AuthService authService, PasswordEncoder passwordEncoder) {
+    public AuthController(AppUserRepository userRepository,
+                          AuthService authService,
+                          PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.authService = authService;
         this.passwordEncoder = passwordEncoder;
@@ -36,10 +37,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest req) {
-        AppUser user = userRepository.findByUsername(req.getUsername())
-                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
-        if (!passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
+        AppUser user = userRepository.findByUsername(req.getUsername()).orElse(null);
+
+        if (user == null || !passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
             throw new BadCredentialsException("Invalid username or password");
         }
 
@@ -49,13 +50,19 @@ public class AuthController {
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Map<String, Object> handleBadCred(BadCredentialsException ex) {
-        return Map.of("error", ex.getMessage(), "success", false);
+        return Map.of(
+                "error", ex.getMessage(),
+                "success", false
+        );
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleRuntime(RuntimeException ex) {
-        return Map.of("error", ex.getMessage(), "success", false);
+        return Map.of(
+                "error", ex.getMessage(),
+                "success", false
+        );
     }
-}
+
 

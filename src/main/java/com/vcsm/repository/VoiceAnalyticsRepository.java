@@ -4,16 +4,26 @@ import com.vcsm.model.VoiceAnalytics;
 import com.vcsm.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+
 @Repository
 public interface VoiceAnalyticsRepository extends JpaRepository<VoiceAnalytics, Long> {
     
+
+    List<VoiceAnalytics> findByUserOrderByCreatedAtDesc(User user);
+
     List<VoiceAnalytics> findByUser(User user);
+
     
     List<VoiceAnalytics> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     

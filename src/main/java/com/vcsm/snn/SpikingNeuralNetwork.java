@@ -3,19 +3,20 @@ package com.vcsm.snn;
 import com.vcsm.snn.LIFNeuronModel.LIFNeuron;
 import com.vcsm.snn.LIFNeuronModel.LayerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Profile("dev")
 @Service
+@lombok.RequiredArgsConstructor
 public class SpikingNeuralNetwork {
 
-    @Autowired
-    private LIFNeuronModel lifNeuronModel;
+    private final LIFNeuronModel lifNeuronModel;
 
-    @Autowired
-    private STDPLearning stdpLearning;
+    private final STDPLearning stdpLearning;
 
     private List<LIFNeuron> inputLayer;
     private List<LIFNeuron> hiddenLayer;
@@ -60,7 +61,7 @@ public class SpikingNeuralNetwork {
      */
     public SNNResponse forward(double[] input) {
         if (!initialized) {
-            throw new RuntimeException("SNN not initialized. Call initialize() first.");
+            throw new CustomDomainException("SNN not initialized. Call initialize() first.");
         }
 
         double timeStep = 1.0;
@@ -98,7 +99,7 @@ public class SpikingNeuralNetwork {
      */
     public void train(double[][] trainingData, int epochs) {
         if (!initialized) {
-            throw new RuntimeException("SNN not initialized. Call initialize() first.");
+            throw new CustomDomainException("SNN not initialized. Call initialize() first.");
         }
 
         for (int epoch = 0; epoch < epochs; epoch++) {

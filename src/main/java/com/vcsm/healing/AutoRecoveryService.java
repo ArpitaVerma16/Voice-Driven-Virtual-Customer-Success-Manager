@@ -1,5 +1,7 @@
 package com.vcsm.healing;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -7,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AutoRecoveryService {
+
+    private static final Logger log = LoggerFactory.getLogger(AutoRecoveryService.class);
 
     private final Map<String, RecoveryAction> activeRecoveries = new ConcurrentHashMap<>();
     private final List<String> recoveryHistory = new ArrayList<>();
@@ -30,6 +34,7 @@ public class AutoRecoveryService {
 
             return new RecoveryResult(recoveryId, status, action, logEntry);
         } catch (Exception e) {
+            log.error("Recovery {} failed for action {}: {}", recoveryId, action.getType(), e.getMessage(), e);
             return new RecoveryResult(recoveryId, "FAILED", action, "Recovery failed: " + e.getMessage());
         }
     }
@@ -57,6 +62,8 @@ public class AutoRecoveryService {
             Thread.sleep(100);
             return true;
         } catch (InterruptedException e) {
+            log.warn("Recovery execution interrupted: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
             return false;
         }
     }

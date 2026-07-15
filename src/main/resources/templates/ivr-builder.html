@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>IVR Flow Builder - VCSM</title>
+    
+    <!-- Favicon & Stylesheets -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='80' text-anchor='middle' dy='.3em'%3E📞%3C/text%3E%3C/svg%3E">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/dark-mode-toggle.css">
+    <link rel="stylesheet" href="/css/hover-effects.css">
+    <link rel="stylesheet" href="/css/toast-notifications.css">
+    <link rel="stylesheet" href="/css/spinners.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <style>
+        .tree-node-wrapper {
+            margin-left: 30px;
+            position: relative;
+            padding-left: 15px;
+            border-left: 2px dashed rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        .tree-node-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            width: 15px;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.2);
+        }
+        .node-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .dark-mode .node-card {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .node-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+        .node-card.selected {
+            border: 2px solid #8b5cf6 !important;
+            background: rgba(139, 92, 246, 0.04) !important;
+        }
+        .node-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #8b5cf6;
+        }
+        .node-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted, #6c757d);
+        }
+        .node-actions {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .node-card:hover .node-actions {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fas fa-robot me-2"></i>VCSM
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <div class="navbar-nav ms-auto text-center">
+                <a class="nav-link" href="/">Dashboard</a>
+                <a class="nav-link" href="/complaints">Complaints</a>
+                <a class="nav-link" href="/events">Events</a>
+                <a class="nav-link active" href="/ivr-builder">IVR Builder</a>
+            </div>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <button class="btn btn-link nav-link" onclick="toggleDarkMode()" style="color: white; font-size: 20px;">
+                    <i class="fas fa-moon" id="darkModeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold"><i class="fas fa-sitemap text-purple me-2"></i>Interactive IVR Menu Builder</h4>
+            <p class="text-muted small">Design and customize Interactive Voice Response (IVR) flows dynamically without writing code.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-purple" onclick="saveFlowConfig()">
+                <i class="fas fa-save me-1"></i> Save Configuration
+            </button>
+            <button class="btn btn-outline-danger" onclick="resetToDefault()">
+                <i class="fas fa-undo me-1"></i> Reset to Default
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Flow Canvas / Tree representation -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white fw-bold border-0 py-3 d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-network-wired me-2 text-purple"></i>IVR Menu Hierarchy</span>
+                    <span class="badge bg-purple-soft text-purple">Click any node to edit</span>
+                </div>
+                <div class="card-body bg-light-soft p-4" style="min-height: 520px; overflow-y: auto;">
+                    <div id="treeContainer">
+                        <!-- Hierarchy gets rendered here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node Inspector / Details Panel -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white fw-bold border-0 py-3">
+                    <i class="fas fa-info-circle me-2 text-purple"></i>Node Inspector
+                </div>
+                <div class="card-body" id="inspectorBody">
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-mouse-pointer fa-2x mb-3 text-purple-soft"></i>
+                        <p>Select any node in the hierarchy tree to inspect and configure its attributes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Guide Card -->
+            <div class="card shadow-sm bg-purple-soft border-0">
+                <div class="card-body text-purple">
+                    <h6 class="fw-bold"><i class="fas fa-lightbulb me-1"></i>Flow Builder Tips</h6>
+                    <ul class="small ps-3 mb-0">
+                        <li class="mb-1"><strong>Root Prompt</strong> plays when the call starts.</li>
+                        <li class="mb-1"><strong>Patterns</strong> match speech inputs (e.g. <code>1|one|complaint</code>).</li>
+                        <li class="mb-1"><strong>Redirection Actions</strong> automatically route call outcomes.</li>
+                        <li>Leaving action as <code>none</code> expects next menu choices.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="mt-5 py-4 text-center text-muted border-top bg-light">
+    <small>Voice-Driven Virtual Customer Success Manager &bull; Interactive Voice Response Service</small>
+</footer>
+
+<!-- JavaScript Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/toast-notifications.js"></script>
+<script src="/js/dark-mode.js"></script>
+
+<script>
+    let flowTree = null;
+    let selectedNodeId = null;
+
+    // Load configuration
+    function loadFlowConfig() {
+        fetch('/api/voice/flow-config')
+            .then(r => r.json())
+            .then(data => {
+                flowTree = data;
+                renderTree();
+                if (typeof toast !== 'undefined') {
+                    toast.success('IVR configuration loaded successfully.', 'Load Status');
+                }
+            })
+            .catch(err => {
+                console.error('Error loading config:', err);
+                if (typeof toast !== 'undefined') {
+                    toast.error('Failed to load flow config', 'Error');
+                }
+            });
+    }
+
+    // Render tree representation
+    function renderTree() {
+        const container = document.getElementById('treeContainer');
+        container.innerHTML = '';
+        if (flowTree) {
+            container.appendChild(createNodeElement(flowTree, true));
+        }
+    }
+
+    // Create a node HTML element recursively
+    function createNodeElement(node, isRoot = false) {
+        const div = document.createElement('div');
+        div.className = isRoot ? 'root-node-container' : 'tree-node-wrapper';
+
+        const card = document.createElement('div');
+        card.className = 'node-card shadow-sm';
+        if (node.id === selectedNodeId) {
+            card.classList.add('selected');
+        }
+        card.onclick = (e) => {
+            e.stopPropagation();
+            selectNode(node.id);
+        };
+
+        const patternBadge = isRoot ? 
+            `<span class="badge bg-purple text-white">ROOT MENU</span>` : 
+            `<span class="badge bg-secondary text-white">Pattern: "${node.pattern}"</span>`;
+
+        const actionBadge = node.action && node.action !== 'none' ? 
+            `<span class="badge bg-info text-dark ms-1"><i class="fas fa-external-link-alt me-1"></i>${node.action}</span>` : 
+            '';
+
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="node-title"><i class="fas ${isRoot ? 'fa-phone-square' : 'fa-align-left'} me-1"></i>${node.id}</span>
+                <div>
+                    ${patternBadge}
+                    ${actionBadge}
+                </div>
+            </div>
+            <div class="node-meta text-truncate"><strong>Prompt:</strong> "${node.prompt}"</div>
+            <div class="node-actions btn-group">
+                <button class="btn btn-purple btn-sm py-0 px-2" onclick="addChildNode(event, '${node.id}')"><i class="fas fa-plus"></i></button>
+                ${!isRoot ? `<button class="btn btn-outline-danger btn-sm py-0 px-2" onclick="deleteNode(event, '${node.id}')"><i class="fas fa-trash-alt"></i></button>` : ''}
+            </div>
+        `;
+
+        div.appendChild(card);
+
+        if (node.options && node.options.length > 0) {
+            node.options.forEach(child => {
+                div.appendChild(createNodeElement(child));
+            });
+        }
+
+        return div;
+    }
+
+    // Select a node and populate inspector
+    function selectNode(nodeId) {
+        selectedNodeId = nodeId;
+        renderTree();
+
+        const node = findNodeById(flowTree, nodeId);
+        const inspector = document.getElementById('inspectorBody');
+        if (!node) return;
+
+        const isRoot = node.id === 'root';
+
+        inspector.innerHTML = `
+            <div class="mb-3">
+                <label class="form-label small text-muted">Node ID (Unique)</label>
+                <input type="text" class="form-control" id="inspectId" value="${node.id}" ${isRoot ? 'readonly' : ''} oninput="updateSelectedNode('id', this.value)">
+            </div>
+            <div class="mb-3">
+                <label class="form-label small text-muted">Resident Voice Prompt</label>
+                <textarea class="form-control" id="inspectPrompt" rows="3" oninput="updateSelectedNode('prompt', this.value)">${node.prompt}</textarea>
+            </div>
+            ${!isRoot ? `
+            <div class="mb-3">
+                <label class="form-label small text-muted">Matching Patterns (Regex options, e.g. <code>new|file</code>)</label>
+                <input type="text" class="form-control" id="inspectPattern" value="${node.pattern || ''}" oninput="updateSelectedNode('pattern', this.value)">
+            </div>
+            <div class="mb-3">
+                <label class="form-label small text-muted">Redirection Action</label>
+                <select class="form-select" id="inspectAction" onchange="updateSelectedNode('action', this.value)">
+                    <option value="none" ${node.action === 'none' || !node.action ? 'selected' : ''}>none (Navigate sub-menu)</option>
+                    <option value="action_file_complaint" ${node.action === 'action_file_complaint' ? 'selected' : ''}>File Complaint (action_file_complaint)</option>
+                    <option value="action_view_complaints" ${node.action === 'action_view_complaints' ? 'selected' : ''}>View Complaints (action_view_complaints)</option>
+                    <option value="action_book_event" ${node.action === 'action_book_event' ? 'selected' : ''}>Book Event (action_book_event)</option>
+                    <option value="action_view_events" ${node.action === 'action_view_events' ? 'selected' : ''}>View Events (action_view_events)</option>
+                </select>
+            </div>
+            ` : ''}
+            <div class="d-grid mt-3">
+                <button class="btn btn-outline-purple" onclick="addChildNode(null, '${node.id}')">
+                    <i class="fas fa-plus me-1"></i> Add Child Option
+                </button>
+            </div>
+        `;
+    }
+
+    // Update fields dynamically in memory
+    function updateSelectedNode(field, val) {
+        const node = findNodeById(flowTree, selectedNodeId);
+        if (node) {
+            node[field] = val;
+            // Immediate partial refresh without losing input focus
+            const cardTitle = document.querySelector(`.node-card.selected .node-title`);
+            const cardPrompt = document.querySelector(`.node-card.selected .node-meta`);
+            if (cardTitle && field === 'id') cardTitle.innerHTML = `<i class="fas fa-align-left me-1"></i>${val}`;
+            if (cardPrompt && field === 'prompt') cardPrompt.innerHTML = `<strong>Prompt:</strong> "${val}"`;
+        }
+    }
+
+    // Add a child node
+    function addChildNode(event, parentId) {
+        if (event) event.stopPropagation();
+
+        const parent = findNodeById(flowTree, parentId);
+        if (!parent) return;
+
+        if (!parent.options) {
+            parent.options = [];
+        }
+
+        const newId = 'option_' + Math.random().toString(36).substr(2, 5);
+        const newNode = {
+            id: newId,
+            prompt: 'Say something...',
+            pattern: 'key_word',
+            action: 'none',
+            options: []
+        };
+
+        parent.options.push(newNode);
+        selectedNodeId = newId;
+        renderTree();
+        selectNode(newId);
+
+        if (typeof toast !== 'undefined') {
+            toast.success('New child node added.', 'Tree Update');
+        }
+    }
+
+    // Delete a node
+    function deleteNode(event, nodeId) {
+        if (event) event.stopPropagation();
+
+        if (confirm('Are you sure you want to delete this option and all its children?')) {
+            removeNodeById(flowTree, nodeId);
+            selectedNodeId = null;
+            renderTree();
+            document.getElementById('inspectorBody').innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-mouse-pointer fa-2x mb-3 text-purple-soft"></i>
+                    <p>Select any node in the hierarchy tree to inspect and configure its attributes.</p>
+                </div>
+            `;
+            if (typeof toast !== 'undefined') {
+                toast.warning('Node deleted.', 'Tree Update');
+            }
+        }
+    }
+
+    // Helper functions
+    function findNodeById(current, id) {
+        if (current.id === id) return current;
+        if (current.options) {
+            for (let i = 0; i < current.options.length; i++) {
+                const found = findNodeById(current.options[i], id);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    function removeNodeById(current, id) {
+        if (current.options) {
+            const index = current.options.findIndex(node => node.id === id);
+            if (index !== -1) {
+                current.options.splice(index, 1);
+                return true;
+            }
+            for (let i = 0; i < current.options.length; i++) {
+                if (removeNodeById(current.options[i], id)) return true;
+            }
+        }
+        return false;
+    }
+
+    // Save configuration
+    function saveFlowConfig() {
+        if (!flowTree) return;
+
+        fetch('/api/voice/flow-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ flowJson: JSON.stringify(flowTree, null, 2) })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof toast !== 'undefined') {
+                    toast.success('Active voice flow structure updated successfully!', 'Saved');
+                } else {
+                    alert('Active voice flow structure updated successfully!');
+                }
+            } else {
+                alert('Save failed: ' + data.error);
+            }
+        })
+        .catch(err => console.error('Save error:', err));
+    }
+
+    // Reset configuration to default
+    function resetToDefault() {
+        if (confirm('Reset active IVR configuration back to defaults?')) {
+            const defaultFlow = {
+                "id": "root",
+                "prompt": "Welcome to VCSM voice support. Say '1' for complaints, or '2' for community events.",
+                "options": [
+                    {
+                        "id": "complaints_menu",
+                        "pattern": "1|one|complaint|complaints",
+                        "prompt": "You selected complaints. Say 'new' to file a new complaint, or 'status' to check existing complaints.",
+                        "options": [
+                            {
+                                "id": "file_complaint",
+                                "pattern": "new|file|create",
+                                "prompt": "Redirecting you to the file complaint screen. Please describe your issue.",
+                                "action": "action_file_complaint"
+                            },
+                            {
+                                "id": "view_complaints",
+                                "pattern": "status|check|existing",
+                                "prompt": "Opening your active complaints board.",
+                                "action": "action_view_complaints"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "events_menu",
+                        "pattern": "2|two|event|events",
+                        "prompt": "You selected events. Say 'book' to book a new event ticket, or 'list' to view available events.",
+                        "options": [
+                            {
+                                "id": "book_event",
+                                "pattern": "book|reserve|register",
+                                "prompt": "Redirecting to the event registration section.",
+                                "action": "action_book_event"
+                            },
+                            {
+                                "id": "view_events",
+                                "pattern": "list|view|show",
+                                "prompt": "Opening the community events board.",
+                                "action": "action_view_events"
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            flowTree = defaultFlow;
+            selectedNodeId = null;
+            renderTree();
+            document.getElementById('inspectorBody').innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-mouse-pointer fa-2x mb-3 text-purple-soft"></i>
+                    <p>Select any node in the hierarchy tree to inspect and configure its attributes.</p>
+                </div>
+            `;
+            saveFlowConfig();
+        }
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', loadFlowConfig);
+</script>
+</body>
+</html>

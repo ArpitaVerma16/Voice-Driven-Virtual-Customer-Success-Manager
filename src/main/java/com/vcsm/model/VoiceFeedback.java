@@ -1,7 +1,10 @@
 package com.vcsm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "voice_feedback")
@@ -22,6 +25,12 @@ public class VoiceFeedback {
     @Column(name = "feedback", nullable = false)
     private String feedback; // 'UP' or 'DOWN'
     
+    @Min(1)
+    @Max(5)
+    @Column(name = "rating")
+    private int rating;
+    
+    @Size(max = 2000)
     @Column(length = 500)
     private String comment;
     
@@ -55,6 +64,9 @@ public class VoiceFeedback {
     
     public String getFeedback() { return feedback; }
     public void setFeedback(String feedback) { this.feedback = feedback; }
+    
+    public int getRating() { return rating; }
+    public void setRating(int rating) { this.rating = rating; }
     
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }

@@ -11,11 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/healing")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class SelfHealingController {
 
-    @Autowired
-    private SelfHealingEngine selfHealingEngine;
+    private final SelfHealingEngine selfHealingEngine;
 
     @PostMapping("/run")
     public ResponseEntity<Map<String, String>> runHealingCycle() {

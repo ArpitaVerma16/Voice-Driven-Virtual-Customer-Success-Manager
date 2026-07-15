@@ -55,11 +55,11 @@ public class ResponseGenerator {
     private String generateEmpathy(String tone) {
         switch (tone) {
             case "empathy":
-                return "We understand how frustrating this issue can be and we sincerely apologize for the inconvenience caused. We are committed to resolving this as quickly as possible.";
+                return org.springframework.http.ResponseEntity.ok("We understand how frustrating this issue can be and we sincerely apologize for the inconvenience caused. We are committed to resolving this as quickly as possible.");
             case "urgent":
-                return "We recognize the urgency of this matter and are treating it with the highest priority. Our team is actively working on this.";
+                return org.springframework.http.ResponseEntity.ok("We recognize the urgency of this matter and are treating it with the highest priority. Our team is actively working on this.");
             default:
-                return "Thank you for bringing this to our attention. We are here to help resolve your issue.";
+                return org.springframework.http.ResponseEntity.ok("Thank you for bringing this to our attention. We are here to help resolve your issue.");
         }
     }
 
@@ -133,17 +133,17 @@ public class ResponseGenerator {
             else if ("HIGH".equals(complaint.getPriority())) eta = "4 hours";
         }
         
-        return "📅 Resolution Timeline: " + eta + " (Started: " + date + ")";
+        return org.springframework.http.ResponseEntity.ok("📅 Resolution Timeline: " + eta + " (Started: " + date + ")");
     }
 
     private String generateClosing(String tone) {
         switch (tone) {
             case "empathy":
-                return "We appreciate your patience and understanding. Please don't hesitate to reach out if you need any further assistance.";
+                return org.springframework.http.ResponseEntity.ok("We appreciate your patience and understanding. Please don't hesitate to reach out if you need any further assistance.");
             case "urgent":
-                return "We will keep you updated on the progress. Thank you for your cooperation.";
+                return org.springframework.http.ResponseEntity.ok("We will keep you updated on the progress. Thank you for your cooperation.");
             default:
-                return "Thank you for your trust in us. We are committed to resolving your issue satisfactorily.";
+                return org.springframework.http.ResponseEntity.ok("Thank you for your trust in us. We are committed to resolving your issue satisfactorily.");
         }
     }
 

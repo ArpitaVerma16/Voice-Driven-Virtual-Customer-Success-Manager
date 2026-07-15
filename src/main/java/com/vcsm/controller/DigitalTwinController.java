@@ -13,14 +13,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/twin")
-@CrossOrigin(origins = "*")
+@lombok.RequiredArgsConstructor
 public class DigitalTwinController {
 
-    @Autowired
-    private DigitalTwinService digitalTwinService;
+    private final DigitalTwinService digitalTwinService;
 
     @PostMapping
-    public ResponseEntity<DigitalTwin> createTwin(@RequestBody DigitalTwin twin) {
+    public ResponseEntity<DigitalTwin> createTwin(@Valid @RequestBody DigitalTwin twin) {
         return ResponseEntity.ok(digitalTwinService.createTwin(twin));
     }
 

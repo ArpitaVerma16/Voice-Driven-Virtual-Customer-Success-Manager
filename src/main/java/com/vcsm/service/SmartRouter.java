@@ -1,35 +1,35 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
+
+import com.vcsm.config.AppConstants;
 
 import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
 import com.vcsm.ml.TicketClassifier;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class SmartRouter {
 
-    @Autowired
-    private TicketClassifier classifier;
+    private final TicketClassifier classifier;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    // Admin expertise mapping
-    private static final Map<String, List<String>> ADMIN_EXPERTISE = new HashMap<>();
+    @Value("#{${router.admin.expertise:{'admin@example.com':['NOISE','MAINTENANCE','SECURITY'],'security@example.com':['SECURITY','PARKING'],'maintenance@example.com':['MAINTENANCE','UTILITIES']}}}")
+    private Map<String, List<String>> adminExpertise;
 
     static {
-        ADMIN_EXPERTISE.put("admin@example.com", Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
-        ADMIN_EXPERTISE.put("security@example.com", Arrays.asList("SECURITY", "PARKING"));
-        ADMIN_EXPERTISE.put("maintenance@example.com", Arrays.asList("MAINTENANCE", "UTILITIES"));
+        ADMIN_EXPERTISE.put(AppConstants.ADMIN_EMAIL, Arrays.asList("NOISE", "MAINTENANCE", "SECURITY"));
+        ADMIN_EXPERTISE.put(AppConstants.SECURITY_EMAIL, Arrays.asList("SECURITY", "PARKING"));
+        ADMIN_EXPERTISE.put(AppConstants.MAINTENANCE_EMAIL, Arrays.asList("MAINTENANCE", "UTILITIES"));
     }
 
     /**
@@ -86,7 +86,7 @@ public class SmartRouter {
         if (containsAny(lower, "water", "leak", "flood", "power", "outage")) urgency += 15;
         if (containsAny(lower, "again", "repeat", "still", "not fixed")) urgency += 10;
 
-        return Math.min(100, urgency);
+return Math.min(100, urgency);
     }
 
     private boolean containsAny(String text, String... keywords) {
@@ -97,33 +97,35 @@ public class SmartRouter {
     }
 
     private User findBestAdmin(String category) {
-        // Find admin with matching expertise
-        for (Map.Entry<String, List<String>> entry : ADMIN_EXPERTISE.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : adminExpertise.entrySet()) {
             if (entry.getValue().contains(category)) {
                 return userRepository.findByEmail(entry.getKey()).orElse(null);
             }
         }
         // Fallback to first admin
-        return userRepository.findByEmail("admin@example.com").orElse(null);
+        return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
+        String firstAdmin = adminExpertise.keySet().iterator().next();
+        return userRepository.findByEmail(firstAdmin).orElse(null);
     }
 
     private List<Complaint> findDuplicates(Complaint complaint) {
-        List<Complaint> allComplaints = complaintRepository.findAll();
-        return allComplaints.stream()
-            .filter(c -> !c.getId().equals(complaint.getId()))
-            .filter(c -> c.getStatus() != Complaint.ComplaintStatus.RESOLVED)
-            .filter(c -> {
-                String desc1 = c.getDescription().toLowerCase();
-                String desc2 = complaint.getDescription().toLowerCase();
-                String[] words = desc2.split(" ");
-                long matches = 0;
-                for (String w : words) {
-                    if (desc1.contains(w) && w.length() > 3) matches++;
-                }
-                return matches >= 2;
-            })
-            .limit(5)
-            .collect(Collectors.toList());
+        return complaintRepository.findByCategory(complaint.getCategory()).stream()
+                .filter(c -> !c.getId().equals(complaint.getId()))
+                .filter(c -> c.getDescription() != null && complaint.getDescription() != null
+                        && similarity(c.getDescription(), complaint.getDescription()) >= 0.7)
+                .limit(5)
+                .collect(Collectors.toList());
+    }
+
+    private double similarity(String a, String b) {
+        if (a == null || b == null) return 0.0;
+        Set<String> wordsA = new HashSet<>(Arrays.asList(a.toLowerCase().split("\\s+")));
+        Set<String> wordsB = new HashSet<>(Arrays.asList(b.toLowerCase().split("\\s+")));
+        Set<String> intersection = new HashSet<>(wordsA);
+        intersection.retainAll(wordsB);
+        Set<String> union = new HashSet<>(wordsA);
+        union.addAll(wordsB);
+        return union.isEmpty() ? 0.0 : (double) intersection.size() / union.size();
     }
 
     private String generateRecommendation(String category, int urgency) {

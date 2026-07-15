@@ -1,6 +1,8 @@
-package com.vcsm.service;
+package com.vcsm.service;$1
 
-import com.vcsm.ml.ComplaintClassifier;
+import com.vcsm.config.AppConstants;
+
+import com.vcsm.ml.TicketClassifier;
 import com.vcsm.model.Complaint;
 import com.vcsm.model.TriageRequest;
 import com.vcsm.model.User;
@@ -13,18 +15,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@lombok.RequiredArgsConstructor
 public class TriageService {
 
-    @Autowired
-    private ComplaintClassifier classifier;
+    private final TicketClassifier classifier;
 
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private static final Map<String, Integer> CATEGORY_URGENCY = new HashMap<>();
+    private static final Map<String, Integer> CATEGORY_URGENCY = new ConcurrentHashMap<>();
 
     static {
         CATEGORY_URGENCY.put("SECURITY", 100);
@@ -43,7 +43,7 @@ public class TriageService {
         TriageRequest request = new TriageRequest(complaint.getId(), complaint.getDescription());
 
         // 1. Classify category
-        ComplaintClassifier.ClassificationResult result = classifier.classify(complaint.getDescription());
+        TicketClassifier.ClassificationResult result = classifier.classify(complaint.getDescription());
         request.setCategory(result.getCategory());
         request.setConfidence(result.getConfidence());
 
@@ -86,31 +86,28 @@ public class TriageService {
         return Math.min(100, severity);
     }
 
-    private boolean containsAny(String text, String... keywords) {
-        for (String keyword : keywords) {
-            if (text.contains(keyword)) return true;
-        }
+    // Replaced by ComplaintRoutingUtils.containsAny()
         return false;
     }
 
     private String getSeverityLabel(int severity) {
-        if (severity >= 80) return "CRITICAL";
-        if (severity >= 60) return "HIGH";
-        if (severity >= 40) return "MEDIUM";
-        return "LOW";
+        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("CRITICAL");
+        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("HIGH");
+        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("MEDIUM");
+        return org.springframework.http.ResponseEntity.ok("LOW");
     }
 
     private User findBestAdmin(String category) {
         // In production, match based on expertise
         // For now, return first admin
-        return userRepository.findByEmail("admin@example.com").orElse(null);
+        return userRepository.findByEmail(AppConstants.ADMIN_EMAIL).orElse(null);
     }
 
     private String calculateETA(int severity) {
-        if (severity >= 80) return "1 hour";
-        if (severity >= 60) return "4 hours";
-        if (severity >= 40) return "24 hours";
-        return "48 hours";
+        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("1 hour");
+        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("4 hours");
+        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("24 hours");
+        return org.springframework.http.ResponseEntity.ok("48 hours");
     }
 
     private List<Complaint> findSimilarComplaints(Complaint complaint) {
