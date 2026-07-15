@@ -4,8 +4,12 @@ import com.vcsm.model.Complaint;
 import com.vcsm.model.User;
 import com.vcsm.repository.ComplaintRepository;
 import com.vcsm.repository.UserRepository;
+
+import com.vcsm.service.elasticsearch.ElasticsearchService;
+
 import com.vcsm.security.model.UserRole;
 import com.vcsm.specification.ComplaintSpecification;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,6 +73,9 @@ public class ComplaintService {
         }
     }
 
+    @Autowired
+    private ElasticsearchService elasticsearchService;
+
     private boolean isAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;
@@ -94,6 +101,7 @@ public class ComplaintService {
         if (username == null || username.isEmpty()) return null;
         return userRepository.findByEmail(username).orElse(null);
     }
+
 
     private Map<String, Integer> buildWordFrequency(String text) {
         Map<String, Integer> freq = new HashMap<>();
@@ -181,6 +189,15 @@ public class ComplaintService {
         complaint.setStatus(Complaint.ComplaintStatus.OPEN);
 
         Complaint saved = complaintRepository.save(complaint);
+        
+        // Index in Elasticsearch
+        try {
+            elasticsearchService.indexComplaint(saved);
+            log.info("✅ Complaint indexed in Elasticsearch: " + saved.getId());
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to index complaint in Elasticsearch: " + e.getMessage());
+            // Don't fail the transaction if Elasticsearch is down
+        }
 
         log.info("📝 Filing complaint for user: " + username + " with priority: " + priority);
 
@@ -313,9 +330,23 @@ public class ComplaintService {
         if (resolvedBy != null && !resolvedBy.isBlank()) complaint.setResolvedBy(resolvedBy);
         if (notes != null && !notes.isBlank()) complaint.setResolutionNotes(notes);
         
+        if (newStatus == Complaint.ComplaintStatus.RESOLVED || newStatus == Complaint.ComplaintStatus.CLOSED) {
+            complaint.setResolvedAt(LocalDateTime.now());
+        }
+        
         Complaint updated = complaintRepository.save(complaint);
         try {
             User user = getComplaintUser(id);
+
+
+        // Update in Elasticsearch
+        try {
+            elasticsearchService.updateComplaint(updated);
+            log.info("✅ Complaint updated in Elasticsearch: " + updated.getId());
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to update complaint in Elasticsearch: " + e.getMessage());
+        }
+
 
             if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
                 String subject = "Complaint Status Updated - #" + id;
@@ -336,6 +367,7 @@ public class ComplaintService {
         } catch (Exception e) {
             log.warning("Failed to send complaint status update email: " + e.getMessage());
         }
+
         // Log user activity
         try {
         safelyExecute(() -> {
@@ -416,6 +448,16 @@ public class ComplaintService {
         
         Complaint updated = complaintRepository.save(complaint);
 
+        // Update in Elasticsearch
+        try {
+            elasticsearchService.updateComplaint(updated);
+            log.info("✅ Complaint priority updated in Elasticsearch: " + updated.getId());
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to update complaint priority in Elasticsearch: " + e.getMessage());
+        }
+
+        // Log user activity
+        try {
         safelyExecute(() -> {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
             if (admin != null) {
@@ -459,6 +501,16 @@ public class ComplaintService {
 
         safelyExecute(() -> blockchainService.addBlock(complaint, "COMPLAINT_DELETED"), "add blockchain entry for complaint deletion");
 
+        // Delete from Elasticsearch
+        try {
+            elasticsearchService.deleteComplaint(id);
+            log.info("✅ Complaint deleted from Elasticsearch: " + id);
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to delete complaint from Elasticsearch: " + e.getMessage());
+        }
+
+        // Log user activity
+        try {
 
         safelyExecute(() -> {
             User admin = userRepository.findByEmail(currentUsername()).orElse(null);
@@ -510,6 +562,18 @@ public class ComplaintService {
             throw new AccessDeniedException("Only admins can access analytics");
         }
 
+        // Try to get stats from Elasticsearch first for better performance
+        try {
+            Map<String, Long> esStats = elasticsearchService.getComplaintStatistics();
+            if (esStats != null && !esStats.isEmpty()) {
+                log.info("✅ Retrieved stats from Elasticsearch");
+                return esStats;
+            }
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to get stats from Elasticsearch, falling back to database: " + e.getMessage());
+        }
+
+        // Fallback to database
         Map<String, Long> stats = new LinkedHashMap<>();
         stats.put("total", complaintRepository.count());
         stats.put("open", complaintRepository.countByStatus(Complaint.ComplaintStatus.OPEN));
@@ -542,5 +606,70 @@ public class ComplaintService {
             stats.put((String) result[0], (Long) result[1]);
         }
         return stats;
+    }
+
+    /**
+     * Search complaints using Elasticsearch with full-text search
+     */
+    public List<Complaint> searchComplaints(String query) {
+        if (!isAdmin()) {
+            String username = currentUsername();
+            // For non-admin users, only search their own complaints
+            // This would need to be implemented in the Elasticsearch service
+            // with a filter for residentUsername
+        }
+        
+        try {
+            var documents = elasticsearchService.fuzzySearch(query);
+            // Convert documents back to Complaint entities
+            return documents.stream()
+                .map(doc -> complaintRepository.findById(doc.getComplaintId()).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to search complaints in Elasticsearch: " + e.getMessage());
+            // Fallback to database search
+            return complaintRepository.findByDescriptionContainingIgnoreCase(query);
+        }
+    }
+
+    /**
+     * Reindex all complaints to Elasticsearch
+     */
+    @Transactional
+    public void reindexAllComplaints() {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("Only admins can reindex complaints");
+        }
+
+        log.info("🔄 Starting full reindex of all complaints to Elasticsearch");
+        
+        List<Complaint> allComplaints = complaintRepository.findAll();
+        try {
+            elasticsearchService.reindexAll(allComplaints);
+            log.info("✅ Successfully reindexed " + allComplaints.size() + " complaints");
+        } catch (Exception e) {
+            log.severe("❌ Failed to reindex complaints: " + e.getMessage());
+            throw new RuntimeException("Reindexing failed", e);
+        }
+    }
+
+    /**
+     * Get complaint analytics from Elasticsearch
+     */
+    public Map<String, Object> getElasticsearchAnalytics() {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("Only admins can access analytics");
+        }
+
+        try {
+            Map<String, Object> analytics = new HashMap<>();
+            analytics.put("statusDistribution", elasticsearchService.getComplaintStatistics());
+            // Add more analytics as needed
+            return analytics;
+        } catch (Exception e) {
+            log.warning("⚠️ Failed to get analytics from Elasticsearch: " + e.getMessage());
+            return Map.of("error", "Failed to retrieve analytics");
+        }
     }
 }

@@ -1,0 +1,130 @@
+/* src/main/resources/static/css/elasticsearch.css */
+.search-container {
+    position: relative;
+}
+
+.autocomplete-list {
+    position: absolute;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.autocomplete-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.autocomplete-item:hover {
+    background-color: #f5f5f5;
+}
+
+.filters-row {
+    display: flex;
+    gap: 15px;
+}
+
+.filters-row select {
+    flex: 1;
+}
+
+.search-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.complaint-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.complaint-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.complaint-id {
+    font-weight: bold;
+    color: #495057;
+}
+
+.resident-name {
+    font-size: 1.1em;
+    color: #212529;
+    margin-bottom: 10px;
+}
+
+.description {
+    color: #495057;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.description mark {
+    background-color: #ffeaa7;
+    padding: 0 2px;
+}
+
+.meta-info {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.card-footer {
+    padding: 15px;
+    border-top: 1px solid #e9ecef;
+    text-align: right;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3em;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 0.85em;
+}
+
+.category-tag {
+    background: #e9ecef;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: #495057;
+}

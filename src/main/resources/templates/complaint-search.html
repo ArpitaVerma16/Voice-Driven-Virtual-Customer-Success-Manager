@@ -1,0 +1,58 @@
+<!-- src/main/resources/templates/complaint-search.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Complaint Search - VCSM</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Complaint Search</h1>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="input-group">
+                <input type="text" 
+                       id="searchInput" 
+                       class="form-control" 
+                       placeholder="Search complaints by description, resident name, or category..."
+                       autocomplete="off">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" onclick="performSearch()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+            <div id="autoCompleteList" class="autocomplete-list"></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-row mt-3">
+            <select id="statusFilter" class="form-control">
+                <option value="">All Status</option>
+                <option value="OPEN">Open</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="RESOLVED">Resolved</option>
+                <option value="CLOSED">Closed</option>
+            </select>
+            
+            <select id="categoryFilter" class="form-control">
+                <option value="">All Categories</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="SECURITY">Security</option>
+                <option value="PARKING">Parking</option>
+                <option value="FACILITIES">Facilities</option>
+                <option value="OTHER">Other</option>
+            </select>
+        </div>
+
+        <!-- Results -->
+        <div id="searchResults" class="search-results mt-4"></div>
+        
+        <!-- Pagination -->
+        <div id="paginationContainer" class="d-flex justify-content-center mt-4"></div>
+    </div>
+
+    <script th:src="@{/js/elasticsearch.js}"></script>
+</body>
+</html>
