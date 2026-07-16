@@ -81,6 +81,18 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
+    public SecurityFilterChain h2ConsoleFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/h2-console/**")
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().denyAll()
+                );
+        return http.build();
+    }
+
+    @Bean
+    @Order(3)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
