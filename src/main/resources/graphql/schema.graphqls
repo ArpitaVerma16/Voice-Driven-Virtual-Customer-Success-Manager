@@ -1,0 +1,234 @@
+# ==================== SCALARS ====================
+scalar LocalDateTime
+scalar Long
+
+# ==================== ENUMS ====================
+enum ComplaintStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    CLOSED
+}
+
+enum ComplaintCategory {
+    MAINTENANCE
+    SECURITY
+    PARKING
+    FACILITIES
+    NOISE
+    OTHER
+}
+
+enum EventCategory {
+    SOCIAL
+    SPORTS
+    CULTURAL
+    EDUCATIONAL
+    HEALTH
+    OTHER
+}
+
+enum UserRole {
+    ADMIN
+    RESIDENT
+    STAFF
+}
+
+# ==================== TYPES ====================
+type Complaint {
+    id: Long!
+    residentName: String!
+    residentUsername: String!
+    description: String!
+    status: ComplaintStatus!
+    category: ComplaintCategory!
+    priority: String!
+    apartmentNumber: String
+    contactEmail: String
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime
+    resolvedAt: LocalDateTime
+    resolvedBy: String
+    resolutionNotes: String
+    autoAssigned: Boolean!
+    comments: [Comment!]!
+}
+
+type Comment {
+    id: Long!
+    text: String!
+    author: User!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime
+}
+
+type Event {
+    id: Long!
+    name: String!
+    description: String!
+    category: EventCategory!
+    location: String!
+    eventDate: LocalDateTime!
+    maxCapacity: Int
+    registrations: Int!
+    organizer: String!
+    active: Boolean!
+    createdAt: LocalDateTime!
+}
+
+type User {
+    id: Long!
+    username: String!
+    email: String!
+    name: String!
+    role: UserRole!
+    apartmentNumber: String
+    phoneNumber: String
+    createdAt: LocalDateTime!
+    complaints: [Complaint!]!
+    events: [Event!]!
+}
+
+type ComplaintStats {
+    total: Long!
+    open: Long!
+    inProgress: Long!
+    resolved: Long!
+    closed: Long!
+}
+
+type CategoryStats {
+    category: String!
+    count: Long!
+}
+
+type PriorityStats {
+    priority: String!
+    count: Long!
+}
+
+type AnalyticsData {
+    complaintStats: ComplaintStats!
+    categoryDistribution: [CategoryStats!]!
+    priorityDistribution: [PriorityStats!]!
+    monthlyTrends: [MonthlyTrend!]!
+}
+
+type MonthlyTrend {
+    month: String!
+    complaints: Long!
+    resolved: Long!
+}
+
+type VoiceCommand {
+    id: Long!
+    transcript: String!
+    intent: String!
+    response: String!
+    success: Boolean!
+    createdAt: LocalDateTime!
+    user: User!
+}
+
+type PageInfo {
+    totalElements: Long!
+    totalPages: Int!
+    pageNumber: Int!
+    pageSize: Int!
+    hasNext: Boolean!
+    hasPrevious: Boolean!
+}
+
+type ComplaintPage {
+    content: [Complaint!]!
+    pageInfo: PageInfo!
+}
+
+# ==================== INPUT TYPES ====================
+input CreateComplaintInput {
+    description: String!
+    category: ComplaintCategory!
+    apartmentNumber: String
+    contactEmail: String
+}
+
+input UpdateStatusInput {
+    complaintId: Long!
+    status: ComplaintStatus!
+    notes: String
+}
+
+input CreateEventInput {
+    name: String!
+    description: String!
+    category: EventCategory!
+    location: String!
+    eventDate: LocalDateTime!
+    maxCapacity: Int
+    organizer: String!
+}
+
+input ComplaintFilterInput {
+    status: ComplaintStatus
+    category: ComplaintCategory
+    priority: String
+    dateFrom: LocalDateTime
+    dateTo: LocalDateTime
+    search: String
+}
+
+input PaginationInput {
+    page: Int = 0
+    size: Int = 20
+    sortBy: String = "createdAt"
+    sortOrder: SortOrder = DESC
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
+
+# ==================== QUERIES ====================
+type Query {
+    # Complaint Queries
+    complaints(filter: ComplaintFilterInput, pagination: PaginationInput): ComplaintPage!
+    complaint(id: Long!): Complaint
+    myComplaints(pagination: PaginationInput): ComplaintPage!
+    complaintStats: ComplaintStats!
+    
+    # Event Queries
+    events(upcoming: Boolean, category: EventCategory): [Event!]!
+    event(id: Long!): Event
+    upcomingEvents(limit: Int): [Event!]!
+    recommendedEvents(keyword: String): [Event!]!
+    
+    # Analytics Queries
+    analytics: AnalyticsData!
+    categoryDistribution: [CategoryStats!]!
+    priorityDistribution: [PriorityStats!]!
+    
+    # User Queries
+    me: User!
+    user(id: Long!): User
+    
+    # Voice Command Queries
+    myVoiceCommands(limit: Int): [VoiceCommand!]!
+}
+
+# ==================== MUTATIONS ====================
+type Mutation {
+    # Complaint Mutations
+    createComplaint(input: CreateComplaintInput!): Complaint!
+    updateComplaintStatus(input: UpdateStatusInput!): Complaint!
+    updateComplaintPriority(id: Long!, priority: String!): Complaint!
+    deleteComplaint(id: Long!): Boolean!
+    
+    # Event Mutations
+    createEvent(input: CreateEventInput!): Event!
+    registerForEvent(eventId: Long!): Event!
+    cancelEventRegistration(eventId: Long!): Boolean!
+    
+    # Voice Command Mutations
+    processVoiceCommand(transcript: String!): VoiceCommand!
+}

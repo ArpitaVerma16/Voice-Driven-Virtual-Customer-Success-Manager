@@ -33,4 +33,16 @@ public class SecurityConfig {
 
         return http.build();
     }
+    @Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(authz -> authz
+            // GraphQL endpoints
+            .requestMatchers("/graphql", "/graphiql").permitAll()
+            .requestMatchers("/graphql/**").permitAll()
+            // Rest of your existing configuration...
+        )
+        // Rest of your security config...
+    return http.build();
+}
 }

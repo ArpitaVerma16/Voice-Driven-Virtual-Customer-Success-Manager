@@ -1,0 +1,272 @@
+# ========== COMPLAINT QUERIES ==========
+
+# Get paginated complaints with filters
+query GetComplaints($filter: ComplaintFilterInput, $pagination: PaginationInput) {
+  complaints(filter: $filter, pagination: $pagination) {
+    content {
+      id
+      description
+      status
+      category
+      priority
+      createdAt
+      residentName
+      apartmentNumber
+      comments {
+        text
+        author {
+          name
+        }
+      }
+    }
+    pageInfo {
+      totalElements
+      totalPages
+      hasNext
+    }
+  }
+}
+
+# Variables for the above query
+{
+  "filter": {
+    "status": "OPEN",
+    "category": "MAINTENANCE",
+    "search": "water"
+  },
+  "pagination": {
+    "page": 0,
+    "size": 10,
+    "sortBy": "createdAt",
+    "sortOrder": "DESC"
+  }
+}
+
+# Get single complaint
+query GetComplaint($id: Long!) {
+  complaint(id: $id) {
+    id
+    description
+    status
+    category
+    priority
+    createdAt
+    residentName
+    residentUsername
+    comments {
+      id
+      text
+      author {
+        name
+        email
+      }
+      createdAt
+    }
+  }
+}
+
+# Get my complaints
+query MyComplaints($pagination: PaginationInput) {
+  myComplaints(pagination: $pagination) {
+    content {
+      id
+      description
+      status
+      category
+      priority
+      createdAt
+      resolvedAt
+      resolutionNotes
+    }
+    pageInfo {
+      totalElements
+    }
+  }
+}
+
+# Get complaint statistics
+query GetComplaintStats {
+  complaintStats {
+    total
+    open
+    inProgress
+    resolved
+    closed
+  }
+  categoryDistribution {
+    category
+    count
+  }
+  priorityDistribution {
+    priority
+    count
+  }
+}
+
+# ========== EVENT QUERIES ==========
+
+# Get upcoming events
+query GetUpcomingEvents($limit: Int) {
+  upcomingEvents(limit: $limit) {
+    id
+    name
+    description
+    category
+    location
+    eventDate
+    registrations
+    maxCapacity
+    organizer
+  }
+}
+
+# Get recommended events
+query GetRecommendedEvents($keyword: String) {
+  recommendedEvents(keyword: $keyword) {
+    id
+    name
+    description
+    category
+    eventDate
+    registrations
+  }
+}
+
+# ========== ANALYTICS QUERIES ==========
+
+# Get full analytics
+query GetAnalytics {
+  analytics {
+    complaintStats {
+      total
+      open
+      resolved
+    }
+    categoryDistribution {
+      category
+      count
+    }
+    priorityDistribution {
+      priority
+      count
+    }
+    monthlyTrends {
+      month
+      complaints
+      resolved
+    }
+  }
+}
+
+# ========== MUTATIONS ==========
+
+# Create complaint
+mutation CreateComplaint($input: CreateComplaintInput!) {
+  createComplaint(input: $input) {
+    id
+    description
+    status
+    category
+    priority
+    createdAt
+  }
+}
+
+# Variables for create complaint
+{
+  "input": {
+    "description": "Water leakage in Block A, Apartment 204",
+    "category": "MAINTENANCE",
+    "apartmentNumber": "A-204",
+    "contactEmail": "john@example.com"
+  }
+}
+
+# Update complaint status
+mutation UpdateStatus($input: UpdateStatusInput!) {
+  updateComplaintStatus(input: $input) {
+    id
+    status
+    updatedAt
+    resolutionNotes
+  }
+}
+
+# Variables for update status
+{
+  "input": {
+    "complaintId": 1,
+    "status": "IN_PROGRESS",
+    "notes": "Assigned to maintenance team"
+  }
+}
+
+# Register for event
+mutation RegisterForEvent($eventId: Long!) {
+  registerForEvent(eventId: $eventId) {
+    id
+    name
+    registrations
+  }
+}
+
+# ========== ADVANCED QUERIES ==========
+
+# Get all data for dashboard (single query)
+query DashboardData {
+  # My complaints
+  myComplaints(pagination: {page: 0, size: 5}) {
+    content {
+      id
+      description
+      status
+      createdAt
+    }
+  }
+  
+  # Upcoming events
+  upcomingEvents(limit: 5) {
+    id
+    name
+    eventDate
+    registrations
+  }
+  
+  # Statistics
+  complaintStats {
+    total
+    open
+    resolved
+  }
+  
+  # User info
+  me {
+    name
+    email
+    apartmentNumber
+    role
+  }
+}
+
+# Complex nested query with fragments
+fragment ComplaintDetails on Complaint {
+  id
+  description
+  status
+  category
+  priority
+  createdAt
+  residentName
+  comments {
+    text
+    author {
+      name
+    }
+  }
+}
+
+query GetComplaintDetails($id: Long!) {
+  complaint(id: $id) {
+    ...ComplaintDetails
+  }
+}
