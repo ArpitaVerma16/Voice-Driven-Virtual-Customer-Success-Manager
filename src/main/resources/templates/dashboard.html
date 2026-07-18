@@ -66,7 +66,7 @@
 </script>
 
 </head>
-<body>
+<body th:attr="data-omnidim-widget-id=${@environment.getProperty('omnidim.widget.id')}"></body>
 
 <!-- Page Load Spinner Overlay -->
 <div class="spinner-overlay" id="pageSpinner">
@@ -466,6 +466,7 @@
 <script src="/js/dark-mode.js"></script>
 <script src="/js/confirm-dialogs.js"></script>
 <script src="/js/interaction-history.js"></script>
+<script src="/js/omnidim-widget.js"></script>
 
 <script>
     // Initialize toast
