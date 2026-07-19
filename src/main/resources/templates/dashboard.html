@@ -206,6 +206,26 @@
         </div>
     </div>
 
+    <!-- Admin Emergency Broadcast Panel -->
+    <div class="card mb-4 shadow border-danger" th:if="${userRole == 'ROLE_ADMIN'}">
+        <div class="card-header bg-danger text-white fw-bold">
+            <i class="fas fa-bullhorn me-2"></i>Emergency Broadcast
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">Dictate an emergency message. It will be professionally formatted by AI and sent via SMS, Email, and Push Notifications simultaneously.</p>
+            <div class="voice-input-group">
+                <input type="text" id="emergencyInput" class="form-control border-danger" placeholder="e.g. Water shut off on floor 3 in ten minutes">
+                <div class="voice-buttons">
+                    <button class="btn btn-danger" onclick="sendEmergencyBroadcast()">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-text"><i class="fas fa-paper-plane"></i> Dispatch Now</span>
+                    </button>
+                </div>
+            </div>
+            <div id="emergencyResponse" class="mt-3 d-none alert alert-success"></div>
+        </div>
+    </div>
+
     <!-- Stats Cards - 2 columns on mobile, 4 on desktop -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
@@ -642,6 +662,40 @@
         .catch(err => {
             if (typeof toast !== 'undefined') {
                 toast.error('Error processing command', 'Error');
+            }
+        });
+    }
+
+    // ===== EMERGENCY BROADCAST =====
+    function sendEmergencyBroadcast() {
+        const input = document.getElementById('emergencyInput');
+        const transcript = input.value.trim();
+        if (!transcript) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Please type a message to broadcast', 'Warning');
+            }
+            return;
+        }
+        
+        fetch('/api/admin/emergency-broadcast', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript: transcript })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const responseDiv = document.getElementById('emergencyResponse');
+            responseDiv.classList.remove('d-none');
+            responseDiv.innerHTML = `<strong>Broadcast Sent:</strong> ${data.response}`;
+            
+            if (typeof toast !== 'undefined') {
+                toast.success('Emergency broadcast dispatched!', 'Success');
+            }
+            input.value = '';
+        })
+        .catch(err => {
+            if (typeof toast !== 'undefined') {
+                toast.error('Error dispatching broadcast', 'Error');
             }
         });
     }
