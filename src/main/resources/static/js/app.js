@@ -94,7 +94,7 @@ function startVoice() {
     isRecording = false;
 
     recognition.onerror = (e) => {
-        console.error('Voice error:', e);
+        toast.error('Voice processing failed. Please try again.', 'Voice Error');
         isRecording = false;
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
@@ -118,7 +118,7 @@ function startVoice() {
 };
 
    recognition.onerror = (e) => {
-    console.error('Voice error:', e);
+    toast.error('Voice processing failed. Please try again.', 'Voice Error');
     isRecording = false;
 
     document.getElementById('micBtn').classList.remove('btn-danger', 'recording');
@@ -225,7 +225,7 @@ renderConversation();
         input.value = '';
 
     } catch (err) {
-        console.error('Error sending command:', err);
+        toast.error('Error processing command', 'Error');
         if (typeof typingIndicator !== 'undefined') {
             typingIndicator.hide();
         }
@@ -335,7 +335,7 @@ async function quickFileComplaint() {
             }, 2000);
         }
     } catch (err) {
-        console.error('Error filing complaint:', err);
+        toast.error('Error filing complaint. Please try again.', 'Error');
         if (typeof toast !== 'undefined') {
             toast.error('Failed to file complaint. Please try again.', 'Error');
         }
@@ -373,7 +373,7 @@ async function submitComplaint() {
             location.reload();
         }
     } catch (err) {
-        console.error('Error:', err);
+        toast.error('Error: ' + (err.message || 'Unknown error'), 'Error');
         if (typeof toast !== 'undefined') {
             toast.error('Failed to submit complaint. Please try again.', 'Error');
         }
@@ -394,7 +394,7 @@ async function updateComplaintStatus(id) {
         await fetch(`/api/complaints/${id}/status?status=${status.toUpperCase()}`, { method: 'PUT', headers: withAuthHeaders() });
         location.reload();
     } catch (err) {
-        console.error('Error updating status:', err);
+        toast.error('Error updating status', 'Error');
         if (typeof toast !== 'undefined') {
             toast.error('Failed to update status. Please try again.', 'Error');
         }
@@ -431,7 +431,7 @@ async function submitEvent() {
         });
         if (res.ok) location.reload();
     } catch (err) {
-        console.error('Error creating event:', err);
+        toast.error('Error creating event', 'Error');
         if (typeof toast !== 'undefined') {
             toast.error('Failed to create event. Please try again.', 'Error');
         }
@@ -456,7 +456,7 @@ async function registerEvent(id) {
             }
         }
     } catch (err) {
-        console.error('Error registering:', err);
+        toast.error('Error registering for event', 'Error');
     } finally {
         setButtonLoading('registerBtn', false);
     }
@@ -625,10 +625,10 @@ function connectWebSocket() {
                 showNotification(data);
             });
         }, function(error) {
-            console.error('WebSocket connection failed:', error);
+            toast.error('Real-time connection failed', 'Connection Error');
         });
     } catch (e) {
-        console.error('WebSocket error:', e);
+        toast.error('Real-time error occurred', 'Connection Error');
     }
 }
 
