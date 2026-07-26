@@ -1,4 +1,4 @@
-package com.vcsm.service;$1
+package com.vcsm.service;
 
 import com.vcsm.config.AppConstants;
 
@@ -86,15 +86,13 @@ public class TriageService {
         return Math.min(100, severity);
     }
 
-    // Replaced by ComplaintRoutingUtils.containsAny()
-        return false;
     }
 
     private String getSeverityLabel(int severity) {
-        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("CRITICAL");
-        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("HIGH");
-        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("MEDIUM");
-        return org.springframework.http.ResponseEntity.ok("LOW");
+        if (severity >= 80) return "CRITICAL";
+        if (severity >= 60) return "HIGH";
+        if (severity >= 40) return "MEDIUM";
+        return "LOW";
     }
 
     private User findBestAdmin(String category) {
@@ -104,10 +102,10 @@ public class TriageService {
     }
 
     private String calculateETA(int severity) {
-        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("1 hour");
-        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("4 hours");
-        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("24 hours");
-        return org.springframework.http.ResponseEntity.ok("48 hours");
+        if (severity >= 80) return "1 hour";
+        if (severity >= 60) return "4 hours";
+        if (severity >= 40) return "24 hours";
+        return "48 hours";
     }
 
     private List<Complaint> findSimilarComplaints(Complaint complaint) {
