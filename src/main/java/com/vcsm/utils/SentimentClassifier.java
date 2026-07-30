@@ -14,7 +14,13 @@ public class SentimentClassifier {
     private Map<String, Integer> phraseSentimentScores;
 
     @PostConstruct
-    public void init() {
+    
+    // Negation words that flip sentiment
+    private static final String[] NEGATION_WORDS = {
+        "not", "no", "never", "neither", "nobody", "nothing",
+        "nowhere", "hardly", "scarcely", "barely", "don", "doesn", "didn", "won", "wouldn", "can", "couldn"
+    };
+public void init() {
         // Initialize sentiment scoring
         sentimentScores = new HashMap<>();
         phraseSentimentScores = new HashMap<>();
@@ -73,13 +79,39 @@ public class SentimentClassifier {
         }
 
         // Analyze individual words
+        boolean negateNext = false;
+        int negationCount = 0;
         for (String token : tokens) {
-            // Remove punctuation
-            token = token.replaceAll("[^a-zA-Z]", "");
-
-            if (token.isEmpty()) {
-                continue;
+            // Check for negation context
+            for (String neg : NEGATION_WORDS) {
+                if (token.contains(neg)) {
+                    negateNext = true;
+                    negationCount++;
+                    break;
+                }
             }
+            
+            // Remove punctuation and lowercase
+            token = token.replaceAll("[^a-zA-Z]", "").toLowerCase();
+            
+            if (token.isEmpty()) continue;
+            
+            Integer score = sentimentScores.get(token);
+            if (score != null) {
+                int adjustedScore = negateNext ? -score : score;
+                totalScore += adjustedScore;
+                wordCount++;
+                negateNext = false;
+            }
+            Integer phraseScore = phraseSentimentScores.get(token);
+            if (phraseScore != null) {
+                totalScore += phraseScore;
+            }
+        }
+        // Reduce score if strong negation detected (more than 2 negations)
+        if (negationCount > 2) {
+            totalScore = (int) Math.round(totalScore * 0.8);
+        }
 
             if (sentimentScores.containsKey(token)) {
                 totalScore += sentimentScores.get(token);
