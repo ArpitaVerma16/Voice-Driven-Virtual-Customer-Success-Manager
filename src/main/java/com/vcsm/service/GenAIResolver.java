@@ -86,7 +86,7 @@ public class GenAIResolver {
                     Complaint saved = complaintService.fileComplaint(complaint);
                     ticketId = saved.getId();
                 } catch (Exception e) {
-                    System.err.println("Failed to auto-file complaint: " + e.getMessage());
+                    log.error("Failed to auto-file complaint: " + e.getMessage());
                 }
             }
         }
