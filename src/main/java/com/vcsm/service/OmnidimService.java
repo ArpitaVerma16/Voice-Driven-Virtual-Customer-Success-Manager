@@ -34,28 +34,23 @@ public class OmnidimService {
     @Autowired
     private com.vcsm.repository.ComplaintRepository complaintRepository;
 
-    @Autowired
-    private PiiRedactionService piiRedactionService;
+    private final PiiRedactionService piiRedactionService;
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
 
-    @Autowired
-    private SmartLockService smartLockService;
+    private final SmartLockService smartLockService;
 
     private final EventRegistrationService eventRegistrationService;
 
     private final VoiceModelRegistryService voiceModelRegistryService;
 
-    @Autowired
-    private AnalyticsEventProducer analyticsEventProducer;
+    private final AnalyticsEventProducer analyticsEventProducer;
 
     private final UserRepository userRepository;
 
     private final SchedulingOptimizer schedulingOptimizer;
 
-    @Autowired
-    private RagService ragService;
+    private final RagService ragService;
 
     private final Map<Long, PendingBookingState> pendingBookings = new java.util.concurrent.ConcurrentHashMap<>();
 
