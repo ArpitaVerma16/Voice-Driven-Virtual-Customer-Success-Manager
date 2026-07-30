@@ -128,7 +128,7 @@ public class EventService {
         try {
             reminderScheduler.sendRegistrationConfirmation(savedEvent, user);
         } catch (Exception e) {
-            System.err.println("❌ Failed to send registration email: " + e.getMessage());
+            log.error("❌ Failed to send registration email: " + e.getMessage());
         }
 
         return savedEvent;
