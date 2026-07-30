@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/rag")
-@CrossOrigin(origins = "*")
 public class RagController {
 
     private final RagService ragService;
