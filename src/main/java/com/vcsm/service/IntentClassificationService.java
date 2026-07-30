@@ -65,7 +65,7 @@ public class IntentClassificationService {
 
         long processingTime = System.currentTimeMillis() - startTime;
         if (processingTime > 100) {
-            System.err.println("Warning: Intent classification took " + processingTime + "ms");
+            log.warn("Intent classification took {}ms", processingTime);
         }
 
         return new IntentResult(finalIntent, topScore.getScore(), scores);

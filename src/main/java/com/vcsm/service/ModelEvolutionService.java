@@ -59,7 +59,7 @@ public class ModelEvolutionService {
                 ModelVersion newVersion = autoTrainer.trainNewModel(modelName);
                 log.info("✅ Model '" + modelName + "' retrained. New version: " + newVersion.getVersion());
             } catch (Exception e) {
-                System.err.println("❌ Failed to retrain model '" + modelName + "': " + e.getMessage());
+                log.error("Failed to retrain model: {}", modelName + "': " + e.getMessage());
             }
         }
     }
