@@ -9,6 +9,29 @@ import java.util.concurrent.ThreadLocalRandom;
 @Profile("dev")
 @Component
 public class QuantumCircuitBuilder {
+    /**
+     * Quantum gate type enum — replaces hardcoded string literals.
+     * See issue #699.
+     */
+    public enum QuantumGateType {
+        H("H"),           // Hadamard gate
+        RX("RX"),         // X-axis rotation
+        RY("RY"),         // Y-axis rotation
+        RZ("RZ"),         // Z-axis rotation
+        CNOT("CNOT"),     // Controlled-NOT gate
+        CZ("CZ"),         // Controlled-Z gate
+        SWAP("SWAP"),     // SWAP gate
+        MEASURE("MEASURE"); // Measurement gate
+        
+        private final String symbol;
+        QuantumGateType(String symbol) { this.symbol = symbol; }
+        public String symbol() { return symbol; }
+        public static QuantumGateType fromString(String s) {
+            for (QuantumGateType g : values()) if (g.symbol.equals(s)) return g;
+            throw new IllegalArgumentException("Unknown gate: " + s);
+        }
+    }
+
 
     /**
      * Build a quantum circuit for feature mapping
@@ -18,7 +41,7 @@ public class QuantumCircuitBuilder {
 
         // Add initial Hadamard gates
         for (int i = 0; i < numQubits; i++) {
-            circuit.addGate("H", i);
+            circuit.addGate(QuantumGateType.H, i);
         }
 
         // Add entangling layers
@@ -26,18 +49,18 @@ public class QuantumCircuitBuilder {
             // Rotation gates with random angles
             for (int i = 0; i < numQubits; i++) {
                 double angle = ThreadLocalRandom.current().nextDouble() * 2 * Math.PI;
-                circuit.addGate("RY", i, angle);
+                circuit.addGate(QuantumGateType.RY, i, angle);
             }
 
             // CNOT gates for entanglement
             for (int i = 0; i < numQubits - 1; i++) {
-                circuit.addGate("CNOT", i, i + 1);
+                circuit.addGate(QuantumGateType.CNOT, i, i + 1);
             }
         }
 
         // Add measurement
         for (int i = 0; i < numQubits; i++) {
-            circuit.addGate("MEASURE", i);
+            circuit.addGate(QuantumGateType.MEASURE, i);
         }
 
         return circuit;
@@ -54,14 +77,14 @@ public class QuantumCircuitBuilder {
             // Rotations with trainable parameters
             for (int i = 0; i < numQubits; i++) {
                 double angle = params.length > paramIndex ? params[paramIndex] : 0.0;
-                circuit.addGate("RY", i, angle);
+                circuit.addGate(QuantumGateType.RY, i, angle);
                 paramIndex++;
                 if (paramIndex >= params.length) paramIndex = 0;
             }
 
             // Entangling layers
             for (int i = 0; i < numQubits - 1; i++) {
-                circuit.addGate("CNOT", i, i + 1);
+                circuit.addGate(QuantumGateType.CNOT, i, i + 1);
             }
         }
 
@@ -77,12 +100,12 @@ public class QuantumCircuitBuilder {
 
         // Encode data into quantum states
         for (int i = 0; i < numQubits; i++) {
-            circuit.addGate("RY", i, dataPoint[i] * Math.PI);
+            circuit.addGate(QuantumGateType.RY, i, dataPoint[i] * Math.PI);
         }
 
         // Add entanglement
         for (int i = 0; i < numQubits - 1; i++) {
-            circuit.addGate("CNOT", i, i + 1);
+            circuit.addGate(QuantumGateType.CNOT, i, i + 1);
         }
 
         return circuit;
