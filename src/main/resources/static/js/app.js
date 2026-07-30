@@ -1,3 +1,8 @@
+// Dark mode FOUC prevention
+(function(){
+  var saved=localStorage.getItem('darkMode');
+  if(saved==='true')document.documentElement.classList.add('dark-mode');
+})();
 // ===== UTILITY: Disable button during request =====
 function setButtonLoading(buttonId, loading) {
     const btn = document.getElementById(buttonId);
