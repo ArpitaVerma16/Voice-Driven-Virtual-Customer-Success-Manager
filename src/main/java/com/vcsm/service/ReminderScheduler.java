@@ -1,4 +1,4 @@
-package com.vcsm.service;$1
+package com.vcsm.service;
 
 import com.vcsm.config.AppConstants;
 
