@@ -6,6 +6,7 @@ import com.vcsm.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -116,6 +117,20 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    @Profile("dev")
+    @Order(0)
+    public SecurityFilterChain h2ConsoleDevFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/h2-console/**")
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/h2-console/**").permitAll()
+            )
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+        return http.build();
     }
 
     @Bean
