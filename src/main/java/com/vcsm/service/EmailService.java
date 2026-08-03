@@ -182,7 +182,7 @@ public class EmailService {
             html.append("</div>");
         }
 
-        html.append("<p style='text-align: center;'><a href='http://localhost:8080/events' class='btn'>View Event Details</a></p>");
+        html.append("<p style='text-align: center;'><a href='' + System.getenv().getOrDefault(\"APP_BASE_URL\", \"https://vcsm.example.com\") + '/events' class='btn'>View Event Details</a></p>");
         html.append("<p>Best regards,<br>VCSM Team</p>");
         html.append("</div>");
         html.append("<div class='footer'><small>This is an automated message. Please do not reply.</small></div>");
@@ -220,7 +220,7 @@ public class EmailService {
         }
         html.append("</div>");
         html.append("<p style='text-align: center;'>");
-        html.append("<a href='http://localhost:8080/api/events/waitlist/confirm?eventId=" + event.getId() + "&userId=" + user.getId() + "' class='btn'>✅ Confirm Registration</a>");
+        html.append("<a href='' + System.getenv().getOrDefault(\"APP_BASE_URL\", \"https://vcsm.example.com\") + '/api/events/waitlist/confirm?eventId=" + event.getId() + "&userId=" + user.getId() + "' class='btn'>✅ Confirm Registration</a>");
         html.append("</p>");
         html.append("<p style='color: #666; font-size: 14px;'>This link will expire in <strong>24 hours</strong>.</p>");
         html.append("<p>Best regards,<br>VCSM Team</p>");
