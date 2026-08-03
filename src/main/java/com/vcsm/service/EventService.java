@@ -9,6 +9,7 @@ import com.vcsm.repository.UserRepository;
 import com.vcsm.repository.EventRegistrationRepository;
 import com.vcsm.repository.EventWaitlistRepository;
 import com.vcsm.repository.EmailLogRepository;
+import com.vcsm.security.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,10 @@ public class EventService {
     private final EventWaitlistRepository eventWaitlistRepository;
 
     private final EmailLogRepository emailLogRepository;
+
+    private final JwtService jwtService;
+
+    private final ReminderScheduler reminderScheduler;
 
     @Transactional
     public Event createEvent(Event event) { return eventRepository.save(event); }
