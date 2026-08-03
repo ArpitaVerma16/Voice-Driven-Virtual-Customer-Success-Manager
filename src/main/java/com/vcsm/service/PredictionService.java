@@ -273,7 +273,7 @@ public class PredictionService {
                 try {
                     proactiveOutreachService.sendProactiveOutreach(user.getId(), "email");
                 } catch (Exception e) {
-                    System.err.println("❌ Failed to trigger outreach: " + e.getMessage());
+                    log.error("❌ Failed to trigger outreach: " + e.getMessage());
                 }
             }
         }
