@@ -66,7 +66,12 @@ public class QuantumFederatedController {
     }
 
     public static class ClientUpdateRequest {
+        @Valid
+        @Size(min = 1, message = "Weights array must not be empty")
         private double[] weights;
+
+        @Min(value = 1, message = "Data size must be at least 1")
+        @Max(value = 1_000_000, message = "Data size exceeds maximum allowed")
         private int dataSize;
 
         public double[] getWeights() { return weights; }
