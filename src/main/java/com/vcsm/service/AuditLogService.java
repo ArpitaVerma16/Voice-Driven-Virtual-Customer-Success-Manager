@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @lombok.RequiredArgsConstructor
@@ -37,8 +38,8 @@ public class AuditLogService {
         AuditLog log = new AuditLog(admin, actionType, description);
         log.setTargetType(targetType);
         log.setTargetId(targetId);
-        log.setOldValue(oldValue);
-        log.setNewValue(newValue);
+        log.setOldValue(sanitizeValue(targetType, oldValue));
+        log.setNewValue(sanitizeValue(targetType, newValue));
 
         auditLogRepository.save(log);
     }
