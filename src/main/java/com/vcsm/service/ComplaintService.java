@@ -210,8 +210,8 @@ public class ComplaintService {
                     )
                 );
             }
-        }, "send notification for complaint filing");
-        }, "send notification for complaint filing");
+
+
         } catch (Exception e) {
             log.warn("Failed to send notification: {}", e.getMessage(), e);
         }
@@ -219,7 +219,6 @@ public class ComplaintService {
         safelyExecute(() -> blockchainService.addBlock(saved, "COMPLAINT_CREATED"), "add blockchain entry for complaint creation");
 
 
-        safelyExecute(() -> blockchainService.addBlock(saved, "COMPLAINT_CREATED"), "add blockchain entry for complaint creation");
 
         return saved;
     }
@@ -334,7 +333,7 @@ public class ComplaintService {
                 emailService.sendSimpleEmail(user.getEmail(), subject, emailBody);
             }
         } catch (Exception e) {
-            log.warning("Failed to send complaint status update email: " + e.getMessage());
+            log.warn("Failed to send complaint status update email: " + e.getMessage());
         }
         // Log user activity
         try {
@@ -358,8 +357,8 @@ public class ComplaintService {
                     newStatus.toString()
                 );
             }
-        }, "log user activity and audit for status update");
-        }, "log user activity and audit for status update");
+
+
         } catch (Exception e) {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
@@ -394,7 +393,6 @@ public class ComplaintService {
         safelyExecute(() -> blockchainService.addBlock(updated, "STATUS_UPDATED"), "add blockchain entry for status update");
 
 
-        safelyExecute(() -> blockchainService.addBlock(updated, "STATUS_UPDATED"), "add blockchain entry for status update");
 
         return updated;
     }
@@ -443,7 +441,6 @@ public class ComplaintService {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
 
-        safelyExecute(() -> blockchainService.addBlock(updated, "PRIORITY_UPDATED"), "add blockchain entry for priority update");
 
         return updated;
     }
@@ -478,8 +475,8 @@ public class ComplaintService {
                     id
                 );
             }
-        }, "log user activity and audit for complaint deletion");
-        }, "log user activity and audit for complaint deletion");
+
+
         } catch (Exception e) {
             log.warn("Failed to log user activity: {}", e.getMessage(), e);
         }
@@ -496,8 +493,8 @@ public class ComplaintService {
                     )
                 );
             }
-        }, "send notification for complaint deletion");
-        }, "send notification for complaint deletion");
+
+
         } catch (Exception e) {
             log.warn("Failed to send notification: {}", e.getMessage(), e);
         }
