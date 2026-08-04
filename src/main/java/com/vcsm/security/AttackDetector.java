@@ -44,9 +44,9 @@ public class AttackDetector {
 
     private String generateAlert(boolean isActive, String userId, String attackType) {
         if (isActive) {
-            return org.springframework.http.ResponseEntity.ok("🚨 ACTIVE ATTACK: User " + userId + " is under " + attackType + " attack!");
+            return "🚨 ACTIVE ATTACK: User " + userId + " is under " + attackType + " attack!";
         }
-        return org.springframework.http.ResponseEntity.ok("⚠️ Suspicious activity detected from user " + userId + " (" + attackType + ")");
+        return "⚠️ Suspicious activity detected from user " + userId + " (" + attackType + ")";
     }
 
     /**
