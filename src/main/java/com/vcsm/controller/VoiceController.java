@@ -181,4 +181,20 @@ public class VoiceController {
     public ResponseEntity<Map<String, Object>> getExperimentStats() {
         return ResponseEntity.ok(promptExperimentService.getExperimentStats());
     }
+
+    // Webhook endpoint for OmniDimension's Custom API Integration.
+    // Configure this URL in the OmniDimension dashboard as a Custom API
+    // action so the voice agent can call back into VCSM with the user's
+    // transcript and receive a structured response to speak back.
+    @PostMapping("/omnidim-webhook")
+    public ResponseEntity<Map<String, Object>> handleOmnidimWebhook(@RequestBody Map<String, String> payload) {
+        String transcript = payload.getOrDefault("transcript", "");
+        if (transcript.isBlank()) {
+            return ResponseEntity.ok(Map.of(
+                "success", false,
+                "response", "I didn't catch that. Could you repeat your request?"
+            ));
+        }
+        return ResponseEntity.ok(omnidimService.processVoiceCommand(transcript));
+    }
 }
