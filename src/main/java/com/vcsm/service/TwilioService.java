@@ -33,6 +33,11 @@ public class TwilioService {
     @Value("${twilio.webhook.url}")
     private String webhookUrl;
 
+
+    public String getTwilioPhoneNumber() {
+        return twilioPhoneNumber;
+    }
+
     @PostConstruct
     public void init() {
         Twilio.init(accountSid, authToken);

@@ -265,7 +265,7 @@ public class TwilioController {
                 "<Response>" +
                 "<Say voice=\"alice\">Connecting you to a support agent. Please hold.</Say>" +
                 "<Dial>" +
-                "<Number>+1234567890</Number>" +
+                "<Number>" + twilioService.getTwilioPhoneNumber() + "</Number>" +
                 "</Dial>" +
                 "</Response>";
     }
