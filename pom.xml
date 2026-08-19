@@ -24,6 +24,17 @@
         <spring-ai.version>0.8.1</spring-ai.version>
     </properties>
 
+    <repositories>
+    <repository>
+        <id>spring-milestones</id>
+        <name>Spring Milestones</name>
+        <url>https://repo.spring.io/milestone</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
