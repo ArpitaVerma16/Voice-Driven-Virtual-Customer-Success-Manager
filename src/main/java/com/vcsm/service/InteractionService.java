@@ -204,7 +204,7 @@ public class InteractionService {
         } catch (IllegalArgumentException e) {
             return Collections.emptyList();
         }
-    }
+    
 
     /**
      * Get recent interactions
