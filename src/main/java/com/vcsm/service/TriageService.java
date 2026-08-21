@@ -73,28 +73,26 @@ public class TriageService {
         int severity = CATEGORY_URGENCY.getOrDefault(category, 50);
 
         // Emergency keywords
-        if (containsAny(lower, "emergency", "urgent", "critical", "danger", "fire", "medical", "injury")) {
+        if (lower.contains("emergency") || lower.contains("urgent") || lower.contains("critical") || lower.contains("danger") || lower.contains("fire") || lower.contains("medical") || lower.contains("injury")) {
             severity += 30;
         }
-        if (containsAny(lower, "security", "break-in", "water leak", "flood", "power outage")) {
+        if (lower.contains("security") || lower.contains("break-in") || lower.contains("water leak") || lower.contains("flood") || lower.contains("power outage")) {
             severity += 20;
         }
-        if (containsAny(lower, "again", "third time", "still not fixed", "repeat")) {
+        if (lower.contains("again") || lower.contains("third time") || lower.contains("still not fixed") || lower.contains("repeat")) {
             severity += 15;
         }
 
         return Math.min(100, severity);
     }
 
-    // Replaced by ComplaintRoutingUtils.containsAny()
-        return false;
-    }
+
 
     private String getSeverityLabel(int severity) {
-        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("CRITICAL");
-        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("HIGH");
-        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("MEDIUM");
-        return org.springframework.http.ResponseEntity.ok("LOW");
+        if (severity >= 80) return "CRITICAL";
+        if (severity >= 60) return "HIGH";
+        if (severity >= 40) return "MEDIUM";
+        return "LOW";
     }
 
     private User findBestAdmin(String category) {
@@ -104,10 +102,10 @@ public class TriageService {
     }
 
     private String calculateETA(int severity) {
-        if (severity >= 80) return org.springframework.http.ResponseEntity.ok("1 hour");
-        if (severity >= 60) return org.springframework.http.ResponseEntity.ok("4 hours");
-        if (severity >= 40) return org.springframework.http.ResponseEntity.ok("24 hours");
-        return org.springframework.http.ResponseEntity.ok("48 hours");
+        if (severity >= 80) return "1 hour";
+        if (severity >= 60) return "4 hours";
+        if (severity >= 40) return "24 hours";
+        return "48 hours";
     }
 
     private List<Complaint> findSimilarComplaints(Complaint complaint) {
