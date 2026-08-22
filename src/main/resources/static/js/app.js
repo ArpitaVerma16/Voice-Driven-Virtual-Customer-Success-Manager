@@ -109,6 +109,13 @@ function startVoice() {
     recordingSeconds = 0;
 
     const timer = document.getElementById('recordingTimer');
+
+    // Prevent sending empty or too-short audio
+    if (!recordingSeconds || recordingSeconds < 0.5) {
+        showToast('Recording too short. Please hold the mic button for at least 1 second.', 'warning');
+        return;
+    }
+
     const time = document.getElementById('recordingTime');
 
     if (timer && time) {

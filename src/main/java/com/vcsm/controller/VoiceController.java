@@ -46,10 +46,16 @@ public class VoiceController {
     @PostMapping("/command")
     public ResponseEntity<?> command(@Valid @RequestBody Map<String, String> body) {
         String transcript = body.get("transcript");
+        Integer duration = body.get("duration") != null ? Integer.parseInt(body.get("duration")) : null;
         
         if (transcript == null || transcript.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Transcript required", "success", false));
         }
+        
+        if (duration != null && duration < 500) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Recording too short — minimum 0.5s required", "success", false));
+        }
+        {
         
         // Authentication check FIRST
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
